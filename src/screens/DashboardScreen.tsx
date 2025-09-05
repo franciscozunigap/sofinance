@@ -5,6 +5,8 @@ import {
   StyleSheet,
   RefreshControl,
   ScrollView,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FinancialCard from '../components/FinancialCard';
@@ -18,6 +20,8 @@ interface DashboardScreenProps {
   onLogout: () => void;
 }
 
+const { width } = Dimensions.get('window');
+
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [financialData, setFinancialData] = useState<FinancialData>({
     balance: 0,
@@ -27,6 +31,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(30));
 
   const loadFinancialData = useCallback(async () => {
     try {
@@ -56,6 +62,20 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
   useEffect(() => {
     loadFinancialData();
+    
+    // Animar entrada del dashboard
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [loadFinancialData]);
 
   const user = AuthService.getCurrentUser();
@@ -73,12 +93,23 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           />
         }
       >
-        <View style={styles.content}>
+        <Animated.View 
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
           <View style={styles.header}>
-            <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
-            <Text style={styles.subtitle}>
-              Hola, {user?.name || user?.email}
-            </Text>
+            <View style={styles.welcomeContainer}>
+              <Text style={styles.greeting}>¡Hola! 👋</Text>
+              <Text style={styles.title}>Bienvenido a SoFinance</Text>
+              <Text style={styles.subtitle}>
+                {user?.name || user?.email}
+              </Text>
+            </View>
           </View>
           
           <FinancialCard
@@ -90,26 +121,40 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
           <View style={styles.actionsContainer}>
             <Button
-              title="Ver Transacciones"
+              title="📊 Ver Transacciones"
               onPress={() => {/* TODO: Navigate to transactions */}}
               style={styles.actionButton}
             />
             
             <Button
-              title="Agregar Transacción"
+              title="➕ Agregar Transacción"
               onPress={() => {/* TODO: Navigate to add transaction */}}
+              variant="secondary"
+              style={styles.actionButton}
+            />
+            
+            <Button
+              title="📈 Estadísticas"
+              onPress={() => {/* TODO: Navigate to stats */}}
+              variant="secondary"
+              style={styles.actionButton}
+            />
+            
+            <Button
+              title="⚙️ Configuración"
+              onPress={() => {/* TODO: Navigate to settings */}}
               variant="secondary"
               style={styles.actionButton}
             />
           </View>
 
           <Button
-            title="Cerrar Sesión"
+            title="🚪 Cerrar Sesión"
             onPress={handleLogout}
             variant="danger"
-            style={styles.logoutButton}
+            style={[styles.actionButton, styles.logoutButton]}
           />
-        </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -130,8 +175,29 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: SIZES.lg,
   },
+  welcomeContainer: {
+    alignItems: 'center',
+    paddingVertical: SIZES.lg,
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    marginBottom: SIZES.lg,
+    shadowColor: COLORS.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  greeting: {
+    fontSize: 24,
+    fontFamily: FONTS.bold,
+    color: COLORS.primary,
+    marginBottom: SIZES.sm,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: FONTS.bold,
     color: COLORS.dark,
     textAlign: 'center',
@@ -148,6 +214,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: SIZES.md,
+    width: '100%',
+    paddingVertical: SIZES.md,
+    paddingHorizontal: SIZES.lg,
   },
   logoutButton: {
     marginTop: SIZES.lg,

@@ -7,6 +7,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../components/Input';
@@ -19,11 +21,15 @@ interface LoginScreenProps {
   onLoginSuccess: () => void;
 }
 
+const { width } = Dimensions.get('window');
+
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(50));
 
   const validateForm = (): boolean => {
     const newErrors: { email?: string; password?: string } = {};
@@ -58,6 +64,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     }
   };
 
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -68,9 +89,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.content}>
-            <Text style={styles.title}>SoFinance</Text>
-            <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
+          <Animated.View 
+            style={[
+              styles.content,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            <View style={styles.logoContainer}>
+              <View style={styles.logoCircle}>
+                <Text style={styles.logoText}>💰</Text>
+              </View>
+              <Text style={styles.title}>SoFinance</Text>
+              <Text style={styles.subtitle}>Tu app de finanzas personales</Text>
+            </View>
             
             <View style={styles.form}>
               <Input
@@ -98,16 +132,17 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 onPress={handleLogin}
                 loading={loading}
                 disabled={loading}
+                style={styles.button}
               />
               
               <Button
                 title="¿No tienes cuenta? Regístrate"
                 onPress={() => Alert.alert('Info', 'Funcionalidad de registro próximamente')}
                 variant="secondary"
-                style={styles.registerButton}
+                style={[styles.button, styles.registerButton]}
               />
             </View>
-          </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -130,6 +165,30 @@ const styles = StyleSheet.create({
     padding: SIZES.lg,
     justifyContent: 'center',
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: SIZES.xxl,
+  },
+  logoCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SIZES.lg,
+    shadowColor: COLORS.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  logoText: {
+    fontSize: 32,
+  },
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
@@ -145,6 +204,9 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   form: {
+    width: '100%',
+  },
+  button: {
     width: '100%',
   },
   registerButton: {

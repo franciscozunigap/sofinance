@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Animated,
+  View,
 } from 'react-native';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 
@@ -30,6 +32,22 @@ const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const scaleAnim = React.useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const buttonStyle = [
     styles.button,
     styles[variant],
@@ -47,18 +65,25 @@ const Button: React.FC<ButtonProps> = ({
   ];
 
   return (
-    <TouchableOpacity
-      style={buttonStyle}
-      onPress={onPress}
-      disabled={disabled || loading}
-      activeOpacity={0.8}
-    >
-      {loading ? (
-        <ActivityIndicator color={COLORS.white} size="small" />
-      ) : (
-        <Text style={buttonTextStyle}>{title}</Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        style={buttonStyle}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        activeOpacity={0.8}
+      >
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator color={COLORS.white} size="small" />
+            <Text style={[buttonTextStyle, { marginLeft: SIZES.sm }]}>Cargando...</Text>
+          </View>
+        ) : (
+          <Text style={buttonTextStyle}>{title}</Text>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -79,15 +104,18 @@ const styles = StyleSheet.create({
   },
   small: {
     paddingVertical: SIZES.sm,
-    paddingHorizontal: SIZES.md,
+    paddingHorizontal: SIZES.lg,
+    minHeight: 44,
   },
   medium: {
     paddingVertical: SIZES.md,
-    paddingHorizontal: SIZES.lg,
+    paddingHorizontal: SIZES.xl,
+    minHeight: 52,
   },
   large: {
     paddingVertical: SIZES.lg,
-    paddingHorizontal: SIZES.xl,
+    paddingHorizontal: SIZES.xxl,
+    minHeight: 60,
   },
   disabled: {
     backgroundColor: COLORS.gray,
@@ -117,6 +145,11 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: COLORS.gray,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
