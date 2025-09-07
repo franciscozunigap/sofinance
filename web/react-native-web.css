@@ -1,0 +1,135 @@
+/* Estilos para React Native Web - Mantener consistencia visual */
+
+/* Reset básico para React Native Web */
+* {
+  box-sizing: border-box;
+}
+
+/* Configuración de fuentes para mantener consistencia */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  background-color: #f8fafc;
+}
+
+/* Estilos para View */
+[data-rn] {
+  display: flex;
+}
+
+/* Estilos para Text */
+[data-rn-text] {
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+/* Estilos para TouchableOpacity */
+[data-rn-touchable] {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-rn-touchable]:hover {
+  opacity: 0.8;
+}
+
+[data-rn-touchable]:active {
+  opacity: 0.6;
+}
+
+/* Estilos para TextInput */
+[data-rn-textinput] {
+  font-family: inherit;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+[data-rn-textinput]:focus {
+  outline: none;
+}
+
+/* Estilos para ScrollView */
+[data-rn-scrollview] {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Estilos para SafeAreaView */
+[data-rn-safe-area] {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Animaciones */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design para mobile first */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 769px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+/* Estilos específicos para SoFinance */
+.sofinance-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.sofinance-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 16px;
+  padding: 20px;
+}
+
+.sofinance-button {
+  background-color: #4F46E5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sofinance-button:hover {
+  background-color: #4338CA;
+  transform: translateY(-1px);
+}
+
+.sofinance-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: white;
+  transition: border-color 0.2s ease;
+}
+
+.sofinance-input:focus {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
+}

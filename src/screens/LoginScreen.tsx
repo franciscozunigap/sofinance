@@ -3,14 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Animated,
-  Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, Platform, Dimensions, SafeAreaView } from '../platform';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
@@ -19,11 +16,12 @@ import { AuthService } from '../services/authService';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
+  onShowRegistration: () => void;
 }
 
 const { width } = Dimensions.get('window');
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistration }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -137,7 +135,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               
               <Button
                 title="¿No tienes cuenta? Regístrate"
-                onPress={() => Alert.alert('Info', 'Funcionalidad de registro próximamente')}
+                onPress={onShowRegistration}
                 variant="secondary"
                 style={[styles.button, styles.registerButton]}
               />

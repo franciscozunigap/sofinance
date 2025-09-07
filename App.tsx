@@ -4,8 +4,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { StatusBar, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { StatusBar, ActivityIndicator } from './src/platform';
 import LoginScreen from './src/screens/LoginScreen';
+import RegistrationScreen from './src/screens/RegistrationScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import { AuthService } from './src/services/authService';
 import { COLORS } from './src/constants';
@@ -13,6 +15,7 @@ import { COLORS } from './src/constants';
 function App(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -31,6 +34,20 @@ function App(): JSX.Element {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setShowRegistration(false);
+  };
+
+  const handleShowRegistration = () => {
+    setShowRegistration(true);
+  };
+
+  const handleBackToLogin = () => {
+    setShowRegistration(false);
+  };
+
+  const handleRegistrationSuccess = () => {
+    setShowRegistration(false);
+    setIsLoggedIn(true);
   };
 
   if (isLoading) {
@@ -61,8 +78,16 @@ function App(): JSX.Element {
       />
       {isLoggedIn ? (
         <DashboardScreen onLogout={handleLogout} />
+      ) : showRegistration ? (
+        <RegistrationScreen 
+          onRegistrationSuccess={handleRegistrationSuccess}
+          onBackToLogin={handleBackToLogin}
+        />
       ) : (
-        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+        <LoginScreen 
+          onLoginSuccess={handleLoginSuccess}
+          onShowRegistration={handleShowRegistration}
+        />
       )}
     </>
   );

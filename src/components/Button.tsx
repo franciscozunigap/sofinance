@@ -3,12 +3,12 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ActivityIndicator,
   ViewStyle,
   TextStyle,
   Animated,
   View,
 } from 'react-native';
+import { ActivityIndicator } from '../platform';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 
 interface ButtonProps {
