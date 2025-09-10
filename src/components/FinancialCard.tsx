@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ViewStyle,
-  Animated,
 } from 'react-native';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { formatCurrency } from '../utils';

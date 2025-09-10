@@ -3,11 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
-  Animated,
 } from 'react-native';
-import { Alert, Platform, Dimensions, SafeAreaView } from '../platform';
+import { Alert, Platform, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
@@ -80,12 +77,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           <Animated.View 
             style={[
@@ -157,6 +156,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: Platform.OS === 'android' ? 20 : 0,
   },
   content: {
     flex: 1,

@@ -3,10 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  Animated,
 } from 'react-native';
-import { Dimensions, SafeAreaView, RefreshControl } from '../platform';
+import { Dimensions, SafeAreaView, RefreshControl, ScrollView, Animated } from '../platform';
 import FinancialCard from '../components/FinancialCard';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';

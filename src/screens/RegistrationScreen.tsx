@@ -5,11 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
-  Animated,
 } from 'react-native';
-import { Alert, Platform, Dimensions, SafeAreaView } from '../platform';
+import { Alert, Platform, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
@@ -249,7 +246,8 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
             onChangeText={(value) => updateFormData('financialGoals', value)}
             multiline
             numberOfLines={4}
-            textAlignVertical="top"
+            textAlignVertical={Platform.OS === 'android' ? 'top' : 'top'}
+            placeholderTextColor={COLORS.gray}
           />
         </View>
         {errors.financialGoals && (
@@ -288,6 +286,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
         <TouchableOpacity
           style={styles.checkbox}
           onPress={() => updateFormData('termsAccepted', !formData.termsAccepted)}
+          activeOpacity={0.7}
         >
           <View style={[
             styles.checkboxBox,
@@ -314,12 +313,14 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           <Animated.View 
             style={[
@@ -386,6 +387,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: Platform.OS === 'android' ? 20 : 0,
   },
   content: {
     flex: 1,
@@ -496,6 +498,7 @@ const styles = StyleSheet.create({
   checkbox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    paddingVertical: SIZES.xs,
   },
   checkboxBox: {
     width: 20,
