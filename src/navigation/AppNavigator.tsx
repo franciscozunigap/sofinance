@@ -4,10 +4,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import DashboardScreen from '../screens/DashboardScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 
 export type RootStackParamList = {
   Login: { onLoginSuccess: () => void };
   Register: { onRegistrationSuccess: () => void };
+  Onboarding: { onComplete: () => void };
   Dashboard: undefined;
 };
 
@@ -17,6 +19,7 @@ interface AppNavigatorProps {
   isLoggedIn: boolean;
   onLoginSuccess: () => void;
   onRegistrationSuccess: () => void;
+  onOnboardingComplete: () => void;
   onLogout: () => void;
 }
 
@@ -24,6 +27,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = ({
   isLoggedIn,
   onLoginSuccess,
   onRegistrationSuccess,
+  onOnboardingComplete,
   onLogout,
 }) => {
   return (
@@ -47,6 +51,10 @@ const AppNavigator: React.FC<AppNavigatorProps> = ({
             <Stack.Screen 
               name="Register" 
               component={(props: any) => <RegistrationScreen {...props} onRegistrationSuccess={onRegistrationSuccess} />}
+            />
+            <Stack.Screen 
+              name="Onboarding" 
+              component={(props: any) => <OnboardingScreen {...props} onComplete={onOnboardingComplete} />}
             />
           </>
         )}

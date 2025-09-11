@@ -1,4 +1,4 @@
-import { LoginCredentials, User } from '../types';
+import { LoginCredentials, User, OnboardingData } from '../types';
 
 // Simulación de servicio de autenticación
 export class AuthService {
@@ -39,6 +39,40 @@ export class AuthService {
     
     console.log('Credenciales inválidas:', { email: credentials.email, password: credentials.password });
     throw new Error('Credenciales inválidas. Usa: test@sofinance.com / 123456');
+  }
+
+  static async register(data: OnboardingData): Promise<User> {
+    console.log('AuthService.register llamado con:', data);
+    
+    // Simulación de delay de red
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Validación básica
+    if (!data.email || !data.password || !data.firstName || !data.lastName) {
+      throw new Error('Todos los campos son requeridos');
+    }
+    
+    if (data.password.length < 6) {
+      throw new Error('La contraseña debe tener al menos 6 caracteres');
+    }
+    
+    // Simulación de verificación de email único
+    const existingEmails = ['test@sofinance.com', 'demo@sofinance.com', 'admin@sofinance.com'];
+    if (existingEmails.includes(data.email)) {
+      throw new Error('Este correo electrónico ya está registrado');
+    }
+    
+    const user: User = {
+      id: Date.now().toString(),
+      email: data.email,
+      name: `${data.firstName} ${data.lastName}`,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    };
+    
+    this.currentUser = user;
+    console.log('Usuario registrado:', user);
+    return user;
   }
 
   static async logout(): Promise<void> {

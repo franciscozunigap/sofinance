@@ -2,20 +2,16 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Platform,
+  Dimensions,
 } from 'react-native';
-import { Alert, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
-import { validateEmail, validatePassword } from '../utils';
-import { AuthService } from '../services/authService';
 
 type RegistrationScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
@@ -24,309 +20,32 @@ interface RegistrationScreenProps {
   onBackToLogin?: () => void;
 }
 
-const { width } = Dimensions.get('window');
-
 const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ 
   onRegistrationSuccess,
   onBackToLogin 
 }) => {
   const navigation = useNavigation<RegistrationScreenNavigationProp>();
-  
-  // Debug: verificar si las props están llegando
-  console.log('RegistrationScreen props:', { onRegistrationSuccess, onBackToLogin });
-  const [currentStep, setCurrentStep] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
 
-  // Datos del formulario
-  const [formData, setFormData] = useState({
-    // Paso 1: Información personal
-    firstName: '',
-    lastName: '',
-    email: '',
-    // Paso 2: Información financiera
-    monthlyIncome: '',
-    financialGoals: '',
-    // Paso 3: Seguridad
-    password: '',
-    confirmPassword: '',
-    termsAccepted: false,
-  });
-
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
-
-  const validateStep = (step: number): boolean => {
-    const newErrors: {[key: string]: string} = {};
-
-    switch (step) {
-      case 1:
-        if (!formData.firstName.trim()) {
-          newErrors.firstName = 'El nombre es requerido';
-        }
-        if (!formData.lastName.trim()) {
-          newErrors.lastName = 'El apellido es requerido';
-        }
-        if (!formData.email.trim()) {
-          newErrors.email = 'El email es requerido';
-        } else if (!validateEmail(formData.email)) {
-          newErrors.email = 'El email no es válido';
-        }
-        break;
-      
-      case 2:
-        if (!formData.monthlyIncome.trim()) {
-          newErrors.monthlyIncome = 'El ingreso mensual es requerido';
-        } else if (isNaN(Number(formData.monthlyIncome)) || Number(formData.monthlyIncome) <= 0) {
-          newErrors.monthlyIncome = 'Ingresa un monto válido';
-        }
-        if (!formData.financialGoals.trim()) {
-          newErrors.financialGoals = 'Los objetivos financieros son requeridos';
-        }
-        break;
-      
-      case 3:
-        if (!formData.password.trim()) {
-          newErrors.password = 'La contraseña es requerida';
-        } else if (!validatePassword(formData.password)) {
-          newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
-        }
-        if (!formData.confirmPassword.trim()) {
-          newErrors.confirmPassword = 'Confirma tu contraseña';
-        } else if (formData.password !== formData.confirmPassword) {
-          newErrors.confirmPassword = 'Las contraseñas no coinciden';
-        }
-        if (!formData.termsAccepted) {
-          newErrors.termsAccepted = 'Debes aceptar los términos y condiciones';
-        }
-        break;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleStartOnboarding = () => {
+    navigation.navigate('Onboarding', { onComplete: onRegistrationSuccess });
   };
 
-  const handleNext = () => {
-    if (validateStep(currentStep)) {
-      if (currentStep < 3) {
-        setCurrentStep(currentStep + 1);
-        animateTransition();
-      } else {
-        handleRegistration();
-      }
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      animateTransition();
-    }
-  };
-
-  const handleRegistration = async () => {
-    setLoading(true);
-    try {
-      // Simular registro (en una app real, esto sería una llamada a la API)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Crear usuario
-      const user = {
-        id: Date.now().toString(),
-        email: formData.email,
-        name: `${formData.firstName} ${formData.lastName}`,
-      };
-      
-      // Simular login automático después del registro
-      await AuthService.login({ email: formData.email, password: formData.password });
-      
-      // Siempre usar la prop onRegistrationSuccess si está disponible
-      if (onRegistrationSuccess && typeof onRegistrationSuccess === 'function') {
-        console.log('Usando onRegistrationSuccess prop');
-        onRegistrationSuccess();
-      } else {
-        console.log('onRegistrationSuccess no disponible, usando navegación directa');
-        navigation.navigate('Dashboard');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Hubo un problema con el registro. Inténtalo de nuevo.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const animateTransition = () => {
-    fadeAnim.setValue(0);
-    slideAnim.setValue(50);
-    
+  React.useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 300,
+        duration: 800,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 600,
         useNativeDriver: true,
       }),
     ]).start();
-  };
-
-  const updateFormData = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
-
-  React.useEffect(() => {
-    animateTransition();
   }, []);
-
-  const renderStepIndicator = () => (
-    <View style={styles.stepIndicator}>
-      {[1, 2, 3].map((step) => (
-        <View
-          key={step}
-          style={[
-            styles.stepDot,
-            currentStep >= step && styles.stepDotActive,
-          ]}
-        />
-      ))}
-      <Text style={styles.stepText}>
-        Paso {currentStep} de 3
-      </Text>
-    </View>
-  );
-
-  const renderStep1 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Información Personal</Text>
-      <Text style={styles.stepSubtitle}>
-        Cuéntanos sobre ti para personalizar tu experiencia
-      </Text>
-      
-      <Input
-        label="Nombre"
-        placeholder="Tu nombre"
-        value={formData.firstName}
-        onChangeText={(value) => updateFormData('firstName', value)}
-        error={errors.firstName}
-      />
-      
-      <Input
-        label="Apellido"
-        placeholder="Tu apellido"
-        value={formData.lastName}
-        onChangeText={(value) => updateFormData('lastName', value)}
-        error={errors.lastName}
-      />
-      
-      <Input
-        label="Correo electrónico"
-        placeholder="tu@email.com"
-        value={formData.email}
-        onChangeText={(value) => updateFormData('email', value)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        error={errors.email}
-      />
-    </View>
-  );
-
-  const renderStep2 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Información Financiera</Text>
-      <Text style={styles.stepSubtitle}>
-        Ayúdanos a entender tu situación financiera
-      </Text>
-      
-      <Input
-        label="Ingreso mensual"
-        placeholder="€0.00"
-        value={formData.monthlyIncome}
-        onChangeText={(value) => updateFormData('monthlyIncome', value)}
-        keyboardType="numeric"
-        error={errors.monthlyIncome}
-      />
-      
-      <View style={styles.textAreaContainer}>
-        <Text style={styles.label}>Objetivos financieros</Text>
-        <View style={styles.textArea}>
-          <TextInput
-            style={styles.textAreaInput}
-            placeholder="Describe tus objetivos financieros..."
-            value={formData.financialGoals}
-            onChangeText={(value) => updateFormData('financialGoals', value)}
-            multiline
-            numberOfLines={4}
-            textAlignVertical={Platform.OS === 'android' ? 'top' : 'top'}
-            placeholderTextColor={COLORS.gray}
-          />
-        </View>
-        {errors.financialGoals && (
-          <Text style={styles.errorText}>{errors.financialGoals}</Text>
-        )}
-      </View>
-    </View>
-  );
-
-  const renderStep3 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Seguridad</Text>
-      <Text style={styles.stepSubtitle}>
-        Crea una contraseña segura para tu cuenta
-      </Text>
-      
-      <Input
-        label="Contraseña"
-        placeholder="Mínimo 6 caracteres"
-        value={formData.password}
-        onChangeText={(value) => updateFormData('password', value)}
-        secureTextEntry
-        error={errors.password}
-      />
-      
-      <Input
-        label="Confirmar contraseña"
-        placeholder="Repite tu contraseña"
-        value={formData.confirmPassword}
-        onChangeText={(value) => updateFormData('confirmPassword', value)}
-        secureTextEntry
-        error={errors.confirmPassword}
-      />
-      
-      <View style={styles.checkboxContainer}>
-        <TouchableOpacity
-          style={styles.checkbox}
-          onPress={() => updateFormData('termsAccepted', !formData.termsAccepted)}
-          activeOpacity={0.7}
-        >
-          <View style={[
-            styles.checkboxBox,
-            formData.termsAccepted && styles.checkboxBoxChecked
-          ]}>
-            {formData.termsAccepted && (
-              <Text style={styles.checkboxCheck}>✓</Text>
-            )}
-          </View>
-          <Text style={styles.checkboxText}>
-            Acepto los{' '}
-            <Text style={styles.checkboxLink}>términos y condiciones</Text>
-            {' '}y la{' '}
-            <Text style={styles.checkboxLink}>política de privacidad</Text>
-          </Text>
-        </TouchableOpacity>
-        {errors.termsAccepted && (
-          <Text style={styles.errorText}>{errors.termsAccepted}</Text>
-        )}
-      </View>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -353,47 +72,66 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               <View style={styles.logoContainer}>
                 <Text style={styles.logoText}>💰</Text>
               </View>
-              <Text style={styles.title}>Crear Cuenta</Text>
-              <Text style={styles.subtitle}>Únete a SoFinance</Text>
+              <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
+              <Text style={styles.subtitle}>
+                Vamos a configurar tu cuenta paso a paso
+              </Text>
             </View>
             
-            {renderStepIndicator()}
-            
-            {currentStep === 1 && renderStep1()}
-            {currentStep === 2 && renderStep2()}
-            {currentStep === 3 && renderStep3()}
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoTitle}>¿Qué necesitamos de ti?</Text>
+              
+              <View style={styles.stepItem}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>1</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Información personal</Text>
+                  <Text style={styles.stepDescription}>Nombre, apellido y correo electrónico</Text>
+                </View>
+              </View>
+
+              <View style={styles.stepItem}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>2</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Información financiera</Text>
+                  <Text style={styles.stepDescription}>Ingresos mensuales, distribución de gastos y ahorro actual</Text>
+                </View>
+              </View>
+
+              <View style={styles.stepItem}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>3</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Contraseña</Text>
+                  <Text style={styles.stepDescription}>Crea una contraseña segura para tu cuenta</Text>
+                </View>
+              </View>
+            </View>
             
             <View style={styles.buttonContainer}>
-              {currentStep > 1 && (
-                <Button
-                  title="Anterior"
-                  onPress={handlePrevious}
-                  variant="secondary"
-                  style={styles.button}
-                />
-              )}
+              <Button
+                title="Comenzar configuración"
+                onPress={handleStartOnboarding}
+                style={styles.startButton}
+              />
               
               <Button
-                title={currentStep === 3 ? 'Crear Cuenta' : 'Siguiente'}
-                onPress={handleNext}
-                loading={loading}
-                disabled={loading}
-                style={[styles.button, currentStep === 1 && styles.buttonFull]}
+                title="¿Ya tienes cuenta? Iniciar Sesión"
+                onPress={() => {
+                  if (Platform.OS === 'web' && onBackToLogin) {
+                    onBackToLogin();
+                  } else {
+                    navigation.navigate('Login');
+                  }
+                }}
+                variant="secondary"
+                style={styles.backButton}
               />
             </View>
-            
-            <Button
-              title="¿Ya tienes cuenta? Iniciar Sesión"
-              onPress={() => {
-                if (Platform.OS === 'web' && onBackToLogin) {
-                  onBackToLogin();
-                } else {
-                  navigation.navigate('Login');
-                }
-              }}
-              variant="secondary"
-              style={[styles.button, styles.backButton]}
-            />
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -420,7 +158,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: SIZES.xl,
+    marginBottom: SIZES.xxl,
   },
   logoContainer: {
     width: 80,
@@ -454,126 +192,73 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     color: COLORS.gray,
     textAlign: 'center',
+    lineHeight: 24,
   },
-  stepIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SIZES.xl,
+  infoContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: SIZES.lg,
+    marginBottom: SIZES.xxl,
+    shadowColor: COLORS.dark,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  stepDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.gray,
-    marginHorizontal: 4,
-  },
-  stepDotActive: {
-    backgroundColor: COLORS.primary,
-  },
-  stepText: {
-    fontSize: 14,
-    fontFamily: FONTS.medium,
-    color: COLORS.gray,
-    marginLeft: SIZES.md,
-  },
-  stepContent: {
-    marginBottom: SIZES.xl,
-  },
-  stepTitle: {
-    fontSize: 24,
-    fontFamily: FONTS.bold,
+  infoTitle: {
+    fontSize: 18,
+    fontFamily: FONTS.semiBold,
     color: COLORS.dark,
-    textAlign: 'center',
-    marginBottom: SIZES.sm,
-  },
-  stepSubtitle: {
-    fontSize: 16,
-    fontFamily: FONTS.regular,
-    color: COLORS.gray,
     textAlign: 'center',
     marginBottom: SIZES.lg,
   },
-  textAreaContainer: {
-    marginBottom: SIZES.md,
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: FONTS.medium,
-    color: COLORS.dark,
-    marginBottom: SIZES.sm,
-  },
-  textArea: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.light,
-    padding: SIZES.md,
-  },
-  textAreaInput: {
-    fontSize: 16,
-    fontFamily: FONTS.regular,
-    color: COLORS.dark,
-    minHeight: 100,
-  },
-  checkboxContainer: {
-    marginTop: SIZES.lg,
-  },
-  checkbox: {
+  stepItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: SIZES.xs,
-  },
-  checkboxBox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: COLORS.gray,
-    marginRight: SIZES.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxBoxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  checkboxCheck: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  checkboxText: {
-    fontSize: 14,
-    fontFamily: FONTS.regular,
-    color: COLORS.dark,
-    flex: 1,
-    lineHeight: 20,
-  },
-  checkboxLink: {
-    color: COLORS.primary,
-    textDecorationLine: 'underline',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: SIZES.lg,
   },
-  button: {
+  stepNumber: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
+    marginTop: 2,
+  },
+  stepNumberText: {
+    fontSize: 16,
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
+  },
+  stepContent: {
     flex: 1,
-    marginHorizontal: SIZES.xs,
   },
-  buttonFull: {
-    marginHorizontal: 0,
+  stepTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.dark,
+    marginBottom: SIZES.xs,
   },
-  backButton: {
-    marginTop: SIZES.md,
-  },
-  errorText: {
+  stepDescription: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.danger,
-    marginTop: SIZES.xs,
+    color: COLORS.gray,
+    lineHeight: 20,
+  },
+  buttonContainer: {
+    width: '100%',
+  },
+  startButton: {
+    width: '100%',
+    marginBottom: SIZES.md,
+  },
+  backButton: {
+    width: '100%',
   },
 });
 

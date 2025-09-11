@@ -50,6 +50,10 @@ const AppContent = () => {
     setIsLoggedIn(true);
   };
 
+  const handleOnboardingComplete = () => {
+    setIsLoggedIn(true);
+  };
+
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
@@ -76,6 +80,7 @@ const AppContent = () => {
           isLoggedIn={isLoggedIn}
           onLoginSuccess={handleLoginSuccess}
           onRegistrationSuccess={handleLoginSuccess}
+          onOnboardingComplete={handleOnboardingComplete}
           onLogout={handleLogout}
         />
       )}

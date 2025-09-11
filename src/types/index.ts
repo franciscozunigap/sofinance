@@ -2,6 +2,20 @@ export interface User {
   id: string;
   email: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface OnboardingData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  monthlyIncome: number;
+  savingsPercentage: number;
+  needsPercentage: number;
+  consumptionPercentage: number;
+  currentSavings: number;
+  password: string;
 }
 
 export interface FinancialData {
