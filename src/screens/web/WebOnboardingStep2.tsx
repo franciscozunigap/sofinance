@@ -186,9 +186,10 @@ const WebOnboardingStep2: React.FC<WebOnboardingStep2Props> = ({ data, onNext, o
                 
                 <button
                   onClick={applyRecommendedPercentages}
-                  className="mb-6 bg-orange-100 text-orange-700 py-2 px-4 rounded-lg font-medium hover:bg-orange-200 transition-colors border border-orange-200 w-full"
+                  className="mb-0 bg-orange-100 text-orange-700 py-1 px-3 rounded-lg font-medium hover:bg-orange-200 transition-colors border border-orange-200 w-full text-[8px]"
+                  style={{ width: '100%', minWidth: '120px' }}
                 >
-                  🔄 Restablecer a recomendación (20% - 50% - 30%)
+                  Restablecer
                 </button>
 
                 <div className="space-y-6">
@@ -286,11 +287,6 @@ const WebOnboardingStep2: React.FC<WebOnboardingStep2Props> = ({ data, onNext, o
                       {Math.round(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage))}%
                     </span>
                   </div>
-                  {Math.abs(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) - 100) < 0.1 ? (
-                    <p className="text-xs text-green-600 mt-1">✅ Perfecto, los porcentajes suman 100%</p>
-                  ) : (
-                    <p className="text-xs text-red-600 mt-1">⚠️ Los porcentajes deben sumar exactamente 100%</p>
-                  )}
                 </div>
 
                 {errors.percentages && (

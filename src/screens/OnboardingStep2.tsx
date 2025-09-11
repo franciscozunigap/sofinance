@@ -201,12 +201,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   Ajusta los porcentajes según tus prioridades financieras
                 </Text>
                 
-                <Button
-                  title="🔄 Restablecer a recomendación (20% - 50% - 30%)"
-                  onPress={applyRecommendedPercentages}
-                  variant="secondary"
-                  style={styles.recommendButton}
-                />
+
 
                 {/* Sliders para porcentajes */}
                 <View style={styles.slidersContainer}>
@@ -298,12 +293,14 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                       {Math.round(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage))}%
                     </Text>
                   </View>
-                  {Math.abs(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) - 100) < 0.1 ? (
-                    <Text style={styles.successText}>✅ Perfecto, los porcentajes suman 100%</Text>
-                  ) : (
-                    <Text style={styles.errorText}>⚠️ Los porcentajes deben sumar exactamente 100%</Text>
-                  )}
                 </View>
+
+                <Button
+                  title="Restablecer"
+                  onPress={applyRecommendedPercentages}
+                  variant="secondary"
+                  style={styles.recommendButton}
+                />
 
                 {errors.percentages && (
                   <Text style={styles.errorText}>{errors.percentages}</Text>
@@ -444,9 +441,13 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.md,
   },
   recommendButton: {
-    marginBottom: SIZES.lg,
-    backgroundColor: '#fed7aa', // orange-100
+    margin: SIZES.md,
+    backgroundColor: '#fed7aa', // orange-100 
     borderColor: '#fed7aa', // orange-200
+    padding: 6,
+    width: '80%',
+    alignSelf: 'center',
+    fontSize: 8,
   },
   slidersContainer: {
     marginBottom: SIZES.lg,
