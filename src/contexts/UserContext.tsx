@@ -17,6 +17,7 @@ interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
+  logout: () => void;
   isAuthenticated: boolean;
 }
 
@@ -52,12 +53,17 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     setUser(prevUser => prevUser ? { ...prevUser, ...updates } : null);
   };
 
+  const logout = () => {
+    setUser(null);
+  };
+
   const isAuthenticated = !!user;
 
   const value: UserContextType = {
     user,
     setUser,
     updateUser,
+    logout,
     isAuthenticated
   };
 

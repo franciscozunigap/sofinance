@@ -17,12 +17,14 @@ interface AppNavigatorProps {
   isLoggedIn: boolean;
   onLoginSuccess: () => void;
   onRegistrationSuccess: () => void;
+  onLogout: () => void;
 }
 
 const AppNavigator: React.FC<AppNavigatorProps> = ({
   isLoggedIn,
   onLoginSuccess,
   onRegistrationSuccess,
+  onLogout,
 }) => {
   return (
     <NavigationContainer>
@@ -32,18 +34,19 @@ const AppNavigator: React.FC<AppNavigatorProps> = ({
         }}
       >
         {isLoggedIn ? (
-          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen 
+            name="Dashboard" 
+            component={(props: any) => <DashboardScreen {...props} onLogout={onLogout} />}
+          />
         ) : (
           <>
             <Stack.Screen 
               name="Login" 
-              component={LoginScreen}
-              initialParams={{ onLoginSuccess }}
+              component={(props: any) => <LoginScreen {...props} onLoginSuccess={onLoginSuccess} />}
             />
             <Stack.Screen 
               name="Register" 
-              component={RegistrationScreen}
-              initialParams={{ onRegistrationSuccess }}
+              component={(props: any) => <RegistrationScreen {...props} onRegistrationSuccess={onRegistrationSuccess} />}
             />
           </>
         )}

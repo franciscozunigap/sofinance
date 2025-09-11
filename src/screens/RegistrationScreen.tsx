@@ -20,7 +20,7 @@ import { AuthService } from '../services/authService';
 type RegistrationScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 interface RegistrationScreenProps {
-  onRegistrationSuccess: () => void;
+  onRegistrationSuccess?: () => void;
   onBackToLogin?: () => void;
 }
 
@@ -28,9 +28,12 @@ const { width } = Dimensions.get('window');
 
 const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ 
   onRegistrationSuccess,
-  onBackToLogin
+  onBackToLogin 
 }) => {
   const navigation = useNavigation<RegistrationScreenNavigationProp>();
+  
+  // Debug: verificar si las props están llegando
+  console.log('RegistrationScreen props:', { onRegistrationSuccess, onBackToLogin });
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -136,7 +139,15 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       
       // Simular login automático después del registro
       await AuthService.login({ email: formData.email, password: formData.password });
-      onRegistrationSuccess();
+      
+      // Siempre usar la prop onRegistrationSuccess si está disponible
+      if (onRegistrationSuccess && typeof onRegistrationSuccess === 'function') {
+        console.log('Usando onRegistrationSuccess prop');
+        onRegistrationSuccess();
+      } else {
+        console.log('onRegistrationSuccess no disponible, usando navegación directa');
+        navigation.navigate('Dashboard');
+      }
     } catch (error) {
       Alert.alert('Error', 'Hubo un problema con el registro. Inténtalo de nuevo.');
     } finally {

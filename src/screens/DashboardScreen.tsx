@@ -1,16 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
-import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle } from 'lucide-react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  Platform,
+  TextInput,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from '../platform';
 import { useUser } from '../contexts/UserContext';
+import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
+import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 
-const DashboardScreen = () => {
+const { width } = Dimensions.get('window');
+
+interface DashboardScreenProps {
+  onLogout: () => void;
+}
+
+const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { user } = useUser();
   const [currentView, setCurrentView] = useState('dashboard');
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
       sender: 'sofia',
-      text: '¡Hola María! 👋 Veo que tu score financiero está mejorando. ¿Te gustaría revisar algunas recomendaciones para este mes?',
+      text: '¡Hola! 👋 Veo que tu score financiero está mejorando. ¿Te gustaría revisar algunas recomendaciones para este mes?',
       timestamp: '10:30 AM'
     }
   ]);
@@ -107,404 +126,1165 @@ const DashboardScreen = () => {
     return { text: 'Necesitas mejorar', color: 'text-red-600', emoji: '⚠️' };
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Cerrar Sesión',
+          style: 'destructive',
+          onPress: () => {
+            onLogout();
+          },
+        },
+      ]
+    );
+  };
+
   const scoreStatus = getScoreStatus(userData.currentScore);
+
+  if (currentView === 'settings') {
+    return (
+      <SafeAreaView style={styles.container}>
+        {/* Header de Ajustes */}
+        <View style={styles.chatHeader}>
+          <View style={styles.chatHeaderContent}>
+            <TouchableOpacity 
+              onPress={() => setCurrentView('dashboard')}
+              style={styles.backButton}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
+            <View style={styles.chatUserInfo}>
+              <View style={styles.chatAvatar}>
+                <Text style={styles.chatAvatarText}>⚙️</Text>
+              </View>
+              <View>
+                <Text style={styles.chatUserName}>Ajustes</Text>
+                <Text style={styles.chatUserStatus}>Configuración</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Contenido de Ajustes */}
+        <ScrollView style={styles.settingsContent}>
+          <View style={styles.settingsSection}>
+            <Text style={styles.settingsSectionTitle}>Cuenta</Text>
+            
+            <TouchableOpacity style={styles.settingsItem}>
+              <View style={styles.settingsItemLeft}>
+                <Ionicons name="person-outline" size={24} color={COLORS.gray} />
+                <Text style={styles.settingsItemText}>Perfil</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.settingsItem}>
+              <View style={styles.settingsItemLeft}>
+                <Ionicons name="shield-outline" size={24} color={COLORS.gray} />
+                <Text style={styles.settingsItemText}>Privacidad</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.settingsItem}>
+              <View style={styles.settingsItemLeft}>
+                <Ionicons name="notifications-outline" size={24} color={COLORS.gray} />
+                <Text style={styles.settingsItemText}>Notificaciones</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.settingsSection}>
+            <Text style={styles.settingsSectionTitle}>Aplicación</Text>
+            
+            <TouchableOpacity style={styles.settingsItem}>
+              <View style={styles.settingsItemLeft}>
+                <Ionicons name="help-circle-outline" size={24} color={COLORS.gray} />
+                <Text style={styles.settingsItemText}>Ayuda</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.settingsItem}>
+              <View style={styles.settingsItemLeft}>
+                <Ionicons name="information-circle-outline" size={24} color={COLORS.gray} />
+                <Text style={styles.settingsItemText}>Acerca de</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.settingsSection}>
+            <TouchableOpacity style={[styles.settingsItem, styles.logoutItem]} onPress={handleLogout}>
+              <View style={styles.settingsItemLeft}>
+                <Ionicons name="log-out-outline" size={24} color={COLORS.danger} />
+                <Text style={[styles.settingsItemText, styles.logoutText]}>Cerrar Sesión</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+
+        {/* Navigation Bar (Mobile) */}
+        <View style={styles.bottomNav}>
+          <TouchableOpacity 
+            onPress={() => setCurrentView('dashboard')}
+            style={[styles.navItem, currentView === 'dashboard' && styles.navItemActive]}
+          >
+            <Ionicons name="home-outline" size={20} color={currentView === 'dashboard' ? COLORS.primary : COLORS.gray} />
+            <Text style={[styles.navLabel, currentView === 'dashboard' && styles.navLabelActive]}>
+              Inicio
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setCurrentView('analysis')}
+            style={[styles.navItem, currentView === 'analysis' && styles.navItemActive]}
+          >
+            <Ionicons name="bar-chart-outline" size={20} color={currentView === 'analysis' ? COLORS.primary : COLORS.gray} />
+            <Text style={[styles.navLabel, currentView === 'analysis' && styles.navLabelActive]}>
+              Análisis
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setCurrentView('chat')}
+            style={[styles.navItem, currentView === 'chat' && styles.navItemActive]}
+          >
+            <Ionicons name="chatbubble-outline" size={20} color={currentView === 'chat' ? COLORS.primary : COLORS.gray} />
+            <Text style={[styles.navLabel, currentView === 'chat' && styles.navLabelActive]}>
+              Sofía
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setCurrentView('settings')}
+            style={[styles.navItem, currentView === 'settings' && styles.navItemActive]}
+          >
+            <Ionicons name="settings-outline" size={20} color={currentView === 'settings' ? COLORS.primary : COLORS.gray} />
+            <Text style={[styles.navLabel, currentView === 'settings' && styles.navLabelActive]}>
+              Ajustes
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (currentView === 'chat') {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <SafeAreaView style={styles.container}>
         {/* Header del Chat */}
-        <div className="bg-white shadow-sm border-b px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <button 
-                onClick={() => setCurrentView('dashboard')}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <ArrowLeft className="h-5 w-5 text-gray-600" />
-              </button>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Sofía</h3>
-                  <p className="text-sm text-green-500">En línea</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <View style={styles.chatHeader}>
+          <View style={styles.chatHeaderContent}>
+            <TouchableOpacity 
+              onPress={() => setCurrentView('dashboard')}
+              style={styles.backButton}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
+            <View style={styles.chatUserInfo}>
+              <View style={styles.chatAvatar}>
+                <Text style={styles.chatAvatarText}>S</Text>
+              </View>
+              <View>
+                <Text style={styles.chatUserName}>Sofía</Text>
+                <Text style={styles.chatUserStatus}>En línea</Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
         {/* Chat Messages */}
-        <div className="flex-1 p-4 space-y-4 max-h-[calc(100vh-140px)] overflow-y-auto">
+        <ScrollView style={styles.chatMessages} contentContainerStyle={styles.chatMessagesContent}>
           {chatMessages.map((message) => (
-            <div
+            <View
               key={message.id}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              style={[
+                styles.messageContainer,
+                message.sender === 'user' ? styles.userMessageContainer : styles.sofiaMessageContainer
+              ]}
             >
-              <div className="flex items-end space-x-2 max-w-xs lg:max-w-md">
+              <View style={styles.messageContent}>
                 {message.sender === 'sofia' && (
-                  <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-xs">S</span>
-                  </div>
+                  <View style={styles.messageAvatar}>
+                    <Text style={styles.messageAvatarText}>S</Text>
+                  </View>
                 )}
                 
-                <div className="flex flex-col">
-                  <div
-                    className={`px-4 py-2 rounded-2xl ${
-                      message.sender === 'user'
-                        ? 'bg-orange-500 text-white rounded-br-md'
-                        : 'bg-white border rounded-bl-md shadow-sm'
-                    }`}
+                <View style={styles.messageBubble}>
+                  <View
+                    style={[
+                      styles.messageBubbleContent,
+                      message.sender === 'user' ? styles.userMessageBubble : styles.sofiaMessageBubble
+                    ]}
                   >
-                    <p className="text-sm">{message.text}</p>
-                  </div>
-                  <span className={`text-xs text-gray-500 mt-1 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                    <Text style={[
+                      styles.messageText,
+                      message.sender === 'user' ? styles.userMessageText : styles.sofiaMessageText
+                    ]}>
+                      {message.text}
+                    </Text>
+                  </View>
+                  <Text style={[
+                    styles.messageTime,
+                    message.sender === 'user' ? styles.userMessageTime : styles.sofiaMessageTime
+                  ]}>
                     {message.timestamp}
-                  </span>
-                </div>
-              </div>
-            </div>
+                  </Text>
+                </View>
+              </View>
+            </View>
           ))}
-        </div>
+        </ScrollView>
 
         {/* Chat Input */}
-        <div className="bg-white border-t p-4">
-          <div className="flex items-center space-x-2">
-            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
-              <input
-                type="text"
+        <View style={styles.chatInput}>
+          <View style={styles.chatInputContainer}>
+            <TextInput
+              style={styles.chatTextInput}
                 value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onChangeText={setChatInput}
                 placeholder="Pregúntame sobre tus finanzas..."
-                className="flex-1 bg-transparent outline-none text-sm"
-              />
-              <button className="p-1 hover:bg-gray-200 rounded-full">
-                <Mic className="h-4 w-4 text-gray-600" />
-              </button>
-            </div>
-            <button
-              onClick={handleSendMessage}
-              className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
+              placeholderTextColor={COLORS.gray}
+            />
+            <TouchableOpacity style={styles.chatSendButton} onPress={handleSendMessage}>
+              <Text style={styles.chatSendButtonText}>→</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <SafeAreaView style={styles.container}>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
-                </div>
-                <h1 className="text-xl font-bold text-gray-900">Sofinance</h1>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Bell className="h-6 w-6 text-gray-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {userData.alerts}
-                </span>
-              </div>
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <User className="h-5 w-5 text-orange-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerLeft}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>S</Text>
+            </View>
+            <Text style={styles.headerTitle}>Sofinance</Text>
+          </View>
+          
+          <View style={styles.headerRight}>
+            <View style={styles.notificationContainer}>
+              <Ionicons name="notifications-outline" size={24} color={COLORS.gray} />
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationText}>{userData.alerts}</Text>
+              </View>
+            </View>
+            <View style={styles.userAvatar}>
+              <Ionicons name="person-outline" size={20} color={COLORS.primary} />
+            </View>
+          </View>
+        </View>
+      </View>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
         {/* Bienvenida */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">¡Hola {userData.name}! 👋</h2>
-            <p className="text-gray-600 mt-1">Score actual: <span className="font-semibold text-orange-600">{userData.currentScore}/100</span> - Tu progreso mensual es constante</p>
-          </div>
-        </div>
+        <View style={styles.welcomeSection}>
+          <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
+          <Text style={styles.welcomeSubtitle}>
+            Score actual: <Text style={styles.scoreText}>{userData.currentScore}/100</Text> - Tu progreso mensual es constante
+          </Text>
+        </View>
 
-        {/* --- MODIFICADO: Zona Financiera Saludable (vista mensual) --- */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Salud Financiera de {currentMonth}</h3>
-              <p className="text-sm text-gray-600">Evolución semanal de tu score</p>
-            </div>
-            <div className={`flex items-center space-x-2 ${scoreStatus.color}`}>
-              <span className="text-2xl">{scoreStatus.emoji}</span>
-              <span className="font-medium">{scoreStatus.text}</span>
-            </div>
-          </div>
+        {/* Zona Financiera Saludable */}
+        <View style={styles.healthCard}>
+          <View style={styles.healthCardHeader}>
+            <View>
+              <Text style={styles.healthCardTitle}>Salud Financiera de {currentMonth}</Text>
+              <Text style={styles.healthCardSubtitle}>Evolución semanal de tu score</Text>
+            </View>
+            <View style={styles.scoreStatusContainer}>
+              <Text style={styles.scoreEmoji}>{scoreStatus.emoji}</Text>
+              <Text style={[styles.scoreStatusText, { color: scoreStatus.color }]}>
+                {scoreStatus.text}
+              </Text>
+            </View>
+          </View>
 
           {/* Gráfica de Zona Saludable */}
-          <div className="h-64 bg-gradient-to-b from-green-50 to-green-100 rounded-lg p-4 relative">
-            {/* Zona Saludable */}
-            <div className="absolute inset-x-4 top-8 bottom-16 bg-green-200 bg-opacity-30 rounded border-2 border-dashed border-green-300">
-              <div className="absolute top-2 left-2 text-xs font-medium text-green-700">
-                Zona Saludable (40-80 pts)
-              </div>
-            </div>
-            
-            {/* Línea de Progreso */}
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyScoreData}>
-                <XAxis dataKey="week" axisLine={false} tickLine={false} />
-                <YAxis domain={[30, 70]} hide />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="#ea580c" 
-                  strokeWidth={3}
-                  dot={{ fill: '#ea580c', r: 6 }}
-                  activeDot={{ r: 8, fill: '#ea580c' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+          <View style={styles.chartContainer}>
+            <View style={styles.healthyZone}>
+              <Text style={styles.healthyZoneText}>Zona Saludable (40-80 pts)</Text>
+            </View>
+            {/* Aquí iría el gráfico real, por ahora un placeholder */}
+            <View style={styles.chartPlaceholder}>
+              <Text style={styles.chartPlaceholderText}>📊 Gráfico de Progreso</Text>
+            </View>
+          </View>
+        </View>
 
         {/* Métricas Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Score de Riesgo</p>
-                <p className="text-2xl font-bold text-orange-600">{userData.riskScore}/100</p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-orange-500" />
-            </div>
-            <div className="mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-orange-500 h-2 rounded-full" 
-                  style={{ width: `${userData.riskScore}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
+        <View style={styles.metricsGrid}>
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <View>
+                <Text style={styles.metricLabel}>Score de Riesgo</Text>
+                <Text style={styles.metricValue}>{userData.riskScore}/100</Text>
+              </View>
+              <Ionicons name="warning-outline" size={32} color={COLORS.primary} />
+            </View>
+            <View style={styles.progressBar}>
+              <View 
+                style={[styles.progressFill, { width: `${userData.riskScore}%` }]}
+              />
+            </View>
+          </View>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Gastos del Mes</p>
-                <p className="text-2xl font-bold text-red-600">${monthlyExpenses.toLocaleString()}</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-red-500" />
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              {((monthlyExpenses / userData.monthlyIncome) * 100).toFixed(1)}% de tus ingresos
-            </p>
-          </div>
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <View>
+                <Text style={styles.metricLabel}>Gastos del Mes</Text>
+                <Text style={[styles.metricValue, { color: COLORS.danger }]}>
+                  ${userData.monthlyExpenses.toLocaleString()}
+                </Text>
+              </View>
+              <Ionicons name="trending-up-outline" size={32} color={COLORS.danger} />
+            </View>
+            <Text style={styles.metricSubtext}>
+              {((userData.monthlyExpenses / userData.monthlyIncome) * 100).toFixed(1)}% de tus ingresos
+            </Text>
+          </View>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Ahorros Actuales</p>
-                <p className="text-2xl font-bold text-green-600">${userData.currentSavings.toLocaleString()}</p>
-              </div>
-              <DollarSign className="h-8 w-8 text-green-500" />
-            </div>
-            <p className="text-xs text-green-600 mt-2">+5.2% vs mes anterior</p>
-          </div>
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <View>
+                <Text style={styles.metricLabel}>Ahorros Actuales</Text>
+                <Text style={[styles.metricValue, { color: COLORS.success }]}>
+                  ${userData.currentSavings.toLocaleString()}
+                </Text>
+              </View>
+              <Ionicons name="cash-outline" size={32} color={COLORS.success} />
+            </View>
+            <Text style={[styles.metricSubtext, { color: COLORS.success }]}>
+              +5.2% vs mes anterior
+            </Text>
+          </View>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Meta de Ahorro</p>
-                <p className="text-2xl font-bold text-blue-600">
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <View>
+                <Text style={styles.metricLabel}>Meta de Ahorro</Text>
+                <Text style={[styles.metricValue, { color: '#3b82f6' }]}>
                   ${userData.savingsGoal.toLocaleString()}
-                </p>
-              </div>
-              <Target className="h-8 w-8 text-blue-500" />
-            </div>
-            <div className="mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full" 
-                  style={{ width: `${(userData.currentSavings / userData.savingsGoal) * 100}%` }}
-                ></div>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
+                </Text>
+              </View>
+              <Ionicons name="flag-outline" size={32} color="#3b82f6" />
+            </View>
+            <View style={styles.progressBar}>
+              <View 
+                style={[styles.progressFill, { 
+                  width: `${(userData.currentSavings / userData.savingsGoal) * 100}%`,
+                  backgroundColor: '#3b82f6'
+                }]}
+              />
+            </View>
+            <Text style={styles.metricSubtext}>
                 {((userData.currentSavings / userData.savingsGoal) * 100).toFixed(1)}% completado
-              </p>
-            </div>
-          </div>
-        </div>
+            </Text>
+          </View>
+        </View>
 
         {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* --- MODIFICADO: Gastos por Categoría (3 categorías) --- */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Distribución de Gastos</h3>
-            <div className="h-64 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie 
-                    data={expenseCategories} 
-                    cx="50%" 
-                    cy="50%" 
-                    innerRadius={60} 
-                    outerRadius={80} 
-                    dataKey="value" 
-                    paddingAngle={5}
-                  >
-                    {expenseCategories.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+        <View style={styles.chartsContainer}>
+          {/* Gastos por Categoría */}
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Distribución de Gastos</Text>
+            <View style={styles.chartPlaceholder}>
+              <Text style={styles.chartPlaceholderText}>📊</Text>
+              <Text style={styles.chartPlaceholderSubtext}>Gráfico de gastos por categoría</Text>
+            </View>
             
             {/* Leyenda */}
-            <div className="flex justify-center space-x-6 mt-4">
+            <View style={styles.legendContainer}>
               {expenseCategories.map((category, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: category.color }}
-                  ></div>
-                  <span className="text-sm text-gray-600">{category.name}</span>
-                </div>
+                <View key={index} style={styles.legendItem}>
+                  <View 
+                    style={[
+                      styles.legendDot, 
+                      { backgroundColor: category.color }
+                    ]} 
+                  />
+                  <Text style={styles.legendText}>{category.name}</Text>
+                </View>
               ))}
-            </div>
-          </div>
+            </View>
+          </View>
 
           {/* Evolución Semanal */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Evolución Semanal</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="gastos" fill="#ea580c" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Evolución Semanal</Text>
+            <View style={styles.chartPlaceholder}>
+              <Text style={styles.chartPlaceholderText}>📈</Text>
+              <Text style={styles.chartPlaceholderSubtext}>Tendencia de gastos semanales</Text>
+            </View>
+          </View>
+        </View>
 
-        {/* Transacciones Recientes y Logros */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Transacciones Recientes */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transacciones Recientes</h3>
-            <div className="space-y-3">
+        <View style={styles.transactionsCard}>
+          <Text style={styles.cardTitle}>Transacciones Recientes</Text>
+          <View style={styles.transactionsList}>
               {recentTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
-                    }`}>
-                      <DollarSign className={`h-5 w-5 ${
-                        transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                      }`} />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">{transaction.category}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={`font-semibold ${
-                      transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
+              <View key={transaction.id} style={styles.transactionItem}>
+                <View style={styles.transactionLeft}>
+                  <View style={[
+                    styles.transactionIcon,
+                    { backgroundColor: transaction.amount > 0 ? COLORS.success + '20' : COLORS.danger + '20' }
+                  ]}>
+                    <Ionicons 
+                      name="cash-outline" 
+                      size={20} 
+                      color={transaction.amount > 0 ? COLORS.success : COLORS.danger} 
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.transactionDescription}>{transaction.description}</Text>
+                    <Text style={styles.transactionCategory}>{transaction.category}</Text>
+                  </View>
+                </View>
+                <View style={styles.transactionRight}>
+                  <Text style={[
+                    styles.transactionAmount,
+                    { color: transaction.amount > 0 ? COLORS.success : COLORS.danger }
+                  ]}>
                       {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-500">{transaction.date} {transaction.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                  </Text>
+                  <Text style={styles.transactionTime}>{transaction.date} {transaction.time}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
 
           {/* Logros */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tus Logros</h3>
-            <div className="space-y-4">
+        <View style={styles.achievementsCard}>
+          <Text style={styles.cardTitle}>Tus Logros</Text>
+          <View style={styles.achievementsList}>
               {achievements.map((achievement) => (
-                <div 
+              <View 
                   key={achievement.id}
-                  className={`p-3 rounded-lg border-2 ${
-                    achievement.unlocked 
-                      ? 'border-orange-200 bg-orange-50' 
-                      : 'border-gray-200 bg-gray-50 opacity-60'
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <span className="text-2xl">{achievement.icon}</span>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{achievement.title}</h4>
-                      <p className="text-sm text-gray-600">{achievement.description}</p>
-                    </div>
+                style={[
+                  styles.achievementItem,
+                  achievement.unlocked ? styles.achievementUnlocked : styles.achievementLocked
+                ]}
+              >
+                <Text style={styles.achievementIcon}>{achievement.icon}</Text>
+                <View style={styles.achievementContent}>
+                  <Text style={styles.achievementTitle}>{achievement.title}</Text>
+                  <Text style={styles.achievementDescription}>{achievement.description}</Text>
+                </View>
                     {achievement.unlocked && (
-                      <Award className="h-5 w-5 text-orange-500" />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </main>
+                  <Ionicons name="trophy-outline" size={20} color={COLORS.primary} />
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
 
       {/* Chat Button */}
-      <button
-        onClick={() => setCurrentView('chat')}
-        className="fixed bottom-6 right-6 bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+      <TouchableOpacity
+        onPress={() => setCurrentView('chat')}
+        style={styles.chatButton}
       >
-        <MessageCircle className="h-6 w-6" />
-      </button>
+        <Ionicons name="chatbubble-outline" size={24} color={COLORS.white} />
+      </TouchableOpacity>
 
       {/* Navigation Bar (Mobile) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t lg:hidden">
-        <div className="flex items-center justify-around py-2">
-          <button 
-            onClick={() => setCurrentView('dashboard')}
-            className={`flex flex-col items-center p-2 ${currentView === 'dashboard' ? 'text-orange-500' : 'text-gray-400'}`}
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs mt-1">Home</span>
-          </button>
-          <button 
-            onClick={() => setCurrentView('analysis')}
-            className={`flex flex-col items-center p-2 ${currentView === 'analysis' ? 'text-orange-500' : 'text-gray-400'}`}
-          >
-            <BarChart3 className="h-5 w-5" />
-            <span className="text-xs mt-1">Análisis</span>
-          </button>
-          <button 
-            onClick={() => setCurrentView('chat')}
-            className={`flex flex-col items-center p-2 ${currentView === 'chat' ? 'text-orange-500' : 'text-gray-400'}`}
-          >
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-xs mt-1">Sofía</span>
-          </button>
-          <button className="flex flex-col items-center p-2 text-gray-400">
-            <Settings className="h-5 w-5" />
-            <span className="text-xs mt-1">Ajustes</span>
-          </button>
-        </div>
-      </nav>
-    </div>
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          onPress={() => setCurrentView('dashboard')}
+          style={[styles.navItem, currentView === 'dashboard' && styles.navItemActive]}
+        >
+          <Ionicons name="home-outline" size={20} color={currentView === 'dashboard' ? COLORS.primary : COLORS.gray} />
+          <Text style={[styles.navLabel, currentView === 'dashboard' && styles.navLabelActive]}>
+            Inicio
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => setCurrentView('analysis')}
+          style={[styles.navItem, currentView === 'analysis' && styles.navItemActive]}
+        >
+          <Ionicons name="bar-chart-outline" size={20} color={currentView === 'analysis' ? COLORS.primary : COLORS.gray} />
+          <Text style={[styles.navLabel, currentView === 'analysis' && styles.navLabelActive]}>
+            Análisis
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => setCurrentView('chat')}
+          style={[styles.navItem, currentView === 'chat' && styles.navItemActive]}
+        >
+          <Ionicons name="chatbubble-outline" size={20} color={currentView === 'chat' ? COLORS.primary : COLORS.gray} />
+          <Text style={[styles.navLabel, currentView === 'chat' && styles.navLabelActive]}>
+            Sofía
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => setCurrentView('settings')}
+          style={[styles.navItem, currentView === 'settings' && styles.navItemActive]}
+        >
+          <Ionicons name="settings-outline" size={20} color={currentView === 'settings' ? COLORS.primary : COLORS.gray} />
+          <Text style={[styles.navLabel, currentView === 'settings' && styles.navLabelActive]}>
+            Ajustes
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.light,
+  },
+  // Header styles
+  header: {
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayScale[200],
+    paddingTop: Platform.OS === 'ios' ? 0 : 20,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.lg,
+    paddingVertical: SIZES.md,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.sm,
+  },
+  logoText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.dark,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  notificationContainer: {
+    position: 'relative',
+    marginRight: SIZES.md,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: COLORS.danger,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  userAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.orange[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // Main content styles
+  mainContent: {
+    flex: 1,
+    paddingHorizontal: SIZES.lg,
+  },
+  welcomeSection: {
+    marginVertical: SIZES.lg,
+  },
+  welcomeTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.dark,
+    marginBottom: SIZES.xs,
+  },
+  welcomeSubtitle: {
+    fontSize: 16,
+    color: COLORS.gray,
+  },
+  scoreText: {
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  // Health card styles
+  healthCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SIZES.lg,
+    marginBottom: SIZES.lg,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  healthCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.lg,
+  },
+  healthCardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.dark,
+  },
+  healthCardSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginTop: SIZES.xs,
+  },
+  scoreStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  scoreEmoji: {
+    fontSize: 24,
+    marginRight: SIZES.sm,
+  },
+  scoreStatusText: {
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  chartContainer: {
+    height: 200,
+    backgroundColor: COLORS.success + '10',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SIZES.md,
+    position: 'relative',
+  },
+  healthyZone: {
+    position: 'absolute',
+    top: SIZES.md,
+    left: SIZES.md,
+    right: SIZES.md,
+    bottom: SIZES.xl,
+    backgroundColor: COLORS.success + '30',
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 2,
+    borderColor: COLORS.success + '50',
+    borderStyle: 'dashed',
+  },
+  healthyZoneText: {
+    position: 'absolute',
+    top: SIZES.xs,
+    left: SIZES.xs,
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.success,
+  },
+  chartPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chartPlaceholderText: {
+    fontSize: 16,
+    color: COLORS.gray,
+  },
+  // Metrics grid styles
+  metricsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: SIZES.lg,
+  },
+  metricCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SIZES.lg,
+    width: (width - SIZES.lg * 3) / 2,
+    marginBottom: SIZES.md,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  metricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.sm,
+  },
+  metricLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.gray,
+  },
+  metricValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginTop: SIZES.xs,
+  },
+  metricSubtext: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: SIZES.xs,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: COLORS.grayScale[200],
+    borderRadius: 4,
+    marginTop: SIZES.sm,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 4,
+  },
+  // Transactions card styles
+  transactionsCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SIZES.lg,
+    marginBottom: SIZES.lg,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.dark,
+    marginBottom: SIZES.lg,
+  },
+  transactionsList: {
+    gap: SIZES.md,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: SIZES.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayScale[100],
+  },
+  transactionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  transactionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
+  },
+  transactionDescription: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.dark,
+  },
+  transactionCategory: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginTop: SIZES.xs,
+  },
+  transactionRight: {
+    alignItems: 'flex-end',
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  transactionTime: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: SIZES.xs,
+  },
+  // Achievements card styles
+  achievementsCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SIZES.lg,
+    marginBottom: SIZES.xl,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  achievementsList: {
+    gap: SIZES.md,
+  },
+  achievementItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: SIZES.md,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 2,
+  },
+  achievementUnlocked: {
+    borderColor: COLORS.orange[200],
+    backgroundColor: COLORS.orange[50],
+  },
+  achievementLocked: {
+    borderColor: COLORS.grayScale[200],
+    backgroundColor: COLORS.grayScale[50],
+    opacity: 0.6,
+  },
+  achievementIcon: {
+    fontSize: 24,
+    marginRight: SIZES.md,
+  },
+  achievementContent: {
+    flex: 1,
+  },
+  achievementTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.dark,
+    marginBottom: SIZES.xs,
+  },
+  achievementDescription: {
+    fontSize: 14,
+    color: COLORS.gray,
+  },
+  // Chat styles
+  chatHeader: {
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayScale[200],
+    paddingHorizontal: SIZES.lg,
+    paddingVertical: SIZES.md,
+  },
+  chatHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: SIZES.sm,
+    marginRight: SIZES.md,
+  },
+  backButtonText: {
+    fontSize: 20,
+    color: COLORS.gray,
+  },
+  chatUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chatAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
+  },
+  chatAvatarText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  chatUserName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.dark,
+  },
+  chatUserStatus: {
+    fontSize: 14,
+    color: COLORS.success,
+  },
+  chatMessages: {
+    flex: 1,
+  },
+  chatMessagesContent: {
+    padding: SIZES.lg,
+  },
+  messageContainer: {
+    marginBottom: SIZES.md,
+  },
+  userMessageContainer: {
+    alignItems: 'flex-end',
+  },
+  sofiaMessageContainer: {
+    alignItems: 'flex-start',
+  },
+  messageContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    maxWidth: '80%',
+  },
+  messageAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.sm,
+  },
+  messageAvatarText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  messageBubble: {
+    flex: 1,
+  },
+  messageBubbleContent: {
+    paddingHorizontal: SIZES.md,
+    paddingVertical: SIZES.sm,
+    borderRadius: 16,
+  },
+  userMessageBubble: {
+    backgroundColor: COLORS.primary,
+    borderBottomRightRadius: 4,
+  },
+  sofiaMessageBubble: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.grayScale[200],
+    borderBottomLeftRadius: 4,
+  },
+  messageText: {
+    fontSize: 14,
+  },
+  userMessageText: {
+    color: COLORS.white,
+  },
+  sofiaMessageText: {
+    color: COLORS.dark,
+  },
+  messageTime: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: SIZES.xs,
+  },
+  userMessageTime: {
+    textAlign: 'right',
+  },
+  sofiaMessageTime: {
+    textAlign: 'left',
+  },
+  chatInput: {
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.grayScale[200],
+    padding: SIZES.lg,
+  },
+  chatInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.grayScale[100],
+    borderRadius: 20,
+    paddingHorizontal: SIZES.md,
+    paddingVertical: SIZES.sm,
+  },
+  chatTextInput: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.dark,
+    paddingVertical: SIZES.xs,
+  },
+  chatSendButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: SIZES.sm,
+  },
+  chatSendButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  // Chat button
+  chatButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: SIZES.lg,
+    backgroundColor: COLORS.primary,
+    borderRadius: 28,
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  // Bottom navigation
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.grayScale[200],
+    paddingVertical: SIZES.sm,
+    paddingHorizontal: SIZES.lg,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: SIZES.sm,
+  },
+  navItemActive: {
+    // Active state styling
+  },
+  navLabel: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: SIZES.xs,
+  },
+  navLabelActive: {
+    color: COLORS.primary,
+    fontWeight: '500',
+  },
+  // Chart styles
+  chartsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: SIZES.lg,
+  },
+  chartCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SIZES.lg,
+    marginBottom: SIZES.md,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    width: width < 768 ? '100%' : '48%',
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.dark,
+    marginBottom: SIZES.md,
+  },
+  chartPlaceholder: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.grayScale[50],
+    borderRadius: BORDER_RADIUS.md,
+  },
+  chartPlaceholderText: {
+    fontSize: 48,
+    marginBottom: SIZES.sm,
+  },
+  chartPlaceholderSubtext: {
+    fontSize: 14,
+    color: COLORS.gray,
+    textAlign: 'center',
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: SIZES.md,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: SIZES.sm,
+    marginVertical: SIZES.xs,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: SIZES.xs,
+  },
+  legendText: {
+    fontSize: 12,
+    color: COLORS.gray,
+  },
+  // Settings styles
+  settingsContent: {
+    flex: 1,
+    padding: SIZES.lg,
+  },
+  settingsSection: {
+    marginBottom: SIZES.xl,
+  },
+  settingsSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.dark,
+    marginBottom: SIZES.md,
+    marginLeft: SIZES.sm,
+  },
+  settingsItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.white,
+    paddingVertical: SIZES.md,
+    paddingHorizontal: SIZES.lg,
+    marginBottom: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayScale[100],
+  },
+  settingsItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  settingsItemText: {
+    fontSize: 16,
+    color: COLORS.dark,
+    marginLeft: SIZES.md,
+  },
+  logoutItem: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.md,
+    marginTop: SIZES.sm,
+    borderBottomWidth: 0,
+  },
+  logoutText: {
+    color: COLORS.danger,
+    fontWeight: '500',
+  },
+});
 
 export default DashboardScreen;

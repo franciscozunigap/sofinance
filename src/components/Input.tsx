@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     color: COLORS.dark,
     borderWidth: 1,
-    borderColor: COLORS.light,
+    borderColor: COLORS.grayScale[300],
     shadowColor: COLORS.black,
     shadowOffset: {
       width: 0,

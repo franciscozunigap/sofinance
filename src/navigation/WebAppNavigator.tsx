@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import LoginScreen from '../screens/LoginScreen';
-import RegistrationScreen from '../screens/RegistrationScreen';
-import DashboardScreen from '../screens/DashboardScreen';
+import WebLoginScreen from '../screens/web/WebLoginScreen';
+import WebRegistrationScreen from '../screens/web/WebRegistrationScreen';
+import WebDashboardScreen from '../screens/web/WebDashboardScreen';
 
 interface WebAppNavigatorProps {
   isLoggedIn: boolean;
@@ -17,32 +16,27 @@ const WebAppNavigator: React.FC<WebAppNavigatorProps> = ({
 }) => {
   const [showRegistration, setShowRegistration] = useState(false);
 
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: isLoggedIn ? <DashboardScreen /> : <Navigate to="/login" replace />,
-    },
-    {
-      path: "/login",
-      element: isLoggedIn ? <Navigate to="/" replace /> : (
-        <LoginScreen 
-          onLoginSuccess={onLoginSuccess} 
-          onShowRegistration={() => setShowRegistration(true)}
-        />
-      ),
-    },
-    {
-      path: "/register",
-      element: isLoggedIn ? <Navigate to="/" replace /> : (
-        <RegistrationScreen 
+  // Si no está autenticado, mostrar pantalla de login/registro
+  if (!isLoggedIn) {
+    if (showRegistration) {
+      return (
+        <WebRegistrationScreen
           onRegistrationSuccess={onRegistrationSuccess}
-          onBackToLogin={() => setShowRegistration(false)}
+          onShowLogin={() => setShowRegistration(false)}
         />
-      ),
-    },
-  ]);
+      );
+    }
+    
+    return (
+      <WebLoginScreen
+        onLoginSuccess={onLoginSuccess}
+        onShowRegistration={() => setShowRegistration(true)}
+      />
+    );
+  }
 
-  return <RouterProvider router={router} />;
+  // Si está autenticado, mostrar dashboard
+  return <WebDashboardScreen />;
 };
 
 export default WebAppNavigator;

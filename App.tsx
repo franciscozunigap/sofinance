@@ -76,6 +76,7 @@ const AppContent = () => {
           isLoggedIn={isLoggedIn}
           onLoginSuccess={handleLoginSuccess}
           onRegistrationSuccess={handleLoginSuccess}
+          onLogout={handleLogout}
         />
       )}
     </>

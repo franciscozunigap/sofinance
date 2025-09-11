@@ -95,9 +95,19 @@ const styles = StyleSheet.create({
   },
   primary: {
     backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   secondary: {
-    backgroundColor: COLORS.gray,
+    backgroundColor: COLORS.grayScale[100],
+    borderWidth: 1,
+    borderColor: COLORS.grayScale[300],
   },
   danger: {
     backgroundColor: COLORS.danger,
@@ -129,7 +139,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   secondaryText: {
-    color: COLORS.white,
+    color: COLORS.grayScale[700],
   },
   dangerText: {
     color: COLORS.white,
