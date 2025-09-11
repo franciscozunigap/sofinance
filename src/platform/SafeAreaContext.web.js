@@ -8,6 +8,14 @@ const SafeAreaContext = React.createContext({
   right: 0,
 });
 
+// Exportaciones adicionales requeridas por React Navigation
+export const SafeAreaInsetsContext = SafeAreaContext;
+
+export const initialWindowMetrics = {
+  insets: { top: 0, bottom: 0, left: 0, right: 0 },
+  frame: { x: 0, y: 0, width: 0, height: 0 },
+};
+
 export const SafeAreaProvider = ({ children }) => {
   return React.createElement('div', { children });
 };
@@ -31,6 +39,13 @@ export const useSafeAreaInsets = () => ({
   bottom: 0,
   left: 0,
   right: 0,
+});
+
+export const useSafeAreaFrame = () => ({
+  x: 0,
+  y: 0,
+  width: typeof window !== 'undefined' ? window.innerWidth : 0,
+  height: typeof window !== 'undefined' ? window.innerHeight : 0,
 });
 
 export default SafeAreaContext;

@@ -1,4 +1,7 @@
 /* Estilos globales para SoFinance Web */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   margin: 0;

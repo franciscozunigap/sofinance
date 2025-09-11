@@ -4,18 +4,36 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { StatusBar, ActivityIndicator } from './src/platform';
-import LoginScreen from './src/screens/LoginScreen';
-import RegistrationScreen from './src/screens/RegistrationScreen';
-import DashboardScreen from './src/screens/DashboardScreen';
+import AppNavigator from './src/navigation/AppNavigator';
+import WebAppNavigator from './src/navigation/WebAppNavigator';
 import { AuthService } from './src/services/authService';
 import { COLORS } from './src/constants';
+import { UserProvider } from './src/contexts/UserContext';
 
-function App(): JSX.Element {
+// Componente de carga
+const LoadingScreen = () => (
+  <View style={styles.loadingContainer}>
+    <View style={styles.loadingContent}>
+      <View style={styles.logoContainer}>
+        <Text style={styles.logoText}>💰</Text>
+      </View>
+      <Text style={styles.loadingTitle}>SoFinance</Text>
+      <Text style={styles.loadingSubtitle}>Cargando tu información...</Text>
+      <ActivityIndicator 
+        size="large" 
+        color={COLORS.primary} 
+        style={styles.loadingSpinner}
+      />
+    </View>
+  </View>
+);
+
+// Componente principal de la aplicación
+const AppContent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showRegistration, setShowRegistration] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -34,39 +52,10 @@ function App(): JSX.Element {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setShowRegistration(false);
-  };
-
-  const handleShowRegistration = () => {
-    setShowRegistration(true);
-  };
-
-  const handleBackToLogin = () => {
-    setShowRegistration(false);
-  };
-
-  const handleRegistrationSuccess = () => {
-    setShowRegistration(false);
-    setIsLoggedIn(true);
   };
 
   if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <View style={styles.loadingContent}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>💰</Text>
-          </View>
-          <Text style={styles.loadingTitle}>SoFinance</Text>
-          <Text style={styles.loadingSubtitle}>Cargando tu información...</Text>
-          <ActivityIndicator 
-            size="large" 
-            color={COLORS.primary} 
-            style={styles.loadingSpinner}
-          />
-        </View>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -76,20 +65,28 @@ function App(): JSX.Element {
         backgroundColor={COLORS.light} 
         translucent={false}
       />
-      {isLoggedIn ? (
-        <DashboardScreen onLogout={handleLogout} />
-      ) : showRegistration ? (
-        <RegistrationScreen 
-          onRegistrationSuccess={handleRegistrationSuccess}
-          onBackToLogin={handleBackToLogin}
+      {Platform.OS === 'web' ? (
+        <WebAppNavigator
+          isLoggedIn={isLoggedIn}
+          onLoginSuccess={handleLoginSuccess}
+          onRegistrationSuccess={handleLoginSuccess}
         />
       ) : (
-        <LoginScreen 
+        <AppNavigator
+          isLoggedIn={isLoggedIn}
           onLoginSuccess={handleLoginSuccess}
-          onShowRegistration={handleShowRegistration}
+          onRegistrationSuccess={handleLoginSuccess}
         />
       )}
     </>
+  );
+};
+
+function App(): JSX.Element {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }
 

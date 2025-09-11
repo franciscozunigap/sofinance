@@ -5,25 +5,32 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Platform,
 } from 'react-native';
-import { Alert, Platform, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import { Alert, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { validateEmail, validatePassword } from '../utils';
 import { AuthService } from '../services/authService';
 
+type RegistrationScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
+
 interface RegistrationScreenProps {
   onRegistrationSuccess: () => void;
-  onBackToLogin: () => void;
+  onBackToLogin?: () => void;
 }
 
 const { width } = Dimensions.get('window');
 
 const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ 
-  onRegistrationSuccess, 
-  onBackToLogin 
+  onRegistrationSuccess,
+  onBackToLogin
 }) => {
+  const navigation = useNavigation<RegistrationScreenNavigationProp>();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -366,7 +373,13 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
             
             <Button
               title="¿Ya tienes cuenta? Iniciar Sesión"
-              onPress={onBackToLogin}
+              onPress={() => {
+                if (Platform.OS === 'web' && onBackToLogin) {
+                  onBackToLogin();
+                } else {
+                  navigation.navigate('Login');
+                }
+              }}
               variant="secondary"
               style={[styles.button, styles.backButton]}
             />
