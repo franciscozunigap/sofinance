@@ -162,7 +162,7 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                 onClick={onShowRegistration}
                 className="text-orange-600 hover:text-orange-500 text-sm font-medium"
               >
-                ¿No tienes cuenta? Regístrate
+                ¿No tienes cuenta? Crear cuenta
               </button>
             </div>
           </form>

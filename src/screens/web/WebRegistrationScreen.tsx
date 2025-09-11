@@ -4,9 +4,10 @@ import { User, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 interface WebRegistrationScreenProps {
   onRegistrationSuccess: (user: any) => void;
   onShowLogin: () => void;
+  onShowOnboarding?: () => void;
 }
 
-const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistrationSuccess, onShowLogin }) => {
+const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistrationSuccess, onShowLogin, onShowOnboarding }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -244,7 +245,16 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
               </button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center space-y-3">
+              {onShowOnboarding && (
+                <button
+                  type="button"
+                  onClick={onShowOnboarding}
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-md"
+                >
+                  Configuración completa paso a paso
+                </button>
+              )}
               <button
                 type="button"
                 onClick={onShowLogin}

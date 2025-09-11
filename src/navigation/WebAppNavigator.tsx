@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import WebLoginScreen from '../screens/web/WebLoginScreen';
-import WebRegistrationScreen from '../screens/web/WebRegistrationScreen';
+import WebOnboardingScreen from '../screens/web/WebOnboardingScreen';
 import WebDashboardScreen from '../screens/web/WebDashboardScreen';
 
 interface WebAppNavigatorProps {
@@ -14,15 +14,15 @@ const WebAppNavigator: React.FC<WebAppNavigatorProps> = ({
   onLoginSuccess,
   onRegistrationSuccess,
 }) => {
-  const [showRegistration, setShowRegistration] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Si no está autenticado, mostrar pantalla de login/registro
+  // Si no está autenticado, mostrar pantalla de login/onboarding
   if (!isLoggedIn) {
-    if (showRegistration) {
+    if (showOnboarding) {
       return (
-        <WebRegistrationScreen
-          onRegistrationSuccess={onRegistrationSuccess}
-          onShowLogin={() => setShowRegistration(false)}
+        <WebOnboardingScreen
+          onComplete={onRegistrationSuccess}
+          onBack={() => setShowOnboarding(false)}
         />
       );
     }
@@ -30,7 +30,7 @@ const WebAppNavigator: React.FC<WebAppNavigatorProps> = ({
     return (
       <WebLoginScreen
         onLoginSuccess={onLoginSuccess}
-        onShowRegistration={() => setShowRegistration(true)}
+        onShowRegistration={() => setShowOnboarding(true)}
       />
     );
   }

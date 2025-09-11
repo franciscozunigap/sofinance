@@ -7,10 +7,13 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import CustomSlider from '../components/CustomSlider';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { OnboardingData } from '../types';
+
+const { width, height } = Dimensions.get('window');
 
 interface OnboardingStep2Props {
   data: Partial<OnboardingData>;
@@ -146,9 +149,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
               },
             ]}
           >
+            {/* Header con diseño moderno */}
             <View style={styles.header}>
               <View style={styles.stepIndicator}>
-                <Text style={styles.stepText}>Paso 2 de 3</Text>
+                <View style={styles.stepCircle}>
+                  <Text style={styles.stepNumber}>2</Text>
+                </View>
+                <Text style={styles.stepText}>de 3</Text>
               </View>
               <Text style={styles.title}>Información Financiera</Text>
               <Text style={styles.subtitle}>
@@ -156,61 +163,146 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
               </Text>
             </View>
             
-            <View style={styles.form}>
-              <Input
-                label="Ingreso mensual (CLP)"
-                placeholder="Ej: 800000"
-                value={monthlyIncome}
-                onChangeText={setMonthlyIncome}
-                keyboardType="numeric"
-                error={errors.monthlyIncome}
-              />
+            {/* Formulario principal */}
+            <View style={styles.formContainer}>
+              {/* Sección de montos */}
+              <View style={styles.amountsSection}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionIcon}>💰</Text>
+                  <Text style={styles.sectionTitle}>Información Financiera</Text>
+                </View>
+                
+                <Input
+                  label="Ingreso mensual (CLP)"
+                  placeholder="Ej: 800000"
+                  value={monthlyIncome}
+                  onChangeText={setMonthlyIncome}
+                  keyboardType="numeric"
+                  error={errors.monthlyIncome}
+                />
+                
+                <Input
+                  label="Ahorro actual (CLP)"
+                  placeholder="Ej: 500000"
+                  value={currentSavings}
+                  onChangeText={setCurrentSavings}
+                  keyboardType="numeric"
+                  error={errors.currentSavings}
+                />
+              </View>
 
-              <View style={styles.percentageSection}>
-                <Text style={styles.sectionTitle}>Distribución de gastos</Text>
+              {/* Sección de distribución con sliders */}
+              <View style={styles.distributionSection}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionIcon}>📊</Text>
+                  <Text style={styles.sectionTitle}>Distribución de Gastos</Text>
+                </View>
                 <Text style={styles.sectionSubtitle}>
-                  Recomendamos: 20% ahorro, 50% necesidades, 30% consumo
+                  Ajusta los porcentajes según tus prioridades financieras
                 </Text>
                 
-                <View style={styles.recommendButtonContainer}>
-                  <Button
-                    title="Aplicar recomendación"
-                    onPress={applyRecommendedPercentages}
-                    variant="secondary"
-                    style={styles.recommendButton}
-                  />
+                <Button
+                  title="🔄 Restablecer a recomendación (20% - 50% - 30%)"
+                  onPress={applyRecommendedPercentages}
+                  variant="secondary"
+                  style={styles.recommendButton}
+                />
+
+                {/* Sliders para porcentajes */}
+                <View style={styles.slidersContainer}>
+                  {/* Ahorro */}
+                  <View style={styles.sliderItem}>
+                    <View style={styles.sliderHeader}>
+                      <Text style={styles.sliderLabel}>💚 Ahorro</Text>
+                      <Text style={[styles.sliderValue, { color: '#10b981' }]}>
+                        {savingsPercentage}%
+                      </Text>
+                    </View>
+                    <CustomSlider
+                      style={styles.slider}
+                      minimumValue={0}
+                      maximumValue={100}
+                      value={parseFloat(savingsPercentage)}
+                      onValueChange={(value) => setSavingsPercentage(value.toString())}
+                      minimumTrackTintColor="#10b981"
+                      maximumTrackTintColor="#e5e7eb"
+                      thumbTintColor="#10b981"
+                    />
+                    <View style={styles.sliderRange}>
+                      <Text style={styles.rangeText}>0%</Text>
+                      <Text style={styles.rangeText}>100%</Text>
+                    </View>
+                  </View>
+
+                  {/* Necesidades */}
+                  <View style={styles.sliderItem}>
+                    <View style={styles.sliderHeader}>
+                      <Text style={styles.sliderLabel}>🏠 Necesidades</Text>
+                      <Text style={[styles.sliderValue, { color: '#ea580c' }]}>
+                        {needsPercentage}%
+                      </Text>
+                    </View>
+                    <CustomSlider
+                      style={styles.slider}
+                      minimumValue={0}
+                      maximumValue={100}
+                      value={parseFloat(needsPercentage)}
+                      onValueChange={(value) => setNeedsPercentage(value.toString())}
+                      minimumTrackTintColor="#ea580c"
+                      maximumTrackTintColor="#e5e7eb"
+                      thumbTintColor="#ea580c"
+                    />
+                    <View style={styles.sliderRange}>
+                      <Text style={styles.rangeText}>0%</Text>
+                      <Text style={styles.rangeText}>100%</Text>
+                    </View>
+                  </View>
+
+                  {/* Consumo */}
+                  <View style={styles.sliderItem}>
+                    <View style={styles.sliderHeader}>
+                      <Text style={styles.sliderLabel}>🛍️ Consumo</Text>
+                      <Text style={[styles.sliderValue, { color: '#3b82f6' }]}>
+                        {consumptionPercentage}%
+                      </Text>
+                    </View>
+                    <CustomSlider
+                      style={styles.slider}
+                      minimumValue={0}
+                      maximumValue={100}
+                      value={parseFloat(consumptionPercentage)}
+                      onValueChange={(value) => setConsumptionPercentage(value.toString())}
+                      minimumTrackTintColor="#3b82f6"
+                      maximumTrackTintColor="#e5e7eb"
+                      thumbTintColor="#3b82f6"
+                    />
+                    <View style={styles.sliderRange}>
+                      <Text style={styles.rangeText}>0%</Text>
+                      <Text style={styles.rangeText}>100%</Text>
+                    </View>
+                  </View>
                 </View>
 
-                <View style={styles.percentageInputs}>
-                  <Input
-                    label="Ahorro (%)"
-                    placeholder="20"
-                    value={savingsPercentage}
-                    onChangeText={setSavingsPercentage}
-                    keyboardType="numeric"
-                    error={errors.savingsPercentage}
-                    style={styles.percentageInput}
-                  />
-                  
-                  <Input
-                    label="Necesidades (%)"
-                    placeholder="50"
-                    value={needsPercentage}
-                    onChangeText={setNeedsPercentage}
-                    keyboardType="numeric"
-                    error={errors.needsPercentage}
-                    style={styles.percentageInput}
-                  />
-                  
-                  <Input
-                    label="Consumo (%)"
-                    placeholder="30"
-                    value={consumptionPercentage}
-                    onChangeText={setConsumptionPercentage}
-                    keyboardType="numeric"
-                    error={errors.consumptionPercentage}
-                    style={styles.percentageInput}
-                  />
+                {/* Indicador del total */}
+                <View style={styles.totalIndicator}>
+                  <View style={styles.totalRow}>
+                    <Text style={styles.totalLabel}>Total:</Text>
+                    <Text style={[
+                      styles.totalValue,
+                      {
+                        color: Math.abs(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) - 100) < 0.1 
+                          ? '#10b981' 
+                          : '#ef4444'
+                      }
+                    ]}>
+                      {Math.round(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage))}%
+                    </Text>
+                  </View>
+                  {Math.abs(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) - 100) < 0.1 ? (
+                    <Text style={styles.successText}>✅ Perfecto, los porcentajes suman 100%</Text>
+                  ) : (
+                    <Text style={styles.errorText}>⚠️ Los porcentajes deben sumar exactamente 100%</Text>
+                  )}
                 </View>
 
                 {errors.percentages && (
@@ -218,15 +310,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                 )}
               </View>
               
-              <Input
-                label="Ahorro actual (CLP)"
-                placeholder="Ej: 500000"
-                value={currentSavings}
-                onChangeText={setCurrentSavings}
-                keyboardType="numeric"
-                error={errors.currentSavings}
-              />
-              
+              {/* Botones */}
               <View style={styles.buttonContainer}>
                 {onBack && (
                   <Button
@@ -253,7 +337,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.light,
+    backgroundColor: '#f9fafb', // bg-gray-50
   },
   keyboardView: {
     flex: 1,
@@ -272,82 +356,180 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   stepIndicator: {
-    backgroundColor: COLORS.primary + '20',
-    paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.sm,
-    borderRadius: 20,
-    marginBottom: SIZES.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.xl,
+  },
+  stepCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#fed7aa', // orange-200
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.sm,
+  },
+  stepNumber: {
+    fontSize: 20,
+    fontFamily: FONTS.bold,
+    color: '#ea580c', // orange-600
   },
   stepText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: '#ea580c', // orange-600
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.dark,
+    color: '#111827', // gray-900
     textAlign: 'center',
-    marginBottom: SIZES.sm,
+    marginBottom: SIZES.md,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.gray,
+    color: '#6b7280', // gray-500
     textAlign: 'center',
     lineHeight: 24,
+    paddingHorizontal: SIZES.sm,
   },
-  form: {
-    width: '100%',
+  formContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: SIZES.xl,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  percentageSection: {
-    marginVertical: SIZES.lg,
+  amountsSection: {
+    marginBottom: SIZES.xl,
+    padding: SIZES.lg,
+    backgroundColor: '#dbeafe', // blue-100
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#bfdbfe', // blue-200
+  },
+  distributionSection: {
+    marginBottom: SIZES.xl,
+    padding: SIZES.lg,
+    backgroundColor: '#fff7ed', // orange-50
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#fed7aa', // orange-200
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.md,
+  },
+  sectionIcon: {
+    fontSize: 20,
+    marginRight: SIZES.sm,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: FONTS.semiBold,
-    color: COLORS.dark,
-    marginBottom: SIZES.sm,
+    color: '#111827', // gray-900
   },
   sectionSubtitle: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.gray,
-    marginBottom: SIZES.md,
-  },
-  recommendButtonContainer: {
+    color: '#6b7280', // gray-500
     marginBottom: SIZES.md,
   },
   recommendButton: {
-    alignSelf: 'flex-start',
+    marginBottom: SIZES.lg,
+    backgroundColor: '#fed7aa', // orange-100
+    borderColor: '#fed7aa', // orange-200
   },
-  percentageInputs: {
+  slidersContainer: {
+    marginBottom: SIZES.lg,
+  },
+  sliderItem: {
+    marginBottom: SIZES.lg,
+  },
+  sliderHeader: {
     flexDirection: 'row',
-    gap: SIZES.sm,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.sm,
   },
-  percentageInput: {
-    flex: 1,
+  sliderLabel: {
+    fontSize: 16,
+    fontFamily: FONTS.medium,
+    color: '#374151', // gray-700
+  },
+  sliderValue: {
+    fontSize: 18,
+    fontFamily: FONTS.semiBold,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  sliderRange: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: SIZES.xs,
+  },
+  rangeText: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: '#9ca3af', // gray-400
+  },
+  totalIndicator: {
+    backgroundColor: '#f3f4f6', // gray-100
+    padding: SIZES.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb', // gray-200
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.xs,
+  },
+  totalLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.medium,
+    color: '#374151', // gray-700
+  },
+  totalValue: {
+    fontSize: 18,
+    fontFamily: FONTS.bold,
+  },
+  successText: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: '#10b981', // green-600
   },
   errorText: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: COLORS.error,
-    marginTop: SIZES.sm,
+    color: '#ef4444', // red-500
     textAlign: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
     gap: SIZES.md,
-    marginTop: SIZES.xl,
   },
   button: {
     flex: 1,
+    height: 48,
+    borderRadius: 12,
   },
   backButton: {
-    // Estilos específicos para el botón de atrás si es necesario
+    backgroundColor: '#e5e7eb', // gray-200
   },
   nextButton: {
-    // Estilos específicos para el botón de continuar si es necesario
+    backgroundColor: '#ea580c', // orange-600
   },
 });
 

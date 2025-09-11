@@ -13,6 +13,8 @@ import { COLORS, SIZES, FONTS } from '../constants';
 import { validatePassword } from '../utils';
 import { OnboardingData } from '../types';
 
+const { width, height } = Dimensions.get('window');
+
 interface OnboardingStep3Props {
   data: Partial<OnboardingData>;
   onComplete: (stepData: Partial<OnboardingData>) => void;
@@ -89,9 +91,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
               },
             ]}
           >
+            {/* Header con diseño moderno */}
             <View style={styles.header}>
               <View style={styles.stepIndicator}>
-                <Text style={styles.stepText}>Paso 3 de 3</Text>
+                <View style={styles.stepCircle}>
+                  <Text style={styles.stepNumber}>3</Text>
+                </View>
+                <Text style={styles.stepText}>de 3</Text>
               </View>
               <Text style={styles.title}>Crea tu contraseña</Text>
               <Text style={styles.subtitle}>
@@ -99,33 +105,55 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
               </Text>
             </View>
             
-            <View style={styles.form}>
-              <Input
-                label="Contraseña"
-                placeholder="Mínimo 6 caracteres"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                error={errors.password}
-              />
-              
-              <Input
-                label="Confirmar contraseña"
-                placeholder="Repite tu contraseña"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                error={errors.confirmPassword}
-              />
+            {/* Formulario principal */}
+            <View style={styles.formContainer}>
+              <View style={styles.form}>
+                <Input
+                  label="Contraseña"
+                  placeholder="Mínimo 6 caracteres"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  error={errors.password}
+                />
+                
+                <Input
+                  label="Confirmar contraseña"
+                  placeholder="Repite tu contraseña"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry
+                  error={errors.confirmPassword}
+                />
+              </View>
 
+              {/* Consejos de contraseña con mejor diseño */}
               <View style={styles.passwordTips}>
-                <Text style={styles.tipsTitle}>Consejos para una contraseña segura:</Text>
-                <Text style={styles.tipText}>• Usa al menos 6 caracteres</Text>
-                <Text style={styles.tipText}>• Combina letras y números</Text>
-                <Text style={styles.tipText}>• Evita información personal</Text>
-                <Text style={styles.tipText}>• No la compartas con nadie</Text>
+                <View style={styles.tipsHeader}>
+                  <Text style={styles.tipsIcon}>🔒</Text>
+                  <Text style={styles.tipsTitle}>Consejos para una contraseña segura</Text>
+                </View>
+                <View style={styles.tipsList}>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>Usa al menos 6 caracteres</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>Combina letras y números</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>Evita información personal</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>No la compartas con nadie</Text>
+                  </View>
+                </View>
               </View>
               
+              {/* Botones */}
               <View style={styles.buttonContainer}>
                 {onBack && (
                   <Button
@@ -152,7 +180,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.light,
+    backgroundColor: '#f9fafb', // bg-gray-50
   },
   keyboardView: {
     flex: 1,
@@ -171,67 +199,120 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   stepIndicator: {
-    backgroundColor: COLORS.primary + '20',
-    paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.sm,
-    borderRadius: 20,
-    marginBottom: SIZES.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.xl,
+  },
+  stepCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#fed7aa', // orange-200
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.sm,
+  },
+  stepNumber: {
+    fontSize: 20,
+    fontFamily: FONTS.bold,
+    color: '#ea580c', // orange-600
   },
   stepText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: '#ea580c', // orange-600
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.dark,
+    color: '#111827', // gray-900
     textAlign: 'center',
-    marginBottom: SIZES.sm,
+    marginBottom: SIZES.md,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.gray,
+    color: '#6b7280', // gray-500
     textAlign: 'center',
     lineHeight: 24,
+    paddingHorizontal: SIZES.sm,
+  },
+  formContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: SIZES.xl,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   form: {
     width: '100%',
+    marginBottom: SIZES.xl,
   },
   passwordTips: {
-    backgroundColor: COLORS.light + '80',
-    padding: SIZES.md,
+    backgroundColor: '#fff7ed', // orange-50
+    padding: SIZES.lg,
     borderRadius: 12,
-    marginVertical: SIZES.lg,
+    marginBottom: SIZES.xl,
+    borderWidth: 1,
+    borderColor: '#fed7aa', // orange-200
     borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
+    borderLeftColor: '#ea580c', // orange-600
+  },
+  tipsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.md,
+  },
+  tipsIcon: {
+    fontSize: 20,
+    marginRight: SIZES.sm,
   },
   tipsTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: FONTS.semiBold,
-    color: COLORS.dark,
-    marginBottom: SIZES.sm,
+    color: '#111827', // gray-900
+  },
+  tipsList: {
+    gap: SIZES.sm,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  tipBullet: {
+    fontSize: 16,
+    fontFamily: FONTS.regular,
+    color: '#ea580c', // orange-600
+    marginRight: SIZES.sm,
+    marginTop: 2,
   },
   tipText: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.gray,
-    marginBottom: SIZES.xs,
+    color: '#6b7280', // gray-500
+    flex: 1,
+    lineHeight: 20,
   },
   buttonContainer: {
     flexDirection: 'row',
     gap: SIZES.md,
-    marginTop: SIZES.xl,
   },
   button: {
     flex: 1,
+    height: 48,
+    borderRadius: 12,
   },
   backButton: {
-    // Estilos específicos para el botón de atrás si es necesario
+    backgroundColor: '#e5e7eb', // gray-200
   },
   completeButton: {
-    // Estilos específicos para el botón de completar si es necesario
+    backgroundColor: '#ea580c', // orange-600
   },
 });
 

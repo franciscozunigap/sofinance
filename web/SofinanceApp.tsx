@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut } from 'lucide-react';
-import LoginScreen from './LoginScreen';
-import RegistrationScreen from './RegistrationScreen';
+import WebAppNavigator from '../src/navigation/WebAppNavigator';
 
 const SofinanceApp = () => {
   const [currentView, setCurrentView] = useState('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showRegistration, setShowRegistration] = useState(false);
   const [user, setUser] = useState(null);
   const [chatMessages, setChatMessages] = useState([
     {
@@ -68,16 +66,12 @@ const SofinanceApp = () => {
     { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de ahorro mensual', icon: '💎', unlocked: false }
   ];
 
-  const handleLoginSuccess = (userData: any) => {
-    setUser(userData);
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
-    setShowRegistration(false);
   };
 
-  const handleRegistrationSuccess = (userData: any) => {
-    setUser(userData);
+  const handleRegistrationSuccess = () => {
     setIsAuthenticated(true);
-    setShowRegistration(false);
   };
 
   const handleLogout = () => {
@@ -119,7 +113,7 @@ const SofinanceApp = () => {
     }
   };
 
-  const getScoreStatus = (score) => {
+  const getScoreStatus = (score: number) => {
     if (score >= 60) return { text: '¡Excelente! Estás en zona óptima', color: 'text-green-600', emoji: '🚀' };
     if (score >= 40) return { text: 'Bien, mantén el ritmo', color: 'text-orange-600', emoji: '💪' };
     return { text: 'Necesitas mejorar', color: 'text-red-600', emoji: '⚠️' };
@@ -127,21 +121,13 @@ const SofinanceApp = () => {
 
   const scoreStatus = getScoreStatus(userData.currentScore);
 
-  // Si no está autenticado, mostrar pantalla de login/registro
+  // Si no está autenticado, mostrar WebAppNavigator
   if (!isAuthenticated) {
-    if (showRegistration) {
-      return (
-        <RegistrationScreen
-          onRegistrationSuccess={handleRegistrationSuccess}
-          onShowLogin={() => setShowRegistration(false)}
-        />
-      );
-    }
-    
     return (
-      <LoginScreen
+      <WebAppNavigator
+        isLoggedIn={isAuthenticated}
         onLoginSuccess={handleLoginSuccess}
-        onShowRegistration={() => setShowRegistration(true)}
+        onRegistrationSuccess={handleRegistrationSuccess}
       />
     );
   }

@@ -1,15 +1,67 @@
 {
   "root": "/Users/usuario/code/GIT/sofinance",
   "reactNativePath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native",
-  "reactNativeVersion": "0.76",
+  "reactNativeVersion": "0.81",
   "dependencies": {
+    "expo": {
+      "root": "/Users/usuario/code/GIT/sofinance/node_modules/expo",
+      "name": "expo",
+      "platforms": {
+        "ios": {
+          "podspecPath": "/Users/usuario/code/GIT/sofinance/node_modules/expo/Expo.podspec",
+          "version": "54.0.1",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "/Users/usuario/code/GIT/sofinance/node_modules/expo/android",
+          "packageImportPath": "import expo.modules.ExpoModulesPackage;",
+          "packageInstance": "new ExpoModulesPackage()",
+          "buildTypes": [],
+          "componentDescriptors": [],
+          "cmakeListsPath": "/Users/usuario/code/GIT/sofinance/node_modules/expo/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
+    "react-native-gesture-handler": {
+      "root": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-gesture-handler",
+      "name": "react-native-gesture-handler",
+      "platforms": {
+        "ios": {
+          "podspecPath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-gesture-handler/RNGestureHandler.podspec",
+          "version": "2.28.0",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-gesture-handler/android",
+          "packageImportPath": "import com.swmansion.gesturehandler.RNGestureHandlerPackage;",
+          "packageInstance": "new RNGestureHandlerPackage()",
+          "buildTypes": [],
+          "libraryName": "rngesturehandler_codegen",
+          "componentDescriptors": [
+            "RNGestureHandlerButtonComponentDescriptor",
+            "RNGestureHandlerRootViewComponentDescriptor"
+          ],
+          "cmakeListsPath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
     "react-native-safe-area-context": {
       "root": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-safe-area-context",
       "name": "react-native-safe-area-context",
       "platforms": {
         "ios": {
           "podspecPath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-safe-area-context/react-native-safe-area-context.podspec",
-          "version": "4.12.0",
+          "version": "5.6.1",
           "configurations": [],
           "scriptPhases": []
         },
@@ -62,6 +114,61 @@
             "RNSBottomTabsComponentDescriptor"
           ],
           "cmakeListsPath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-screens/android/src/main/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
+    "react-native-svg": {
+      "root": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-svg",
+      "name": "react-native-svg",
+      "platforms": {
+        "ios": {
+          "podspecPath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-svg/RNSVG.podspec",
+          "version": "15.12.1",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-svg/android",
+          "packageImportPath": "import com.horcrux.svg.SvgPackage;",
+          "packageInstance": "new SvgPackage()",
+          "buildTypes": [],
+          "libraryName": "rnsvg",
+          "componentDescriptors": [
+            "RNSVGCircleComponentDescriptor",
+            "RNSVGClipPathComponentDescriptor",
+            "RNSVGDefsComponentDescriptor",
+            "RNSVGFeBlendComponentDescriptor",
+            "RNSVGFeColorMatrixComponentDescriptor",
+            "RNSVGFeCompositeComponentDescriptor",
+            "RNSVGFeFloodComponentDescriptor",
+            "RNSVGFeGaussianBlurComponentDescriptor",
+            "RNSVGFeMergeComponentDescriptor",
+            "RNSVGFeOffsetComponentDescriptor",
+            "RNSVGFilterComponentDescriptor",
+            "RNSVGEllipseComponentDescriptor",
+            "RNSVGForeignObjectComponentDescriptor",
+            "RNSVGGroupComponentDescriptor",
+            "RNSVGImageComponentDescriptor",
+            "RNSVGLinearGradientComponentDescriptor",
+            "RNSVGLineComponentDescriptor",
+            "RNSVGMarkerComponentDescriptor",
+            "RNSVGMaskComponentDescriptor",
+            "RNSVGPathComponentDescriptor",
+            "RNSVGPatternComponentDescriptor",
+            "RNSVGRadialGradientComponentDescriptor",
+            "RNSVGRectComponentDescriptor",
+            "RNSVGSvgViewAndroidComponentDescriptor",
+            "RNSVGSymbolComponentDescriptor",
+            "RNSVGTextComponentDescriptor",
+            "RNSVGTextPathComponentDescriptor",
+            "RNSVGTSpanComponentDescriptor",
+            "RNSVGUseComponentDescriptor"
+          ],
+          "cmakeListsPath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt",
           "cxxModuleCMakeListsModuleName": null,
           "cxxModuleCMakeListsPath": null,
           "cxxModuleHeaderName": null,
@@ -218,6 +325,11 @@
         {
           "name": "--no-interactive",
           "description": "Disables interactive mode"
+        },
+        {
+          "name": "--client-logs",
+          "description": "[Deprecated] Enable plain text JavaScript log streaming for all connected apps. This feature is deprecated and will be removed in future.",
+          "default": false
         }
       ]
     },
@@ -237,6 +349,11 @@
         {
           "name": "--outputPath <path>",
           "description": "Path where generated artifacts will be output to."
+        },
+        {
+          "name": "--source <string>",
+          "description": "Whether the script is invoked from an `app` or a `library`",
+          "default": "app"
         }
       ]
     },
@@ -278,8 +395,7 @@
         },
         {
           "name": "--terminal <string>",
-          "description": "Launches the Metro Bundler in a new window using the specified terminal path.",
-          "default": "vscode"
+          "description": "Launches the Metro Bundler in a new window using the specified terminal path."
         },
         {
           "name": "--binary-path <string>",
@@ -446,8 +562,7 @@
         },
         {
           "name": "--terminal <string>",
-          "description": "Launches the Metro Bundler in a new window using the specified terminal path.",
-          "default": "vscode"
+          "description": "Launches the Metro Bundler in a new window using the specified terminal path."
         },
         {
           "name": "--appId <string>",

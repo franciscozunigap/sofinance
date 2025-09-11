@@ -13,6 +13,8 @@ import { COLORS, SIZES, FONTS } from '../constants';
 import { validateEmail } from '../utils';
 import { OnboardingData } from '../types';
 
+const { width, height } = Dimensions.get('window');
+
 interface OnboardingStep1Props {
   data: Partial<OnboardingData>;
   onNext: (stepData: Partial<OnboardingData>) => void;
@@ -94,9 +96,13 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
               },
             ]}
           >
+            {/* Header con diseño moderno */}
             <View style={styles.header}>
               <View style={styles.stepIndicator}>
-                <Text style={styles.stepText}>Paso 1 de 3</Text>
+                <View style={styles.stepCircle}>
+                  <Text style={styles.stepNumber}>1</Text>
+                </View>
+                <Text style={styles.stepText}>de 3</Text>
               </View>
               <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
               <Text style={styles.subtitle}>
@@ -104,38 +110,42 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
               </Text>
             </View>
             
-            <View style={styles.form}>
-              <Input
-                label="Nombre"
-                placeholder="Ingresa tu nombre"
-                value={firstName}
-                onChangeText={setFirstName}
-                autoCapitalize="words"
-                autoCorrect={false}
-                error={errors.firstName}
-              />
+            {/* Formulario con mejor diseño */}
+            <View style={styles.formContainer}>
+              <View style={styles.form}>
+                <Input
+                  label="Nombre"
+                  placeholder="Ingresa tu nombre"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                  error={errors.firstName}
+                />
+                
+                <Input
+                  label="Apellido"
+                  placeholder="Ingresa tu apellido"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                  error={errors.lastName}
+                />
+                
+                <Input
+                  label="Correo electrónico"
+                  placeholder="Ingresa tu email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  error={errors.email}
+                />
+              </View>
               
-              <Input
-                label="Apellido"
-                placeholder="Ingresa tu apellido"
-                value={lastName}
-                onChangeText={setLastName}
-                autoCapitalize="words"
-                autoCorrect={false}
-                error={errors.lastName}
-              />
-              
-              <Input
-                label="Correo electrónico"
-                placeholder="Ingresa tu email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                error={errors.email}
-              />
-              
+              {/* Botones con mejor diseño */}
               <View style={styles.buttonContainer}>
                 {onBack && (
                   <Button
@@ -162,7 +172,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.light,
+    backgroundColor: '#f9fafb', // bg-gray-50
   },
   keyboardView: {
     flex: 1,
@@ -181,47 +191,75 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   stepIndicator: {
-    backgroundColor: COLORS.primary + '20',
-    paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.sm,
-    borderRadius: 20,
-    marginBottom: SIZES.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.xl,
+  },
+  stepCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#fed7aa', // orange-200
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.sm,
+  },
+  stepNumber: {
+    fontSize: 20,
+    fontFamily: FONTS.bold,
+    color: '#ea580c', // orange-600
   },
   stepText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: '#ea580c', // orange-600
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.dark,
+    color: '#111827', // gray-900
     textAlign: 'center',
-    marginBottom: SIZES.sm,
+    marginBottom: SIZES.md,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.gray,
+    color: '#6b7280', // gray-500
     textAlign: 'center',
     lineHeight: 24,
+    paddingHorizontal: SIZES.sm,
+  },
+  formContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: SIZES.xl,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   form: {
     width: '100%',
+    marginBottom: SIZES.xl,
   },
   buttonContainer: {
     flexDirection: 'row',
     gap: SIZES.md,
-    marginTop: SIZES.xl,
   },
   button: {
     flex: 1,
+    height: 48,
+    borderRadius: 12,
   },
   backButton: {
-    // Estilos específicos para el botón de atrás si es necesario
+    backgroundColor: '#e5e7eb', // gray-200
   },
   nextButton: {
-    // Estilos específicos para el botón de continuar si es necesario
+    backgroundColor: '#ea580c', // orange-600
   },
 });
 
