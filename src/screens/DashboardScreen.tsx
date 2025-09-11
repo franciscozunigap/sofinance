@@ -14,6 +14,7 @@ import { SafeAreaView } from '../platform';
 import { useUser } from '../contexts/UserContext';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
+import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 
 const { width } = Dimensions.get('window');
 
@@ -417,10 +418,35 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             <View style={styles.healthyZone}>
               <Text style={styles.healthyZoneText}>Zona Saludable (40-80 pts)</Text>
             </View>
-            {/* Aquí iría el gráfico real, por ahora un placeholder */}
-            <View style={styles.chartPlaceholder}>
-              <Text style={styles.chartPlaceholderText}>📊 Gráfico de Progreso</Text>
-            </View>
+            <LineChart
+              data={{
+                labels: monthlyScoreData.map(item => item.week),
+                datasets: [{
+                  data: monthlyScoreData.map(item => item.score),
+                  color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`,
+                  strokeWidth: 3
+                }]
+              }}
+              width={width - 80}
+              height={200}
+              chartConfig={{
+                backgroundColor: 'transparent',
+                backgroundGradientFrom: 'transparent',
+                backgroundGradientTo: 'transparent',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                style: {
+                  borderRadius: 16
+                },
+                propsForDots: {
+                  r: "6",
+                  strokeWidth: "2",
+                  stroke: COLORS.primary
+                }
+              }}
+              style={styles.chart}
+            />
           </View>
         </View>
 
@@ -500,9 +526,20 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           {/* Gastos por Categoría */}
           <View style={styles.chartCard}>
             <Text style={styles.chartTitle}>Distribución de Gastos</Text>
-            <View style={styles.chartPlaceholder}>
-              <Text style={styles.chartPlaceholderText}>📊</Text>
-              <Text style={styles.chartPlaceholderSubtext}>Gráfico de gastos por categoría</Text>
+            <View style={styles.chartContainer}>
+              <PieChart
+                data={expenseCategories}
+                width={width - 80}
+                height={200}
+                chartConfig={{
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                }}
+                accessor="value"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                center={[10, 0]}
+                absolute
+              />
             </View>
             
             {/* Leyenda */}
@@ -524,9 +561,34 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           {/* Evolución Semanal */}
           <View style={styles.chartCard}>
             <Text style={styles.chartTitle}>Evolución Semanal</Text>
-            <View style={styles.chartPlaceholder}>
-              <Text style={styles.chartPlaceholderText}>📈</Text>
-              <Text style={styles.chartPlaceholderSubtext}>Tendencia de gastos semanales</Text>
+            <View style={styles.chartContainer}>
+              <BarChart
+                data={{
+                  labels: weeklyTrend.map(item => item.week),
+                  datasets: [{
+                    data: weeklyTrend.map(item => item.gastos)
+                  }]
+                }}
+                width={width - 80}
+                height={200}
+                chartConfig={{
+                  backgroundColor: COLORS.white,
+                  backgroundGradientFrom: COLORS.white,
+                  backgroundGradientTo: COLORS.white,
+                  decimalPlaces: 0,
+                  color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  style: {
+                    borderRadius: 16
+                  },
+                  propsForDots: {
+                    r: "6",
+                    strokeWidth: "2",
+                    stroke: COLORS.primary
+                  }
+                }}
+                style={styles.chart}
+              />
             </View>
           </View>
         </View>
@@ -1284,6 +1346,16 @@ const styles = StyleSheet.create({
   logoutText: {
     color: COLORS.danger,
     fontWeight: '500',
+  },
+  // Chart styles
+  chartContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: SIZES.sm,
+  },
+  chart: {
+    marginVertical: SIZES.sm,
+    borderRadius: BORDER_RADIUS.md,
   },
 });
 
