@@ -675,8 +675,8 @@
     "android": {
       "sourceDir": "/Users/usuario/code/GIT/sofinance/android",
       "appName": "app",
-      "packageName": "com.sofinancetemp",
-      "applicationId": "com.sofinancetemp",
+      "packageName": "com.sofinance",
+      "applicationId": "com.sofinance",
       "mainActivity": ".MainActivity",
       "assets": []
     }
