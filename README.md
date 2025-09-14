@@ -210,6 +210,8 @@ npm run clean        # Limpiar cache
 ### **Configuración**
 ```bash
 npm run setup:firebase  # Configurar Firebase
+npm run test:env        # Probar variables de entorno
+npm run test:android    # Probar configuración de Android
 ```
 
 ### **Plataformas Específicas**

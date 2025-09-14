@@ -1,6 +1,10 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 .env
+# Firebase configuration files
+android/app/google-services.json
+ios/SoFinance/GoogleService-Info.plist
+
 
 # dependencies
 node_modules/

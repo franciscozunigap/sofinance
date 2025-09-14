@@ -1,6 +1,30 @@
 // src/firebase/firebaseConfig.ts
 // Archivo de configuración de Firebase para diferentes plataformas
 
+import {
+  PRIVATE_FIREBASE_APIKEY,
+  PRIVATE_FIREBASE_AUTH_DOMAIN,
+  PRIVATE_FIREBASE_PROYECT_ID,
+  PRIVATE_FIREBASE_STORAGE_BUCKET,
+  PRIVATE_FIREBASE_MESSAGING_SENDER_ID,
+  PRIVATE_FIREBASE_APP_ID,
+  PRIVATE_FIREBASE_MEASUREMENT_ID,
+  IOS_FIREBASE_APIKEY,
+  IOS_FIREBASE_AUTH_DOMAIN,
+  IOS_FIREBASE_PROYECT_ID,
+  IOS_FIREBASE_STORAGE_BUCKET,
+  IOS_FIREBASE_MESSAGING_SENDER_ID,
+  IOS_FIREBASE_APP_ID,
+  IOS_FIREBASE_MEASUREMENT_ID,
+  ANDROID_FIREBASE_APIKEY,
+  ANDROID_FIREBASE_AUTH_DOMAIN,
+  ANDROID_FIREBASE_PROYECT_ID,
+  ANDROID_FIREBASE_STORAGE_BUCKET,
+  ANDROID_FIREBASE_MESSAGING_SENDER_ID,
+  ANDROID_FIREBASE_APP_ID,
+  ANDROID_FIREBASE_MEASUREMENT_ID,
+} from '@env';
+
 export interface FirebaseConfig {
   apiKey: string;
   authDomain: string;
@@ -15,35 +39,36 @@ export interface FirebaseConfig {
 export const firebaseConfigs: Record<string, FirebaseConfig> = {
   // Configuración para web (usa variables de entorno)
   web: {
-    apiKey: process.env.PRIVATE_FIREBASE_APIKEY || "",
-    authDomain: process.env.PRIVATE_FIREBASE_AUTH_DOMAIN || "",
-    projectId: process.env.PRIVATE_FIREBASE_PROYECT_ID || "",
-    storageBucket: process.env.PRIVATE_FIREBASE_STORAGE_BUCKET || "",
-    messagingSenderId: process.env.PRIVATE_FIREBASE_MESSAGING_SENDER_ID || "",
-    appId: process.env.PRIVATE_FIREBASE_APP_ID || "",
-    measurementId: process.env.PRIVATE_FIREBASE_MEASUREMENT_ID || ""
+    apiKey: PRIVATE_FIREBASE_APIKEY || "",
+    authDomain: PRIVATE_FIREBASE_AUTH_DOMAIN || "",
+    projectId: PRIVATE_FIREBASE_PROYECT_ID || "",
+    storageBucket: PRIVATE_FIREBASE_STORAGE_BUCKET || "",
+    messagingSenderId: PRIVATE_FIREBASE_MESSAGING_SENDER_ID || "",
+    appId: PRIVATE_FIREBASE_APP_ID || "",
+    measurementId: PRIVATE_FIREBASE_MEASUREMENT_ID || ""
   },
   
   // Configuración para iOS - REEMPLAZAR CON TUS CREDENCIALES REALES
   ios: {
-    apiKey: process.env.IOS_FIREBASE_APIKEY || "",
-    authDomain: process.env.IOS_FIREBASE_AUTH_DOMAIN || "",
-    projectId: process.env.IOS_FIREBASE_PROYECT_ID || "",
-    storageBucket: process.env.IOS_FIREBASE_STORAGE_BUCKET || "",
-    messagingSenderId: process.env.IOS_FIREBASE_MESSAGING_SENDER_ID || "",
-    appId: process.env.IOS_FIREBASE_APP_ID || "",
+    apiKey: IOS_FIREBASE_APIKEY || "",
+    authDomain: IOS_FIREBASE_AUTH_DOMAIN || "",
+    projectId: IOS_FIREBASE_PROYECT_ID || "",
+    storageBucket: IOS_FIREBASE_STORAGE_BUCKET || "",
+    messagingSenderId: IOS_FIREBASE_MESSAGING_SENDER_ID || "",
+    appId: IOS_FIREBASE_APP_ID || "",
+    measurementId: IOS_FIREBASE_MEASUREMENT_ID || ""
   },
 
   
   // Configuración para Android - REEMPLAZAR CON TUS CREDENCIALES REALES
   android: {
-    apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // Reemplazar con tu API key
-    authDomain: "sofinance-xxxxx.firebaseapp.com", // Reemplazar con tu dominio
-    projectId: "sofinance-xxxxx", // Reemplazar con tu project ID
-    storageBucket: "sofinance-xxxxx.appspot.com", // Reemplazar con tu storage bucket
-    messagingSenderId: "123456789012", // Reemplazar con tu sender ID
-    appId: "1:123456789012:android:abcdef1234567890", // Reemplazar con tu app ID
-    measurementId: "G-XXXXXXXXXX" // Reemplazar con tu measurement ID
+    apiKey: ANDROID_FIREBASE_APIKEY || "",
+    authDomain: ANDROID_FIREBASE_AUTH_DOMAIN || "",
+    projectId: ANDROID_FIREBASE_PROYECT_ID || "",
+    storageBucket: ANDROID_FIREBASE_STORAGE_BUCKET || "",
+    messagingSenderId: ANDROID_FIREBASE_MESSAGING_SENDER_ID || "",
+    appId: ANDROID_FIREBASE_APP_ID || "",
+    measurementId: ANDROID_FIREBASE_MEASUREMENT_ID || ""
   }
 };
 

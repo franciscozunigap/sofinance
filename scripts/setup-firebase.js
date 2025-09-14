@@ -53,6 +53,32 @@ async function main() {
     const androidAppId = await question('App ID para Android: ');
     const androidMeasurementId = await question('Measurement ID para Android (opcional): ');
 
+    console.log('\n📝 Variables de entorno para .env:');
+    console.log('Agrega estas variables a tu archivo .env:');
+    console.log('\n# Firebase Web');
+    console.log(`PRIVATE_FIREBASE_APIKEY=${webApiKey}`);
+    console.log(`PRIVATE_FIREBASE_AUTH_DOMAIN=${webAuthDomain}`);
+    console.log(`PRIVATE_FIREBASE_PROYECT_ID=${webProjectId}`);
+    console.log(`PRIVATE_FIREBASE_STORAGE_BUCKET=${webStorageBucket}`);
+    console.log(`PRIVATE_FIREBASE_MESSAGING_SENDER_ID=${webMessagingSenderId}`);
+    console.log(`PRIVATE_FIREBASE_APP_ID=${webAppId}`);
+    console.log(`PRIVATE_FIREBASE_MEASUREMENT_ID=${webMeasurementId || ''}`);
+    console.log('\n# Firebase iOS');
+    console.log(`IOS_FIREBASE_APIKEY=${iosApiKey}`);
+    console.log(`IOS_FIREBASE_AUTH_DOMAIN=${iosAuthDomain}`);
+    console.log(`IOS_FIREBASE_PROYECT_ID=${iosProjectId}`);
+    console.log(`IOS_FIREBASE_STORAGE_BUCKET=${iosStorageBucket}`);
+    console.log(`IOS_FIREBASE_MESSAGING_SENDER_ID=${iosMessagingSenderId}`);
+    console.log(`IOS_FIREBASE_APP_ID=${iosAppId}`);
+    console.log('\n# Firebase Android');
+    console.log(`ANDROID_FIREBASE_APIKEY=${androidApiKey}`);
+    console.log(`ANDROID_FIREBASE_AUTH_DOMAIN=${androidAuthDomain}`);
+    console.log(`ANDROID_FIREBASE_PROYECT_ID=${androidProjectId}`);
+    console.log(`ANDROID_FIREBASE_STORAGE_BUCKET=${androidStorageBucket}`);
+    console.log(`ANDROID_FIREBASE_MESSAGING_SENDER_ID=${androidMessagingSenderId}`);
+    console.log(`ANDROID_FIREBASE_APP_ID=${androidAppId}`);
+    console.log(`ANDROID_FIREBASE_MEASUREMENT_ID=${androidMeasurementId || ''}`);
+
     // Generar el archivo de configuración
     const configContent = `// src/firebase/firebaseConfig.ts
 // Archivo de configuración de Firebase para diferentes plataformas
@@ -83,24 +109,24 @@ export const firebaseConfigs: Record<string, FirebaseConfig> = {
   
   // Configuración para iOS
   ios: {
-    apiKey: "${iosApiKey}",
-    authDomain: "${iosAuthDomain}",
-    projectId: "${iosProjectId}",
-    storageBucket: "${iosStorageBucket}",
-    messagingSenderId: "${iosMessagingSenderId}",
-    appId: "${iosAppId}",
-    measurementId: "${iosMeasurementId || ''}"
+    apiKey: process.env.IOS_FIREBASE_APIKEY || "${iosApiKey}",
+    authDomain: process.env.IOS_FIREBASE_AUTH_DOMAIN || "${iosAuthDomain}",
+    projectId: process.env.IOS_FIREBASE_PROYECT_ID || "${iosProjectId}",
+    storageBucket: process.env.IOS_FIREBASE_STORAGE_BUCKET || "${iosStorageBucket}",
+    messagingSenderId: process.env.IOS_FIREBASE_MESSAGING_SENDER_ID || "${iosMessagingSenderId}",
+    appId: process.env.IOS_FIREBASE_APP_ID || "${iosAppId}",
+    measurementId: process.env.IOS_FIREBASE_MEASUREMENT_ID || "${iosMeasurementId || ''}"
   },
   
   // Configuración para Android
   android: {
-    apiKey: "${androidApiKey}",
-    authDomain: "${androidAuthDomain}",
-    projectId: "${androidProjectId}",
-    storageBucket: "${androidStorageBucket}",
-    messagingSenderId: "${androidMessagingSenderId}",
-    appId: "${androidAppId}",
-    measurementId: "${androidMeasurementId || ''}"
+    apiKey: process.env.ANDROID_FIREBASE_APIKEY || "${androidApiKey}",
+    authDomain: process.env.ANDROID_FIREBASE_AUTH_DOMAIN || "${androidAuthDomain}",
+    projectId: process.env.ANDROID_FIREBASE_PROYECT_ID || "${androidProjectId}",
+    storageBucket: process.env.ANDROID_FIREBASE_STORAGE_BUCKET || "${androidStorageBucket}",
+    messagingSenderId: process.env.ANDROID_FIREBASE_MESSAGING_SENDER_ID || "${androidMessagingSenderId}",
+    appId: process.env.ANDROID_FIREBASE_APP_ID || "${androidAppId}",
+    measurementId: process.env.ANDROID_FIREBASE_MEASUREMENT_ID || "${androidMeasurementId || ''}"
   }
 };
 

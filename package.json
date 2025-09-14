@@ -19,7 +19,9 @@
     "test:web": "npm run web",
     "test:mobile": "npm run start",
     "clean": "expo start --clear && npm run web -- --config web/webpack.config.js --mode development",
-    "setup:firebase": "node scripts/setup-firebase.js"
+    "setup:firebase": "node scripts/setup-firebase.js",
+    "test:android": "node scripts/test-android.js",
+    "test:env": "node scripts/test-env.js"
   },
   "dependencies": {
     "@babel/preset-env": "^7.28.3",
@@ -64,6 +66,7 @@
     "dotenv": "^17.2.2",
     "postcss": "^8.5.6",
     "postcss-loader": "^8.2.0",
+    "react-native-dotenv": "^3.4.11",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3"
   },

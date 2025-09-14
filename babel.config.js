@@ -19,6 +19,19 @@ module.exports = function (api) {
           },
         },
       ],
+      // Environment variables
+      [
+        'module:react-native-dotenv',
+        {
+          moduleName: '@env',
+          path: '.env',
+          blocklist: null,
+          allowlist: null,
+          safe: false,
+          allowUndefined: true,
+          verbose: false,
+        },
+      ],
       // Note: react-native-reanimated/plugin can be added later if needed
     ],
   };
