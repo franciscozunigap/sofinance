@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { AuthService } from '../../services/authService';
+import { User } from '../../types';
 
 interface WebRegistrationScreenProps {
-  onRegistrationSuccess: (user: any) => void;
+  onRegistrationSuccess: (user: User) => void;
   onShowLogin: () => void;
   onShowOnboarding?: () => void;
 }
@@ -53,25 +55,23 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
 
     setLoading(true);
     try {
-      // Simulación de registro
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const user = {
-        id: '1',
-        name: formData.name,
+      const [firstName, ...lastNameParts] = formData.name.trim().split(' ');
+      const lastName = lastNameParts.join(' ');
+
+      const user = await AuthService.register({
         email: formData.email,
-        monthlyIncome: 0,
-        currentScore: 0,
-        riskScore: 0,
-        monthlyExpenses: 0,
-        currentSavings: 0,
-        savingsGoal: 0,
-        alerts: 0
-      };
+        password: formData.password,
+        firstName: firstName || '',
+        lastName: lastName || ''
+      });
       
       onRegistrationSuccess(user);
-    } catch (error) {
-      alert('Error al crear la cuenta. Inténtalo de nuevo.');
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        alert('Error: El correo electrónico ya está en uso.');
+      } else {
+        alert(`Error al crear la cuenta: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -104,7 +104,7 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <UserIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="name"

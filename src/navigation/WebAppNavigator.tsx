@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import WebLoginScreen from '../screens/web/WebLoginScreen';
 import WebOnboardingScreen from '../screens/web/WebOnboardingScreen';
 import WebDashboardScreen from '../screens/web/WebDashboardScreen';
+import { User } from '../types';
+import { UserProvider } from '../contexts/UserContext';
 
 interface WebAppNavigatorProps {
   isLoggedIn: boolean;
-  onLoginSuccess: () => void;
-  onRegistrationSuccess: () => void;
+  onLoginSuccess: (user: User) => void;
+  onRegistrationSuccess: (user: User) => void;
 }
 
-const WebAppNavigator: React.FC<WebAppNavigatorProps> = ({
+const WebAppNavigatorContent: React.FC<WebAppNavigatorProps> = ({
   isLoggedIn,
   onLoginSuccess,
   onRegistrationSuccess,
@@ -37,6 +39,14 @@ const WebAppNavigator: React.FC<WebAppNavigatorProps> = ({
 
   // Si está autenticado, mostrar dashboard
   return <WebDashboardScreen />;
+};
+
+const WebAppNavigator: React.FC<WebAppNavigatorProps> = (props) => {
+  return (
+    <UserProvider>
+      <WebAppNavigatorContent {...props} />
+    </UserProvider>
+  );
 };
 
 export default WebAppNavigator;

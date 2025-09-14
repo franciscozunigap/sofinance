@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
-import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { Bell, User as UserIcon, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut } from 'lucide-react';
 import WebAppNavigator from '../src/navigation/WebAppNavigator';
+import { AuthService } from '../src/services/authService';
+import { User } from '../src/types';
+import { UserProvider, useUser } from '../src/contexts/UserContext';
 
-const SofinanceApp = () => {
+const SofinanceAppContent = () => {
   const [currentView, setCurrentView] = useState('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user, setUser } = useUser();
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -17,8 +21,33 @@ const SofinanceApp = () => {
   ]);
   const [chatInput, setChatInput] = useState('');
 
-  // Datos del usuario (se actualizarán desde el contexto)
-  const userData = user || {
+  useEffect(() => {
+    const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
+      if (firebaseUser) {
+        // Usar datos mock del usuario desde UserContext
+        setUser(firebaseUser);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [setUser]);
+
+  // Datos del usuario desde el contexto
+  const userData = user ? {
+    name: user.name || 'Usuario',
+    monthlyIncome: user.monthlyIncome || 4200,
+    currentScore: user.currentScore || 52,
+    riskScore: user.riskScore || 48,
+    monthlyExpenses: user.monthlyExpenses || 3180,
+    currentSavings: user.currentSavings || 12500,
+    savingsGoal: user.savingsGoal || 18000,
+    alerts: user.alerts || 3
+  } : {
     name: 'Usuario',
     monthlyIncome: 4200,
     currentScore: 52,
@@ -66,15 +95,18 @@ const SofinanceApp = () => {
     { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de ahorro mensual', icon: '💎', unlocked: false }
   ];
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (loggedInUser: User) => {
+    setUser(loggedInUser);
     setIsAuthenticated(true);
   };
 
-  const handleRegistrationSuccess = () => {
+  const handleRegistrationSuccess = (registeredUser: User) => {
+    setUser(registeredUser);
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await AuthService.logout();
     setUser(null);
     setIsAuthenticated(false);
     setCurrentView('dashboard');
@@ -120,6 +152,14 @@ const SofinanceApp = () => {
   };
 
   const scoreStatus = getScoreStatus(userData.currentScore);
+
+  if (isLoading) {
+    return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500"></div>
+        </div>
+    );
+  }
 
   // Si no está autenticado, mostrar WebAppNavigator
   if (!isAuthenticated) {
@@ -249,7 +289,7 @@ const SofinanceApp = () => {
                 </span>
               </div>
               <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <User className="h-5 w-5 text-orange-600" />
+                <UserIcon className="h-5 w-5 text-orange-600" />
               </div>
               <button
                 onClick={handleLogout}
@@ -544,6 +584,14 @@ const SofinanceApp = () => {
         </div>
       </nav>
     </div>
+  );
+};
+
+const SofinanceApp = () => {
+  return (
+    <UserProvider>
+      <SofinanceAppContent />
+    </UserProvider>
   );
 };
 

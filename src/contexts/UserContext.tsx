@@ -2,15 +2,15 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface User {
   id: string;
-  name: string;
+  name?: string;
   email: string;
-  monthlyIncome: number;
-  currentScore: number;
-  riskScore: number;
-  monthlyExpenses: number;
-  currentSavings: number;
-  savingsGoal: number;
-  alerts: number;
+  monthlyIncome?: number;
+  currentScore?: number;
+  riskScore?: number;
+  monthlyExpenses?: number;
+  currentSavings?: number;
+  savingsGoal?: number;
+  alerts?: number;
 }
 
 interface UserContextType {

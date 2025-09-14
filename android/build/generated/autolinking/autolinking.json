@@ -3,6 +3,33 @@
   "reactNativePath": "/Users/usuario/code/GIT/sofinance/node_modules/react-native",
   "reactNativeVersion": "0.81",
   "dependencies": {
+    "@react-native-community/slider": {
+      "root": "/Users/usuario/code/GIT/sofinance/node_modules/@react-native-community/slider",
+      "name": "@react-native-community/slider",
+      "platforms": {
+        "ios": {
+          "podspecPath": "/Users/usuario/code/GIT/sofinance/node_modules/@react-native-community/slider/react-native-slider.podspec",
+          "version": "5.0.1",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "/Users/usuario/code/GIT/sofinance/node_modules/@react-native-community/slider/android",
+          "packageImportPath": "import com.reactnativecommunity.slider.ReactSliderPackage;",
+          "packageInstance": "new ReactSliderPackage()",
+          "buildTypes": [],
+          "libraryName": "RNCSlider",
+          "componentDescriptors": [
+            "RNCSliderComponentDescriptor"
+          ],
+          "cmakeListsPath": "/Users/usuario/code/GIT/sofinance/node_modules/@react-native-community/slider/android/src/main/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
     "expo": {
       "root": "/Users/usuario/code/GIT/sofinance/node_modules/expo",
       "name": "expo",

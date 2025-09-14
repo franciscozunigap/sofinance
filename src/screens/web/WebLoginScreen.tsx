@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { AuthService } from '../../services/authService';
+import { User } from '../../types';
+import { useUser } from '../../contexts/UserContext';
 
 interface WebLoginScreenProps {
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: User) => void;
   onShowRegistration: () => void;
 }
 
@@ -11,10 +14,11 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const { setUser } = useUser();
 
   const validateForm = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string; general?: string } = {};
 
     if (!email.trim()) {
       newErrors.email = 'El email es requerido';
@@ -36,26 +40,29 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
     if (!validateForm()) return;
 
     setLoading(true);
+    setErrors({}); // Limpiar errores anteriores
+    
     try {
-      // Simulación de login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const user = {
-        id: '1',
-        name: email.split('@')[0],
-        email: email,
-        monthlyIncome: 4200,
-        currentScore: 52,
-        riskScore: 48,
-        monthlyExpenses: 3180,
-        currentSavings: 12500,
-        savingsGoal: 18000,
-        alerts: 3
-      };
-      
+      const user = await AuthService.login({ email, password });
+      // Actualizar el contexto del usuario con los datos mock
+      setUser(user);
       onLoginSuccess(user);
-    } catch (error) {
-      alert('Error: Credenciales inválidas. Inténtalo de nuevo.');
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') {
+        setErrors({ email: 'No existe una cuenta con este email' });
+      } else if (error.code === 'auth/wrong-password') {
+        setErrors({ password: 'Contraseña incorrecta' });
+      } else if (error.code === 'auth/invalid-credential') {
+        setErrors({ 
+          general: 'Email o contraseña incorrectos'
+        });
+      } else if (error.code === 'auth/too-many-requests') {
+        setErrors({ general: 'Demasiados intentos fallidos. Inténtalo más tarde.' });
+      } else if (error.code === 'auth/network-request-failed') {
+        setErrors({ general: 'Error de conexión. Verifica tu internet.' });
+      } else {
+        setErrors({ general: `Error: ${error.message}` });
+      }
     } finally {
       setLoading(false);
     }
@@ -89,7 +96,12 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email || errors.general) {
+                      setErrors(prev => ({ ...prev, email: undefined, general: undefined }));
+                    }
+                  }}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -116,7 +128,12 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                   autoComplete="current-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password || errors.general) {
+                      setErrors(prev => ({ ...prev, password: undefined, general: undefined }));
+                    }
+                  }}
                   className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
                     errors.password ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -138,6 +155,12 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
             </div>
+
+            {errors.general && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-600 text-center">{errors.general}</p>
+              </div>
+            )}
 
             <div>
               <button

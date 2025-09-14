@@ -105,7 +105,7 @@ const WebDashboardScreen = () => {
     }
   };
 
-  const getScoreStatus = (score) => {
+  const getScoreStatus = (score: number) => {
     if (score >= 60) return { text: '¡Excelente! Estás en zona óptima', color: 'text-green-600', emoji: '🚀' };
     if (score >= 40) return { text: 'Bien, mantén el ritmo', color: 'text-orange-600', emoji: '💪' };
     return { text: 'Necesitas mejorar', color: 'text-red-600', emoji: '⚠️' };

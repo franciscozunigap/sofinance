@@ -4,6 +4,14 @@ export interface User {
   name?: string;
   firstName?: string;
   lastName?: string;
+  // Financial data
+  monthlyIncome?: number;
+  currentScore?: number;
+  riskScore?: number;
+  monthlyExpenses?: number;
+  currentSavings?: number;
+  savingsGoal?: number;
+  alerts?: number;
 }
 
 export interface OnboardingData {
