@@ -36,14 +36,12 @@ const AppContent = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkAuthStatus = () => {
-      const isAuthenticated = AuthService.isAuthenticated();
-      setIsLoggedIn(isAuthenticated);
+    const unsubscribe = AuthService.onAuthStateChanged(user => {
+      setIsLoggedIn(!!user);
       setIsLoading(false);
-    };
+    });
 
-    checkAuthStatus();
+    return () => unsubscribe();
   }, []);
 
   const handleLoginSuccess = () => {

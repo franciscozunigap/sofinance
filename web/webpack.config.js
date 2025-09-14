@@ -1,6 +1,16 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+// Cargar variables de entorno desde el archivo .env
+const env = dotenv.config({ path: path.resolve(__dirname, '../.env') }).parsed;
+
+// Crear un objeto para DefinePlugin
+const envKeys = Object.keys(env || {}).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   mode: 'development',
@@ -92,6 +102,7 @@ module.exports = {
       template: './web/index.html',
       filename: 'index.html',
     }),
+    new webpack.DefinePlugin(envKeys),
     // Plugin para reemplazar módulos problemáticos de React Navigation
     new webpack.NormalModuleReplacementPlugin(
       /^\.\.\/MaskedView$/,
