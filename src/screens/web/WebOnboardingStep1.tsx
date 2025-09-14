@@ -12,10 +12,11 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
   const [firstName, setFirstName] = useState(data.firstName || '');
   const [lastName, setLastName] = useState(data.lastName || '');
   const [email, setEmail] = useState(data.email || '');
-  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; email?: string }>({});
+  const [age, setAge] = useState(data.age?.toString() || '');
+  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; email?: string; age?: string }>({});
 
   const validateForm = (): boolean => {
-    const newErrors: { firstName?: string; lastName?: string; email?: string } = {};
+    const newErrors: { firstName?: string; lastName?: string; email?: string; age?: string } = {};
 
     if (!firstName.trim()) {
       newErrors.firstName = 'El nombre es requerido';
@@ -31,6 +32,15 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
       newErrors.email = 'El correo electrónico no es válido';
     }
 
+    if (!age.trim()) {
+      newErrors.age = 'La edad es requerida';
+    } else {
+      const ageNum = parseInt(age);
+      if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+        newErrors.age = 'La edad debe ser entre 18 y 100 años';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -42,6 +52,7 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: email.trim().toLowerCase(),
+      age: parseInt(age),
     });
   };
 
@@ -121,6 +132,27 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">
+                Edad
+              </label>
+              <input
+                id="age"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                  errors.age ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Ingresa tu edad"
+                min="18"
+                max="100"
+              />
+              {errors.age && (
+                <p className="mt-1 text-sm text-red-600">{errors.age}</p>
               )}
             </div>
 

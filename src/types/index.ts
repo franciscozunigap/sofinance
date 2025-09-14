@@ -4,6 +4,7 @@ export interface User {
   name?: string;
   firstName?: string;
   lastName?: string;
+  age?: number;
   // Financial data
   monthlyIncome?: number;
   currentScore?: number;
@@ -12,18 +13,33 @@ export interface User {
   currentSavings?: number;
   savingsGoal?: number;
   alerts?: number;
+  // Preferences
+  preferences?: {
+    needs_percent: number;
+    saving_percent: number;
+    wants_percent: number;
+  };
+  // Wallet
+  wallet?: {
+    monthly_income: number;
+    savings: number;
+  };
+  // Financial Profile
+  financialProfile?: string;
 }
 
 export interface OnboardingData {
   firstName: string;
   lastName: string;
   email: string;
+  age: number;
   monthlyIncome: number;
   savingsPercentage: number;
   needsPercentage: number;
   consumptionPercentage: number;
   currentSavings: number;
   password: string;
+  financialProfile?: string;
 }
 
 export interface FinancialData {

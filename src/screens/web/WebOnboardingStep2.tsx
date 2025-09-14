@@ -13,6 +13,7 @@ const WebOnboardingStep2: React.FC<WebOnboardingStep2Props> = ({ data, onNext, o
   const [needsPercentage, setNeedsPercentage] = useState(data.needsPercentage?.toString() || '50');
   const [consumptionPercentage, setConsumptionPercentage] = useState(data.consumptionPercentage?.toString() || '30');
   const [currentSavings, setCurrentSavings] = useState(data.currentSavings?.toString() || '');
+  const [financialProfile, setFinancialProfile] = useState(data.financialProfile || '');
   
   const [errors, setErrors] = useState<{ 
     monthlyIncome?: string; 
@@ -87,6 +88,7 @@ const WebOnboardingStep2: React.FC<WebOnboardingStep2Props> = ({ data, onNext, o
       needsPercentage: parseFloat(needsPercentage),
       consumptionPercentage: parseFloat(consumptionPercentage),
       currentSavings: parseFloat(currentSavings),
+      financialProfile: financialProfile.trim(),
     });
   };
 
@@ -166,6 +168,8 @@ const WebOnboardingStep2: React.FC<WebOnboardingStep2Props> = ({ data, onNext, o
                   Cuéntanos un poco sobre tu situación financiera actual para personalizar mejor tu experiencia.
                 </p>
                 <textarea
+                  value={financialProfile}
+                  onChange={(e) => setFinancialProfile(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                   rows={4}
                   placeholder="Ej: Soy un profesional de 28 años, trabajo en tecnología, vivo solo en Santiago, tengo algunos gastos fijos como arriendo y servicios básicos, y quiero empezar a ahorrar para comprar una casa en los próximos 5 años..."

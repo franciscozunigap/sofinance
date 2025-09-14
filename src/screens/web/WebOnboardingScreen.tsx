@@ -35,12 +35,14 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
         firstName: completeData.firstName,
         lastName: completeData.lastName,
         email: completeData.email,
+        age: completeData.age,
         password: completeData.password,
         monthlyIncome: completeData.monthlyIncome,
         savingsPercentage: completeData.savingsPercentage,
         needsPercentage: completeData.needsPercentage,
         consumptionPercentage: completeData.consumptionPercentage,
         currentSavings: completeData.currentSavings,
+        financialProfile: completeData.financialProfile,
       });
       
       onComplete();

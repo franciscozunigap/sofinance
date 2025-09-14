@@ -7,7 +7,7 @@ import {
   User as FirebaseUser
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
-import { fetchUserData, createUserData } from './userService';
+import { fetchUserData, createUserData, checkEmailExists } from './userService';
 
 // Simulación de servicio de autenticación
 export class AuthService {
@@ -17,27 +17,45 @@ export class AuthService {
   }
 
   static async register(data: OnboardingData): Promise<FirebaseUser> {
-    if (!data.email || !data.password || !data.firstName || !data.lastName) {
+    if (!data.email || !data.password || !data.firstName || !data.lastName || !data.age) {
       throw new Error('Todos los campos son requeridos');
     }
-    const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+
+    let userCredential;
+    try {
+      // Intentar crear el usuario directamente
+      // Firebase Auth ya valida emails únicos automáticamente
+      userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+    } catch (error: any) {
+      // Si el error es por email ya registrado, mostrar mensaje personalizado
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Este correo electrónico ya está registrado. Por favor, usa otro email o inicia sesión.');
+      }
+      // Re-lanzar otros errores
+      throw error;
+    }
+    
     const firebaseUser = userCredential.user;
     
-    const newUser: Omit<User, 'id'> = {
-        email: firebaseUser.email || '',
-        name: `${data.firstName} ${data.lastName}`,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        monthlyIncome: 4200,
-        currentScore: 52,
-        riskScore: 48,
-        monthlyExpenses: 3180,
-        currentSavings: 12500,
-        savingsGoal: 18000,
-        alerts: 3,
+    // Crear el documento con la estructura exacta que me mostraste
+    const userDocument = {
+      age: data.age,
+      email: data.email,
+      last_name: data.lastName,
+      name: data.firstName,
+      preferences: {
+        needs_percent: data.needsPercentage,
+        saving_percent: data.savingsPercentage,
+        wants_percent: data.consumptionPercentage,
+      },
+      wallet: {
+        monthly_income: data.monthlyIncome,
+        savings: data.currentSavings,
+      },
+      financial_profile: data.financialProfile || '', // Guardar el perfil financiero
     };
 
-    await createUserData(firebaseUser.uid, newUser);
+    await createUserData(firebaseUser.uid, userDocument);
 
     return firebaseUser;
   }
