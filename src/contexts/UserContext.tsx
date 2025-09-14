@@ -1,17 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  name?: string;
-  email: string;
-  monthlyIncome?: number;
-  currentScore?: number;
-  riskScore?: number;
-  monthlyExpenses?: number;
-  currentSavings?: number;
-  savingsGoal?: number;
-  alerts?: number;
-}
+import { AuthService } from '../services/authService';
+import { User } from '../types';
 
 interface UserContextType {
   user: User | null;
@@ -29,24 +18,15 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-
-  // Datos de ejemplo del usuario
-  const defaultUser: User = {
-    id: '1',
-    name: 'María',
-    email: 'maria@example.com',
-    monthlyIncome: 4200,
-    currentScore: 52,
-    riskScore: 48,
-    monthlyExpenses: 3180,
-    currentSavings: 12500,
-    savingsGoal: 18000,
-    alerts: 3
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular carga de datos del usuario
-    setUser(defaultUser);
+    const unsubscribe = AuthService.onAuthStateChanged((user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const updateUser = (updates: Partial<User>) => {
@@ -54,6 +34,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    AuthService.logout();
     setUser(null);
   };
 
@@ -69,7 +50,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </UserContext.Provider>
   );
 };

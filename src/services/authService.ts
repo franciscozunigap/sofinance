@@ -7,48 +7,39 @@ import {
   User as FirebaseUser
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
-
-const defaultFinancialData = {
-  monthlyIncome: 4200,
-  currentScore: 52,
-  riskScore: 48,
-  monthlyExpenses: 3180,
-  currentSavings: 12500,
-  savingsGoal: 18000,
-  alerts: 3,
-};
+import { fetchUserData, createUserData } from './userService';
 
 // Simulación de servicio de autenticación
 export class AuthService {
-  static async login(credentials: LoginCredentials): Promise<User> {
+  static async login(credentials: LoginCredentials): Promise<FirebaseUser> {
     const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
-    const firebaseUser = userCredential.user;
-    return {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
-        ...defaultFinancialData
-    };
+    return userCredential.user;
   }
 
-  static async register(data: OnboardingData): Promise<User> {
+  static async register(data: OnboardingData): Promise<FirebaseUser> {
     if (!data.email || !data.password || !data.firstName || !data.lastName) {
       throw new Error('Todos los campos son requeridos');
     }
     const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
     const firebaseUser = userCredential.user;
     
-    // Here you would typically update the user's profile with their name
-    // For example: await updateProfile(firebaseUser, { displayName: `${data.firstName} ${data.lastName}` });
-
-    return {
-        id: firebaseUser.uid,
+    const newUser: Omit<User, 'id'> = {
         email: firebaseUser.email || '',
         name: `${data.firstName} ${data.lastName}`,
         firstName: data.firstName,
         lastName: data.lastName,
-        ...defaultFinancialData
+        monthlyIncome: 4200,
+        currentScore: 52,
+        riskScore: 48,
+        monthlyExpenses: 3180,
+        currentSavings: 12500,
+        savingsGoal: 18000,
+        alerts: 3,
     };
+
+    await createUserData(firebaseUser.uid, newUser);
+
+    return firebaseUser;
   }
 
   static async logout(): Promise<void> {
@@ -60,15 +51,22 @@ export class AuthService {
   }
 
   static onAuthStateChanged(callback: (user: User | null) => void): () => void {
-    return onFirebaseAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+    return onFirebaseAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        const user: User = {
-          id: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
-          ...defaultFinancialData
-        };
-        callback(user);
+        const userData = await fetchUserData(firebaseUser.uid);
+        if (userData) {
+            callback(userData);
+        } else {
+            // This could happen if the user document is not created yet
+            // Or for a new registration before the document is created.
+            // We can return a basic user object.
+            const basicUser: User = {
+                id: firebaseUser.uid,
+                email: firebaseUser.email || '',
+                name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
+            };
+            callback(basicUser);
+        }
       } else {
         callback(null);
       }
