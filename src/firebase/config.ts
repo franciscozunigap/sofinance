@@ -2,19 +2,28 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from "firebase/firestore";
+import { Platform } from 'react-native';
+import { getFirebaseConfig } from './firebaseConfig';
 
-// TODO: Replace with your app's Firebase project configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-    apiKey: process.env.PRIVATE_FIREBASE_APIKEY,
-    authDomain: process.env.PRIVATE_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.PRIVATE_FIREBASE_PROYECT_ID,
-    storageBucket: process.env.PRIVATE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.PRIVATE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.PRIVATE_FIREBASE_APP_ID,
-    measurementId: process.env.PRIVATE_FIREBASE_MEASUREMENT_ID
-  };
+// Obtener la configuración según la plataforma
+const platform = Platform.OS;
+const firebaseConfig = getFirebaseConfig(platform);
 
+// Verificar que la configuración esté completa
+const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+const missingKeys = requiredKeys.filter(key => !firebaseConfig[key as keyof typeof firebaseConfig]);
+
+if (missingKeys.length > 0) {
+  console.error('Firebase configuration is missing required keys:', missingKeys);
+  console.error('Platform:', platform);
+  console.error('Current config:', firebaseConfig);
+  throw new Error(`Firebase configuration is incomplete for ${platform}. Missing: ${missingKeys.join(', ')}`);
+}
+
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Log de confirmación
+console.log(`Firebase initialized for ${platform} platform`);

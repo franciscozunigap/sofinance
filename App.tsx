@@ -11,16 +11,24 @@ import WebAppNavigator from './src/navigation/WebAppNavigator';
 import { AuthService } from './src/services/authService';
 import { COLORS } from './src/constants';
 import { UserProvider } from './src/contexts/UserContext';
+import { testFirebaseConfig } from './src/firebase/testConnection';
 
 // Componente de carga
-const LoadingScreen = () => (
+const LoadingScreen = ({ firebaseReady }: { firebaseReady: boolean }) => (
   <View style={styles.loadingContainer}>
     <View style={styles.loadingContent}>
       <View style={styles.logoContainer}>
         <Text style={styles.logoText}>💰</Text>
       </View>
       <Text style={styles.loadingTitle}>SoFinance</Text>
-      <Text style={styles.loadingSubtitle}>Cargando tu información...</Text>
+      <Text style={styles.loadingSubtitle}>
+        {firebaseReady ? 'Cargando tu información...' : 'Configurando servicios...'}
+      </Text>
+      {!firebaseReady && (
+        <Text style={styles.warningText}>
+          ⚠️ Verificando configuración de Firebase
+        </Text>
+      )}
       <ActivityIndicator 
         size="large" 
         color={COLORS.primary} 
@@ -34,15 +42,38 @@ const LoadingScreen = () => (
 const AppContent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [firebaseReady, setFirebaseReady] = useState(false);
 
   useEffect(() => {
+    // Probar la configuración de Firebase al iniciar
+    const testFirebase = async () => {
+      try {
+        const isConfigValid = testFirebaseConfig();
+        setFirebaseReady(isConfigValid);
+        
+        if (!isConfigValid) {
+          console.error('Firebase configuration is invalid. Please check your configuration.');
+        }
+      } catch (error) {
+        console.error('Error testing Firebase configuration:', error);
+        setFirebaseReady(false);
+      }
+    };
+
+    testFirebase();
+  }, []);
+
+  useEffect(() => {
+    // Solo configurar el listener de autenticación si Firebase está listo
+    if (!firebaseReady) return;
+
     const unsubscribe = AuthService.onAuthStateChanged(user => {
       setIsLoggedIn(!!user);
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [firebaseReady]);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -56,8 +87,8 @@ const AppContent = () => {
     setIsLoggedIn(false);
   };
 
-  if (isLoading) {
-    return <LoadingScreen />;
+  if (isLoading || !firebaseReady) {
+    return <LoadingScreen firebaseReady={firebaseReady} />;
   }
 
   return (
@@ -139,6 +170,13 @@ const styles = StyleSheet.create({
   },
   loadingSpinner: {
     marginTop: 16,
+  },
+  warningText: {
+    fontSize: 14,
+    color: COLORS.warning || '#FFA500',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
 

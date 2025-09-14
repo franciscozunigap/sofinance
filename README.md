@@ -81,6 +81,17 @@ sofinance/
    npm install
    ```
 
+3. **Configurar Firebase (Requerido)**
+   ```bash
+   # Ejecutar script de configuración interactivo
+   npm run setup:firebase
+   
+   # O configurar manualmente editando:
+   # src/firebase/firebaseConfig.ts
+   ```
+   
+   📖 **Ver documentación completa**: [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
+
 ## 🔥 Desarrollo Multiplataforma
 
 ### **Desarrollo Simultáneo (Recomendado)**
@@ -145,16 +156,23 @@ npm run android
 2. Configura AVD
 3. Ejecuta `npm run android`
 
-## 🔐 Credenciales de Acceso
+## 🔐 Autenticación y Base de Datos
 
-### **Login**
+### **Firebase Integration**
+- **Autenticación**: Email/Password con Firebase Auth
+- **Base de Datos**: Firestore para almacenamiento de datos
+- **Multiplataforma**: Funciona en Web, iOS y Android
+- **Configuración**: Script automático de configuración
+
+### **Credenciales de Prueba**
 - **Email**: Cualquier email válido (ej: `usuario@ejemplo.com`)
 - **Contraseña**: Mínimo 6 caracteres (ej: `123456`)
 
-### **Registro**
+### **Registro de Usuario**
 - **Paso 1**: Información personal (nombre, apellido, email)
 - **Paso 2**: Información financiera (ingresos, objetivos)
 - **Paso 3**: Seguridad (contraseña, términos)
+- **Almacenamiento**: Datos guardados en Firestore
 
 ## 🎨 Sistema de Diseño
 
@@ -187,6 +205,11 @@ npm run start        # Solo mobile
 npm run dev:both     # Ambos simultáneamente
 npm run dev:multi    # Menú interactivo
 npm run clean        # Limpiar cache
+```
+
+### **Configuración**
+```bash
+npm run setup:firebase  # Configurar Firebase
 ```
 
 ### **Plataformas Específicas**

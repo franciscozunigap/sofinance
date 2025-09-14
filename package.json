@@ -18,7 +18,8 @@
     "build:mobile": "expo build",
     "test:web": "npm run web",
     "test:mobile": "npm run start",
-    "clean": "expo start --clear && npm run web -- --config web/webpack.config.js --mode development"
+    "clean": "expo start --clear && npm run web -- --config web/webpack.config.js --mode development",
+    "setup:firebase": "node scripts/setup-firebase.js"
   },
   "dependencies": {
     "@babel/preset-env": "^7.28.3",
