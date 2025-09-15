@@ -5,13 +5,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
-
-export type RootStackParamList = {
-  Login: { onLoginSuccess: () => void };
-  Register: { onRegistrationSuccess: () => void };
-  Onboarding: { onComplete: () => void };
-  Dashboard: undefined;
-};
+import { RootStackParamList } from '../types';
 
 const Stack = createStackNavigator<RootStackParamList>();
 

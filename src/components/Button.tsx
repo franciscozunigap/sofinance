@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primary: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primary, // Azul Suave
     shadowColor: COLORS.primary,
     shadowOffset: {
       width: 0,
@@ -105,12 +105,20 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   secondary: {
-    backgroundColor: COLORS.grayScale[100],
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.grayScale[300],
+    borderColor: COLORS.primary, // Azul Suave para el borde
   },
   danger: {
-    backgroundColor: COLORS.danger,
+    backgroundColor: COLORS.danger, // Rojo Vibrante
+    shadowColor: COLORS.danger,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   small: {
     paddingVertical: SIZES.sm,
@@ -139,7 +147,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   secondaryText: {
-    color: COLORS.grayScale[700],
+    color: COLORS.primary, // Azul Suave para texto secundario
   },
   dangerText: {
     color: COLORS.white,

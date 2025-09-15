@@ -1,38 +1,57 @@
 export const COLORS = {
-  primary: '#ea580c', // Naranja principal de la web
-  secondary: '#fb923c', // Naranja secundario
-  success: '#27ae60',
-  danger: '#e74c3c',
-  warning: '#f39c12',
-  light: '#f8fafc', // Gris claro de la web
-  dark: '#1f2937', // Gris oscuro de la web
-  gray: '#6b7280', // Gris medio de la web
+  // Paleta de colores específica para CRM/gestión
+  // Colores de Base (60% - Dominante)
+  light: '#F2F2F2', // Blanco Roto - Principal para fondos
+  dark: '#212226', // Negro Suave - Principal para textos
+  
+  // Color Primario (30% - Secundario)
+  primary: '#858BF2', // Azul Suave - Elementos principales
+  primaryIntense: '#1B3BF2', // Azul Intenso - Botones CTA
+  
+  // Colores de Acento y Semánticos (10% - Acentos)
+  danger: '#F20505', // Rojo Vibrante - Estados de error/alertas
+  success: '#27ae60', // Verde para éxito
+  warning: '#f39c12', // Amarillo para advertencias
+  
+  // Colores de soporte
   white: '#ffffff',
   black: '#000000',
-  // Colores adicionales para coincidir con la web
-  orange: {
-    50: '#fff7ed',
-    100: '#ffedd5',
-    200: '#fed7aa',
-    300: '#fdba74',
-    400: '#fb923c',
-    500: '#ea580c',
-    600: '#dc2626',
-    700: '#b91c1c',
-    800: '#991b1b',
-    900: '#7f1d1d',
+  gray: '#6b7280', // Gris medio para textos secundarios
+  
+  // Escalas de azul basadas en el primario
+  blue: {
+    50: '#f0f2ff',
+    100: '#e0e7ff',
+    200: '#c7d2fe',
+    300: '#a5b4fc',
+    400: '#858BF2', // Color primario
+    500: '#6366f1',
+    600: '#4f46e5',
+    700: '#4338ca',
+    800: '#3730a3',
+    900: '#312e81',
   },
+  
+  // Escala de grises basada en la paleta
   grayScale: {
-    50: '#f9fafb',
-    100: '#f3f4f6',
-    200: '#e5e7eb',
-    300: '#d1d5db',
-    400: '#9ca3af',
-    500: '#6b7280',
-    600: '#4b5563',
-    700: '#374151',
-    800: '#1f2937',
-    900: '#111827',
+    50: '#fafafa',
+    100: '#f5f5f5',
+    200: '#e5e5e5',
+    300: '#d4d4d4',
+    400: '#a3a3a3',
+    500: '#737373',
+    600: '#525252',
+    700: '#404040',
+    800: '#262626',
+    900: '#171717',
+  },
+  
+  // Colores semánticos específicos
+  semantic: {
+    error: '#F20505', // Rojo vibrante para errores
+    success: '#27ae60', // Verde para éxito
+    warning: '#f39c12', // Amarillo para advertencias
+    info: '#1B3BF2', // Azul intenso para información
   }
 } as const;
 

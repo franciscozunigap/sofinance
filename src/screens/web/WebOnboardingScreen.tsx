@@ -96,7 +96,7 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-light">
       {renderCurrentStep()}
     </div>
   );

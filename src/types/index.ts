@@ -64,7 +64,9 @@ export interface LoginCredentials {
 }
 
 export type RootStackParamList = {
-  Login: undefined;
+  Login: { onLoginSuccess: () => void };
+  Register: { onRegistrationSuccess: () => void };
+  Onboarding: { onComplete: () => void };
   Dashboard: undefined;
   Transactions: undefined;
   Profile: undefined;

@@ -180,7 +180,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // bg-gray-50
+    backgroundColor: COLORS.light, // Blanco Roto
   },
   keyboardView: {
     flex: 1,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#fed7aa', // orange-200
+    backgroundColor: COLORS.blue[100], // Azul claro
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.sm,
@@ -215,33 +215,33 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
   },
   stepText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
   },
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: '#111827', // gray-900
+    color: COLORS.dark, // Negro Suave
     textAlign: 'center',
     marginBottom: SIZES.md,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: '#6b7280', // gray-500
+    color: COLORS.gray,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: SIZES.sm,
   },
   formContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: SIZES.xl,
-    shadowColor: '#000',
+    shadowColor: COLORS.dark,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -255,14 +255,14 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xl,
   },
   passwordTips: {
-    backgroundColor: '#fff7ed', // orange-50
+    backgroundColor: COLORS.blue[50], // Azul muy claro
     padding: SIZES.lg,
     borderRadius: 12,
     marginBottom: SIZES.xl,
     borderWidth: 1,
-    borderColor: '#fed7aa', // orange-200
+    borderColor: COLORS.blue[200], // Azul medio
     borderLeftWidth: 4,
-    borderLeftColor: '#ea580c', // orange-600
+    borderLeftColor: COLORS.primary, // Azul Suave
   },
   tipsHeader: {
     flexDirection: 'row',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   tipsTitle: {
     fontSize: 16,
     fontFamily: FONTS.semiBold,
-    color: '#111827', // gray-900
+    color: COLORS.dark, // Negro Suave
   },
   tipsList: {
     gap: SIZES.sm,
@@ -288,14 +288,14 @@ const styles = StyleSheet.create({
   tipBullet: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
     marginRight: SIZES.sm,
     marginTop: 2,
   },
   tipText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: '#6b7280', // gray-500
+    color: COLORS.gray,
     flex: 1,
     lineHeight: 20,
   },
@@ -309,10 +309,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   backButton: {
-    backgroundColor: '#e5e7eb', // gray-200
+    backgroundColor: COLORS.grayScale[200],
   },
   completeButton: {
-    backgroundColor: '#ea580c', // orange-600
+    backgroundColor: COLORS.primary, // Azul Suave
   },
 });
 

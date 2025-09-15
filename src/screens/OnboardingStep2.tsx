@@ -334,7 +334,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // bg-gray-50
+    backgroundColor: COLORS.light, // Blanco Roto
   },
   keyboardView: {
     flex: 1,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#fed7aa', // orange-200
+    backgroundColor: COLORS.blue[100], // Azul claro
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.sm,
@@ -369,33 +369,33 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
   },
   stepText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
   },
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: '#111827', // gray-900
+    color: COLORS.dark, // Negro Suave
     textAlign: 'center',
     marginBottom: SIZES.md,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: '#6b7280', // gray-500
+    color: COLORS.gray,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: SIZES.sm,
   },
   formContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: SIZES.xl,
-    shadowColor: '#000',
+    shadowColor: COLORS.dark,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -407,18 +407,18 @@ const styles = StyleSheet.create({
   amountsSection: {
     marginBottom: SIZES.xl,
     padding: SIZES.lg,
-    backgroundColor: '#dbeafe', // blue-100
+    backgroundColor: COLORS.blue[100], // Azul claro
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#bfdbfe', // blue-200
+    borderColor: COLORS.blue[200], // Azul medio
   },
   distributionSection: {
     marginBottom: SIZES.xl,
     padding: SIZES.lg,
-    backgroundColor: '#fff7ed', // orange-50
+    backgroundColor: COLORS.blue[50], // Azul muy claro
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#fed7aa', // orange-200
+    borderColor: COLORS.blue[200], // Azul medio
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -432,18 +432,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: FONTS.semiBold,
-    color: '#111827', // gray-900
+    color: COLORS.dark, // Negro Suave
   },
   sectionSubtitle: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: '#6b7280', // gray-500
+    color: COLORS.gray,
     marginBottom: SIZES.md,
   },
   recommendButton: {
     margin: SIZES.md,
-    backgroundColor: '#fed7aa', // orange-100 
-    borderColor: '#fed7aa', // orange-200
+    backgroundColor: COLORS.blue[100], // Azul claro
+    borderColor: COLORS.blue[200], // Azul medio
     padding: 6,
     width: '80%',
     alignSelf: 'center',
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   sliderLabel: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: '#374151', // gray-700
+    color: COLORS.dark, // Negro Suave
   },
   sliderValue: {
     fontSize: 18,
@@ -482,14 +482,14 @@ const styles = StyleSheet.create({
   rangeText: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: '#9ca3af', // gray-400
+    color: COLORS.gray,
   },
   totalIndicator: {
-    backgroundColor: '#f3f4f6', // gray-100
+    backgroundColor: COLORS.grayScale[100],
     padding: SIZES.md,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb', // gray-200
+    borderColor: COLORS.grayScale[200],
   },
   totalRow: {
     flexDirection: 'row',
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: '#374151', // gray-700
+    color: COLORS.dark, // Negro Suave
   },
   totalValue: {
     fontSize: 18,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: '#ef4444', // red-500
+    color: COLORS.danger, // Rojo Vibrante
     textAlign: 'center',
   },
   buttonContainer: {
@@ -527,10 +527,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   backButton: {
-    backgroundColor: '#e5e7eb', // gray-200
+    backgroundColor: COLORS.grayScale[200],
   },
   nextButton: {
-    backgroundColor: '#ea580c', // orange-600
+    backgroundColor: COLORS.primary, // Azul Suave
   },
 });
 

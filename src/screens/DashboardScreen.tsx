@@ -709,7 +709,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.light,
+    backgroundColor: COLORS.light, // Blanco Roto
   },
   // Header styles
   header: {
@@ -746,7 +746,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
   },
   headerRight: {
     flexDirection: 'row',
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.xs,
   },
   welcomeSubtitle: {
@@ -800,7 +800,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.primary, // Azul Suave
   },
   // Health card styles
   healthCard: {
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
   healthCardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
   },
   healthCardSubtitle: {
     fontSize: 14,
@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     height: 200,
-    backgroundColor: COLORS.success + '10',
+    backgroundColor: COLORS.blue[50], // Azul muy claro
     borderRadius: BORDER_RADIUS.lg,
     padding: SIZES.md,
     position: 'relative',
@@ -855,10 +855,10 @@ const styles = StyleSheet.create({
     left: SIZES.md,
     right: SIZES.md,
     bottom: SIZES.xl,
-    backgroundColor: COLORS.success + '30',
+    backgroundColor: COLORS.primary + '30', // Azul Suave con transparencia
     borderRadius: BORDER_RADIUS.md,
     borderWidth: 2,
-    borderColor: COLORS.success + '50',
+    borderColor: COLORS.primary + '50', // Azul Suave con transparencia
     borderStyle: 'dashed',
   },
   healthyZoneText: {
@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
     left: SIZES.xs,
     fontSize: 12,
     fontWeight: '500',
-    color: COLORS.success,
+    color: COLORS.primary, // Azul Suave
   },
   chartPlaceholder: {
     flex: 1,
@@ -911,7 +911,7 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: COLORS.primary, // Azul Suave
     marginTop: SIZES.xs,
   },
   metricSubtext: {
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primary, // Azul Suave
     borderRadius: 4,
   },
   // Transactions card styles
@@ -945,7 +945,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.lg,
   },
   transactionsList: {
@@ -975,7 +975,7 @@ const styles = StyleSheet.create({
   transactionDescription: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
   },
   transactionCategory: {
     fontSize: 14,
@@ -1035,7 +1035,7 @@ const styles = StyleSheet.create({
   achievementTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.xs,
   },
   achievementDescription: {
@@ -1083,7 +1083,7 @@ const styles = StyleSheet.create({
   chatUserName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
   },
   chatUserStatus: {
     fontSize: 14,
@@ -1148,7 +1148,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   sofiaMessageText: {
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
   },
   messageTime: {
     fontSize: 12,
@@ -1178,11 +1178,11 @@ const styles = StyleSheet.create({
   chatTextInput: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     paddingVertical: SIZES.xs,
   },
   chatSendButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primary, // Azul Suave
     borderRadius: 16,
     width: 32,
     height: 32,
@@ -1200,7 +1200,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     right: SIZES.lg,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primary, // Azul Suave
     borderRadius: 28,
     width: 56,
     height: 56,
@@ -1235,7 +1235,7 @@ const styles = StyleSheet.create({
     marginTop: SIZES.xs,
   },
   navLabelActive: {
-    color: COLORS.primary,
+    color: COLORS.primary, // Azul Suave
     fontWeight: '500',
   },
   // Chart styles
@@ -1260,7 +1260,7 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.md,
   },
   chartPlaceholder: {
@@ -1312,7 +1312,7 @@ const styles = StyleSheet.create({
   settingsSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.md,
     marginLeft: SIZES.sm,
   },
@@ -1334,7 +1334,7 @@ const styles = StyleSheet.create({
   },
   settingsItemText: {
     fontSize: 16,
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginLeft: SIZES.md,
   },
   logoutItem: {
@@ -1344,7 +1344,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   logoutText: {
-    color: COLORS.danger,
+    color: COLORS.danger, // Rojo Vibrante
     fontWeight: '500',
   },
   // Chart styles

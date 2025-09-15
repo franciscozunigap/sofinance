@@ -13,9 +13,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8fafc;
+  background-color: #F2F2F2; /* Blanco Roto - Color de fondo principal */
   overflow-x: hidden;
   line-height: 1.6;
+  color: #212226; /* Negro Suave - Color de texto principal */
 }
 
 #root {
@@ -42,16 +43,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #F2F2F2; /* Blanco Roto para el track */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #858BF2; /* Azul Suave para el thumb */
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #1B3BF2; /* Azul Intenso al hacer hover */
 }
 
 /* Animaciones */

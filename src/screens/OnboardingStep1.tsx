@@ -172,7 +172,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // bg-gray-50
+    backgroundColor: COLORS.light, // Blanco Roto
   },
   keyboardView: {
     flex: 1,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#fed7aa', // orange-200
+    backgroundColor: COLORS.blue[100], // Azul claro
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.sm,
@@ -207,33 +207,33 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
   },
   stepText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: '#ea580c', // orange-600
+    color: COLORS.primary, // Azul Suave
   },
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: '#111827', // gray-900
+    color: COLORS.dark, // Negro Suave
     textAlign: 'center',
     marginBottom: SIZES.md,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: '#6b7280', // gray-500
+    color: COLORS.gray,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: SIZES.sm,
   },
   formContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: SIZES.xl,
-    shadowColor: '#000',
+    shadowColor: COLORS.dark,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   backButton: {
-    backgroundColor: '#e5e7eb', // gray-200
+    backgroundColor: COLORS.grayScale[200],
   },
   nextButton: {
-    backgroundColor: '#ea580c', // orange-600
+    backgroundColor: COLORS.primary, // Azul Suave
   },
 });
 

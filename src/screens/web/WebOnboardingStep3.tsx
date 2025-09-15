@@ -42,15 +42,15 @@ const WebOnboardingStep3: React.FC<WebOnboardingStep3Props> = ({ data, onComplet
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white py-8 px-6 shadow-xl rounded-xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-              <span className="text-2xl font-bold text-orange-600">3</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+              <span className="text-2xl font-bold text-primary-400">3</span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Crea tu contraseña</h2>
+            <h2 className="text-3xl font-bold text-dark mb-2">Crea tu contraseña</h2>
             <p className="text-gray-600">
               Protege tu cuenta con una contraseña segura
             </p>

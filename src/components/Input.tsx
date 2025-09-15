@@ -102,14 +102,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.sm,
   },
   labelFocused: {
-    color: COLORS.primary,
+    color: COLORS.primary, // Azul Suave
   },
   labelError: {
-    color: COLORS.danger,
+    color: COLORS.danger, // Rojo Vibrante
   },
   input: {
     backgroundColor: COLORS.white,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.lg,
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     borderWidth: 1,
     borderColor: COLORS.grayScale[300],
     shadowColor: COLORS.black,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   focused: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.primary, // Azul Suave
     borderWidth: 2,
     shadowColor: COLORS.primary,
     shadowOpacity: 0.1,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   error: {
-    borderColor: COLORS.danger,
+    borderColor: COLORS.danger, // Rojo Vibrante
     borderWidth: 2,
     shadowColor: COLORS.danger,
     shadowOpacity: 0.1,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.danger,
+    color: COLORS.danger, // Rojo Vibrante
     flex: 1,
   },
   successContainer: {

@@ -5,6 +5,7 @@ import WebAppNavigator from '../src/navigation/WebAppNavigator';
 import { AuthService } from '../src/services/authService';
 import { User } from '../src/types';
 import { UserProvider, useUser } from '../src/contexts/UserContext';
+import logo from '../assets/logo.png';
 
 const SofinanceAppContent = () => {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -147,16 +148,16 @@ const SofinanceAppContent = () => {
 
   const getScoreStatus = (score: number) => {
     if (score >= 60) return { text: '¡Excelente! Estás en zona óptima', color: 'text-green-600', emoji: '🚀' };
-    if (score >= 40) return { text: 'Bien, mantén el ritmo', color: 'text-orange-600', emoji: '💪' };
-    return { text: 'Necesitas mejorar', color: 'text-red-600', emoji: '⚠️' };
+    if (score >= 40) return { text: 'Bien, mantén el ritmo', color: 'text-primary-400', emoji: '💪' };
+    return { text: 'Necesitas mejorar', color: 'text-danger', emoji: '⚠️' };
   };
 
   const scoreStatus = getScoreStatus(userData.currentScore);
 
   if (isLoading) {
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500"></div>
+        <div className="min-h-screen bg-light flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-400"></div>
         </div>
     );
   }
@@ -174,7 +175,7 @@ const SofinanceAppContent = () => {
 
   if (currentView === 'chat') {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-light">
         {/* Header del Chat */}
         <div className="bg-white shadow-sm border-b px-4 py-3">
           <div className="flex items-center justify-between">
@@ -186,11 +187,15 @@ const SofinanceAppContent = () => {
                 <ArrowLeft className="h-5 w-5 text-gray-600" />
               </button>
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
+                <div className="w-10 h-10 bg-light rounded-full shadow-sm overflow-hidden">
+                  <img 
+                    src={logo} 
+                    alt="SoFinance Logo" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Sofía</h3>
+                  <h3 className="font-semibold text-dark">Sofía</h3>
                   <p className="text-sm text-green-500">En línea</p>
                 </div>
               </div>
@@ -214,8 +219,12 @@ const SofinanceAppContent = () => {
             >
               <div className="flex items-end space-x-2 max-w-xs lg:max-w-md">
                 {message.sender === 'sofia' && (
-                  <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-xs">S</span>
+                  <div className="w-8 h-8 flex-shrink-0 bg-light rounded-full shadow-sm overflow-hidden">
+                    <img 
+                      src={logo} 
+                      alt="SoFinance Logo" 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
                 
@@ -223,7 +232,7 @@ const SofinanceAppContent = () => {
                   <div
                     className={`px-4 py-2 rounded-2xl ${
                       message.sender === 'user'
-                        ? 'bg-orange-500 text-white rounded-br-md'
+                        ? 'bg-primary-400 text-white rounded-br-md'
                         : 'bg-white border rounded-bl-md shadow-sm'
                     }`}
                   >
@@ -256,7 +265,7 @@ const SofinanceAppContent = () => {
             </div>
             <button
               onClick={handleSendMessage}
-              className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full"
+              className="bg-primary-400 hover:bg-primary-500 text-white p-2 rounded-full"
             >
               <Send className="h-4 w-4" />
             </button>
@@ -267,29 +276,33 @@ const SofinanceAppContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-light">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
+                <div className="w-8 h-8 bg-light rounded-lg shadow-sm overflow-hidden">
+                  <img 
+                    src={logo} 
+                    alt="SoFinance Logo" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <h1 className="text-xl font-bold text-gray-900">Sofinance</h1>
+                <h1 className="text-xl font-bold text-dark">Sofinance</h1>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Bell className="h-6 w-6 text-gray-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {userData.alerts}
                 </span>
               </div>
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <UserIcon className="h-5 w-5 text-orange-600" />
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <UserIcon className="h-5 w-5 text-primary-400" />
               </div>
               <button
                 onClick={handleLogout}
@@ -308,8 +321,8 @@ const SofinanceAppContent = () => {
         {/* Bienvenida */}
         <div className="mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">¡Hola {userData.name}! 👋</h2>
-            <p className="text-gray-600 mt-1">Score actual: <span className="font-semibold text-orange-600">{userData.currentScore}/100</span> - Tu progreso mensual es constante</p>
+            <h2 className="text-2xl font-bold text-dark">¡Hola {userData.name}! 👋</h2>
+            <p className="text-gray-600 mt-1">Score actual: <span className="font-semibold text-primary-400">{userData.currentScore}/100</span> - Tu progreso mensual es constante</p>
           </div>
         </div>
 
@@ -317,7 +330,7 @@ const SofinanceAppContent = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Salud Financiera de {currentMonth}</h3>
+              <h3 className="text-lg font-semibold text-dark">Salud Financiera de {currentMonth}</h3>
               <p className="text-sm text-gray-600">Evolución semanal de tu score</p>
             </div>
             <div className={`flex items-center space-x-2 ${scoreStatus.color}`}>
@@ -327,10 +340,10 @@ const SofinanceAppContent = () => {
           </div>
 
           {/* Gráfica de Zona Saludable */}
-          <div className="h-64 bg-gradient-to-b from-green-50 to-green-100 rounded-lg p-4 relative">
+          <div className="h-64 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-4 relative">
             {/* Zona Saludable */}
-            <div className="absolute inset-x-4 top-8 bottom-16 bg-green-200 bg-opacity-30 rounded border-2 border-dashed border-green-300">
-              <div className="absolute top-2 left-2 text-xs font-medium text-green-700">
+            <div className="absolute inset-x-4 top-8 bottom-16 bg-primary-200 bg-opacity-30 rounded border-2 border-dashed border-primary-300">
+              <div className="absolute top-2 left-2 text-xs font-medium text-primary-700">
                 Zona Saludable (40-80 pts)
               </div>
             </div>
@@ -343,10 +356,10 @@ const SofinanceAppContent = () => {
                 <Line 
                   type="monotone" 
                   dataKey="score" 
-                  stroke="#ea580c" 
+                  stroke="#858BF2" 
                   strokeWidth={3}
-                  dot={{ fill: '#ea580c', r: 6 }}
-                  activeDot={{ r: 8, fill: '#ea580c' }}
+                  dot={{ fill: '#858BF2', r: 6 }}
+                  activeDot={{ r: 8, fill: '#858BF2' }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -359,14 +372,14 @@ const SofinanceAppContent = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Score de Riesgo</p>
-                <p className="text-2xl font-bold text-orange-600">{userData.riskScore}/100</p>
+                <p className="text-2xl font-bold text-primary-400">{userData.riskScore}/100</p>
               </div>
-              <AlertTriangle className="h-8 w-8 text-orange-500" />
+              <AlertTriangle className="h-8 w-8 text-primary-400" />
             </div>
             <div className="mt-2">
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-orange-500 h-2 rounded-full" 
+                  className="bg-primary-400 h-2 rounded-full" 
                   style={{ width: `${userData.riskScore}%` }}
                 ></div>
               </div>
@@ -377,9 +390,9 @@ const SofinanceAppContent = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Gastos del Mes</p>
-                <p className="text-2xl font-bold text-red-600">${userData.monthlyExpenses.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-danger">${userData.monthlyExpenses.toLocaleString()}</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-red-500" />
+              <TrendingUp className="h-8 w-8 text-danger" />
             </div>
             <p className="text-xs text-gray-500 mt-2">
               {((userData.monthlyExpenses / userData.monthlyIncome) * 100).toFixed(1)}% de tus ingresos
@@ -425,7 +438,7 @@ const SofinanceAppContent = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Gastos por Categoría */}
           <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Distribución de Gastos</h3>
+            <h3 className="text-lg font-semibold text-dark mb-4">Distribución de Gastos</h3>
             <div className="h-64 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -463,7 +476,7 @@ const SofinanceAppContent = () => {
 
           {/* Evolución Semanal */}
           <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Evolución Semanal</h3>
+            <h3 className="text-lg font-semibold text-dark mb-4">Evolución Semanal</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyTrend}>
@@ -471,7 +484,7 @@ const SofinanceAppContent = () => {
                   <XAxis dataKey="week" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="gastos" fill="#ea580c" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="gastos" fill="#858BF2" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -482,7 +495,7 @@ const SofinanceAppContent = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Transacciones Recientes */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transacciones Recientes</h3>
+            <h3 className="text-lg font-semibold text-dark mb-4">Transacciones Recientes</h3>
             <div className="space-y-3">
               {recentTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
@@ -491,17 +504,17 @@ const SofinanceAppContent = () => {
                       transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
                     }`}>
                       <DollarSign className={`h-5 w-5 ${
-                        transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                        transaction.amount > 0 ? 'text-green-600' : 'text-danger'
                       }`} />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{transaction.description}</p>
+                      <p className="font-medium text-dark">{transaction.description}</p>
                       <p className="text-sm text-gray-500">{transaction.category}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className={`font-semibold ${
-                      transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                        transaction.amount > 0 ? 'text-green-600' : 'text-danger'
                     }`}>
                       {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
                     </p>
@@ -514,25 +527,25 @@ const SofinanceAppContent = () => {
 
           {/* Logros */}
           <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tus Logros</h3>
+            <h3 className="text-lg font-semibold text-dark mb-4">Tus Logros</h3>
             <div className="space-y-4">
               {achievements.map((achievement) => (
                 <div 
                   key={achievement.id}
                   className={`p-3 rounded-lg border-2 ${
                     achievement.unlocked 
-                      ? 'border-orange-200 bg-orange-50' 
+                      ? 'border-primary-200 bg-primary-50' 
                       : 'border-gray-200 bg-gray-50 opacity-60'
                   }`}
                 >
                   <div className="flex items-start space-x-3">
                     <span className="text-2xl">{achievement.icon}</span>
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{achievement.title}</h4>
+                      <h4 className="font-medium text-dark">{achievement.title}</h4>
                       <p className="text-sm text-gray-600">{achievement.description}</p>
                     </div>
                     {achievement.unlocked && (
-                      <Award className="h-5 w-5 text-orange-500" />
+                      <Award className="h-5 w-5 text-primary-400" />
                     )}
                   </div>
                 </div>
@@ -545,7 +558,7 @@ const SofinanceAppContent = () => {
       {/* Chat Button */}
       <button
         onClick={() => setCurrentView('chat')}
-        className="fixed bottom-6 right-6 bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+        className="fixed bottom-6 right-6 bg-primary-400 hover:bg-primary-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
       >
         <MessageCircle className="h-6 w-6" />
       </button>
@@ -555,21 +568,21 @@ const SofinanceAppContent = () => {
         <div className="flex items-center justify-around py-2">
           <button 
             onClick={() => setCurrentView('dashboard')}
-            className={`flex flex-col items-center p-2 ${currentView === 'dashboard' ? 'text-orange-500' : 'text-gray-400'}`}
+            className={`flex flex-col items-center p-2 ${currentView === 'dashboard' ? 'text-primary-400' : 'text-gray-400'}`}
           >
             <Home className="h-5 w-5" />
             <span className="text-xs mt-1">Inicio</span>
           </button>
           <button 
             onClick={() => setCurrentView('analysis')}
-            className={`flex flex-col items-center p-2 ${currentView === 'analysis' ? 'text-orange-500' : 'text-gray-400'}`}
+            className={`flex flex-col items-center p-2 ${currentView === 'analysis' ? 'text-primary-400' : 'text-gray-400'}`}
           >
             <BarChart3 className="h-5 w-5" />
             <span className="text-xs mt-1">Análisis</span>
           </button>
           <button 
             onClick={() => setCurrentView('chat')}
-            className={`flex flex-col items-center p-2 ${currentView === 'chat' ? 'text-orange-500' : 'text-gray-400'}`}
+            className={`flex flex-col items-center p-2 ${currentView === 'chat' ? 'text-primary-400' : 'text-gray-400'}`}
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-xs mt-1">Sofía</span>

@@ -129,7 +129,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // bg-gray-50
+    backgroundColor: COLORS.light, // Blanco Roto
   },
   content: {
     flex: 1,

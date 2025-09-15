@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { AuthService } from '../../services/authService';
 import { User } from '../../types';
+import logo from '../../../assets/logo.png';
 import { useUser } from '../../contexts/UserContext';
 
 interface WebLoginScreenProps {
@@ -43,8 +44,14 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
     setErrors({}); // Limpiar errores anteriores
     
     try {
-      const user = await AuthService.login({ email, password });
-      // Actualizar el contexto del usuario con los datos mock
+      const firebaseUser = await AuthService.login({ email, password });
+      // Convertir FirebaseUser a User personalizado
+      const user: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
+      };
+      // Actualizar el contexto del usuario con los datos convertidos
       setUser(user);
       onLoginSuccess(user);
     } catch (error: any) {
@@ -69,20 +76,23 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-20 w-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mb-6">
-            <span className="text-white text-3xl">💰</span>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">SoFinance</h2>
-          <p className="mt-2 text-sm text-gray-600">Tu app de finanzas personales</p>
-        </div>
+            <div className="text-center">
+              <div className="mx-auto h-20 w-20 mb-6 bg-light rounded-full shadow-lg overflow-hidden">
+                <img 
+                  src={logo} 
+                  alt="SoFinance Logo" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h2 className="text-3xl font-bold text-dark">SoFinance</h2>
+            </div>
 
         <div className="bg-white py-8 px-6 shadow-lg rounded-lg">
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-dark mb-2">
                 Correo electrónico
               </label>
               <div className="relative">
@@ -102,19 +112,19 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                       setErrors(prev => ({ ...prev, email: undefined, general: undefined }));
                     }
                   }}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
+                    errors.email ? 'border-danger' : 'border-gray-300'
                   }`}
                   placeholder="Ingresa tu email"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-danger">{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-dark mb-2">
                 Contraseña
               </label>
               <div className="relative">
@@ -134,8 +144,8 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                       setErrors(prev => ({ ...prev, password: undefined, general: undefined }));
                     }
                   }}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
+                    errors.password ? 'border-danger' : 'border-gray-300'
                   }`}
                   placeholder="Ingresa tu contraseña"
                 />
@@ -152,13 +162,13 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-danger">{errors.password}</p>
               )}
             </div>
 
             {errors.general && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-sm text-red-600 text-center">{errors.general}</p>
+              <div className="bg-red-50 border border-danger rounded-lg p-3">
+                <p className="text-sm text-danger text-center">{errors.general}</p>
               </div>
             )}
 
@@ -166,7 +176,7 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-400 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex items-center">
@@ -183,7 +193,7 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
               <button
                 type="button"
                 onClick={onShowRegistration}
-                className="text-orange-600 hover:text-orange-500 text-sm font-medium"
+                className="text-primary-400 hover:text-primary-500 text-sm font-medium"
               >
                 ¿No tienes cuenta? Crear cuenta
               </button>

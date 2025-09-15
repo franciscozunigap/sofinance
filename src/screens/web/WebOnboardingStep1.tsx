@@ -57,15 +57,15 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white py-8 px-6 shadow-xl rounded-xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-              <span className="text-2xl font-bold text-orange-600">1</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+              <span className="text-2xl font-bold text-primary-400">1</span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido a SoFinance!</h2>
+            <h2 className="text-3xl font-bold text-dark mb-2">¡Bienvenido a SoFinance!</h2>
             <p className="text-gray-600">
               Comencemos con algunos datos básicos para personalizar tu experiencia
             </p>
@@ -74,7 +74,7 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
           {/* Form */}
           <div className="space-y-6">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="firstName" className="block text-sm font-medium text-dark mb-2">
                 Nombre
               </label>
               <input
@@ -82,20 +82,20 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors.firstName ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 ${
+                  errors.firstName ? 'border-danger' : 'border-gray-300'
                 }`}
                 placeholder="Ingresa tu nombre"
                 autoCapitalize="words"
                 autoComplete="given-name"
               />
               {errors.firstName && (
-                <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                <p className="mt-1 text-sm text-danger">{errors.firstName}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="lastName" className="block text-sm font-medium text-dark mb-2">
                 Apellido
               </label>
               <input
@@ -103,20 +103,20 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors.lastName ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 ${
+                  errors.lastName ? 'border-danger' : 'border-gray-300'
                 }`}
                 placeholder="Ingresa tu apellido"
                 autoCapitalize="words"
                 autoComplete="family-name"
               />
               {errors.lastName && (
-                <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                <p className="mt-1 text-sm text-danger">{errors.lastName}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-dark mb-2">
                 Correo electrónico
               </label>
               <input
@@ -124,19 +124,19 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 ${
+                  errors.email ? 'border-danger' : 'border-gray-300'
                 }`}
                 placeholder="Ingresa tu email"
                 autoComplete="email"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-danger">{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="age" className="block text-sm font-medium text-dark mb-2">
                 Edad
               </label>
               <input
@@ -144,15 +144,15 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
                 type="number"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors.age ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 ${
+                  errors.age ? 'border-danger' : 'border-gray-300'
                 }`}
                 placeholder="Ingresa tu edad"
                 min="18"
                 max="100"
               />
               {errors.age && (
-                <p className="mt-1 text-sm text-red-600">{errors.age}</p>
+                <p className="mt-1 text-sm text-danger">{errors.age}</p>
               )}
             </div>
 
@@ -161,14 +161,14 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
               {onBack && (
                 <button
                   onClick={onBack}
-                  className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  className="flex-1 bg-gray-200 text-dark py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
                 >
                   Atrás
                 </button>
               )}
               <button
                 onClick={handleNext}
-                className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+                className="flex-1 bg-primary-400 text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-500 transition-colors"
               >
                 Continuar
               </button>

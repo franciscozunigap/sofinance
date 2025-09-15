@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     flex: 1,
   },
   statusBadge: {
@@ -175,10 +175,10 @@ const styles = StyleSheet.create({
     marginHorizontal: SIZES.xs,
   },
   incomeCard: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: COLORS.blue[50], // Azul muy claro para ingresos
   },
   expenseCard: {
-    backgroundColor: '#fef2f2',
+    backgroundColor: '#fef2f2', // Mantener rojo claro para gastos
   },
   statIcon: {
     width: 32,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   summaryContainer: {
-    backgroundColor: COLORS.light,
+    backgroundColor: COLORS.light, // Blanco Roto
     padding: SIZES.md,
     borderRadius: 12,
     alignItems: 'center',

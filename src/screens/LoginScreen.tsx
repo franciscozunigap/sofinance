@@ -8,12 +8,12 @@ import {
 import { Alert, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { validateEmail, validatePassword } from '../utils';
 import { AuthService } from '../services/authService';
+import { RootStackParamList } from '@/types';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -122,12 +122,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
                 <Text style={styles.logoText}>💰</Text>
               </View>
               <Text style={styles.title}>SoFinance</Text>
-              <Text style={styles.subtitle}>Tu app de finanzas personales</Text>
-              <Text style={styles.helpText}>
-                Credenciales de prueba:{'\n'}
-                test@sofinance.com / 123456{'\n'}
-                demo@sofinance.com / demo123
-              </Text>
             </View>
             
             <View style={styles.form}>
@@ -165,11 +159,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
                   if (Platform.OS === 'web' && onShowRegistration) {
                     onShowRegistration();
                   } else {
-                    navigation.navigate('Register');
+                    navigation.navigate('Register', { onRegistrationSuccess: () => {} });
                   }
                 }}
                 variant="secondary"
-                style={[styles.button, styles.registerButton]}
+                style={styles.registerButton}
               />
             </View>
           </Animated.View>
@@ -182,7 +176,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.light,
+    backgroundColor: COLORS.light, // Blanco Roto
   },
   keyboardView: {
     flex: 1,
@@ -204,7 +198,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primary, // Azul Suave
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.lg,
@@ -223,7 +217,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.dark,
+    color: COLORS.dark, // Negro Suave
     textAlign: 'center',
     marginBottom: SIZES.sm,
   },
@@ -240,11 +234,11 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     textAlign: 'center',
     marginBottom: SIZES.xxl,
-    backgroundColor: COLORS.light,
+    backgroundColor: COLORS.white, // Fondo blanco para el texto de ayuda
     padding: SIZES.sm,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.gray + '20',
+    borderColor: COLORS.primary + '30', // Borde azul suave
   },
   form: {
     width: '100%',

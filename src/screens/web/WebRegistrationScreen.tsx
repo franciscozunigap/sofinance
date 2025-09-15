@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User as UserIcon, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { AuthService } from '../../services/authService';
 import { User } from '../../types';
+import logo from '../../../assets/logo.png';
 
 interface WebRegistrationScreenProps {
   onRegistrationSuccess: (user: User) => void;
@@ -86,20 +87,24 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-20 w-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mb-6">
-            <span className="text-white text-3xl">💰</span>
+          <div className="mx-auto h-20 w-20 mb-6 bg-light rounded-full shadow-lg overflow-hidden">
+            <img 
+              src={logo} 
+              alt="SoFinance Logo" 
+              className="w-full h-full object-cover"
+            />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Crear Cuenta</h2>
+          <h2 className="text-3xl font-bold text-dark">Crear Cuenta</h2>
           <p className="mt-2 text-sm text-gray-600">Únete a SoFinance y toma control de tus finanzas</p>
         </div>
 
         <div className="bg-white py-8 px-6 shadow-lg rounded-lg">
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleRegistration(); }}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-dark mb-2">
                 Nombre completo
               </label>
               <div className="relative">
@@ -114,19 +119,19 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                   required
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
+                    errors.name ? 'border-danger' : 'border-gray-300'
                   }`}
                   placeholder="Ingresa tu nombre completo"
                 />
               </div>
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                <p className="mt-1 text-sm text-danger">{errors.name}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-dark mb-2">
                 Correo electrónico
               </label>
               <div className="relative">
@@ -141,19 +146,19 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                   required
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
+                    errors.email ? 'border-danger' : 'border-gray-300'
                   }`}
                   placeholder="Ingresa tu email"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-danger">{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-dark mb-2">
                 Contraseña
               </label>
               <div className="relative">
@@ -168,8 +173,8 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                   required
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
+                    errors.password ? 'border-danger' : 'border-gray-300'
                   }`}
                   placeholder="Crea una contraseña"
                 />
@@ -186,12 +191,12 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-danger">{errors.password}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-dark mb-2">
                 Confirmar contraseña
               </label>
               <div className="relative">
@@ -206,8 +211,8 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
+                    errors.confirmPassword ? 'border-danger' : 'border-gray-300'
                   }`}
                   placeholder="Confirma tu contraseña"
                 />
@@ -224,7 +229,7 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                <p className="mt-1 text-sm text-danger">{errors.confirmPassword}</p>
               )}
             </div>
 
@@ -232,7 +237,7 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-400 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex items-center">
@@ -250,7 +255,7 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                 <button
                   type="button"
                   onClick={onShowOnboarding}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-md"
+                  className="w-full bg-gradient-to-r from-primary-400 to-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:from-primary-500 hover:to-primary-700 transition-all duration-200 shadow-md"
                 >
                   Configuración completa paso a paso
                 </button>
@@ -258,7 +263,7 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
               <button
                 type="button"
                 onClick={onShowLogin}
-                className="text-orange-600 hover:text-orange-500 text-sm font-medium flex items-center justify-center"
+                className="text-primary-400 hover:text-primary-500 text-sm font-medium flex items-center justify-center"
               >
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 ¿Ya tienes cuenta? Inicia sesión
