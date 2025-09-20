@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import AnalysisScreen from './AnalysisScreen';
 import FloatingNavBar from '../components/FloatingNavBar';
 import ChatComponent from '../components/ChatComponent';
 import SettingsComponent from '../components/SettingsComponent';
-import { Header, Card, TransactionItem, PercentageCard } from '../components/shared';
+import { Header, Card, TransactionItem, PercentageCard, SkeletonLoader } from '../components/shared';
 import { 
   MOCK_USER_DATA, 
   DAILY_SCORE_DATA, 
@@ -43,9 +43,38 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { currentView, navigateTo, goBack } = useViewNavigation();
   const { messages: chatMessages, input: chatInput, setInput: setChatInput, sendMessage: handleSendMessage } = useChat();
   const [scrollY] = useState(new Animated.Value(0));
+  const [isUserDataLoading, setIsUserDataLoading] = useState(true);
+  const [fadeAnim] = useState(new Animated.Value(1));
 
   // Datos del usuario desde el contexto
   const userData = user || MOCK_USER_DATA;
+
+  // Simular carga de datos del usuario
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsUserDataLoading(false);
+    }, 1500); // Simular 1.5 segundos de carga
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Función para transiciones suaves entre vistas
+  const handleViewChange = (view: 'dashboard' | 'analysis' | 'chat' | 'settings') => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0.7,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
+    navigateTo(view);
+  };
 
   // Obtener el estado del score
   const scoreStatus = getScoreStatus(userData.currentScore || 0);
@@ -53,41 +82,47 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   // Vista de Análisis
   if (currentView === 'analysis') {
     return (
-      <AnalysisScreen 
-        currentView={currentView}
-        onViewChange={navigateTo}
-      />
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <AnalysisScreen 
+          currentView={currentView}
+          onViewChange={handleViewChange}
+        />
+      </Animated.View>
     );
   }
 
   if (currentView === 'settings') {
     return (
-      <SafeAreaView style={styles.container}>
-        <SettingsComponent 
-          onBack={goBack}
-          onLogout={onLogout}
-        />
-        <FloatingNavBar 
-          currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
-          onViewChange={navigateTo}
-        />
-      </SafeAreaView>
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <SafeAreaView style={styles.container}>
+          <SettingsComponent 
+            onBack={goBack}
+            onLogout={onLogout}
+          />
+          <FloatingNavBar 
+            currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
+            onViewChange={handleViewChange}
+          />
+        </SafeAreaView>
+      </Animated.View>
     );
   }
 
   if (currentView === 'chat') {
     return (
-      <SafeAreaView style={styles.container}>
-        <ChatComponent 
-          onBack={goBack}
-          initialMessages={INITIAL_CHAT_MESSAGES}
-          responses={CHAT_RESPONSES}
-        />
-        <FloatingNavBar 
-          currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
-          onViewChange={navigateTo}
-        />
-      </SafeAreaView>
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <SafeAreaView style={styles.container}>
+          <ChatComponent 
+            onBack={goBack}
+            initialMessages={INITIAL_CHAT_MESSAGES}
+            responses={CHAT_RESPONSES}
+          />
+          <FloatingNavBar 
+            currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
+            onViewChange={handleViewChange}
+          />
+        </SafeAreaView>
+      </Animated.View>
     );
   }
 
@@ -98,7 +133,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         <View style={styles.avatarHeaderContent}>
           {/* Botón de perfil */}
           <TouchableOpacity
-            onPress={() => navigateTo('settings')}
+            onPress={() => handleViewChange('settings')}
             style={styles.profileButton}
           >
             <Ionicons name="person-outline" size={18} color={COLORS.white} />
@@ -152,7 +187,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         >
           {/* Bienvenida */}
           <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
+            {isUserDataLoading ? (
+              <SkeletonLoader width={200} height={24} borderRadius={12} />
+            ) : (
+              <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
+            )}
           </View>
 
           {/* Título y descripción principal */}
@@ -246,7 +285,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
       {/* Floating Navigation Panel */}
       <FloatingNavBar 
         currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
-        onViewChange={navigateTo}
+        onViewChange={handleViewChange}
       />
     </SafeAreaView>
   );

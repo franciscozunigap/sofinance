@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  Animated,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { COLORS, SIZES } from '../constants';
 
@@ -30,6 +34,49 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 }) => {
   const [chatMessages, setChatMessages] = useState(initialMessages);
   const [chatInput, setChatInput] = useState('');
+  const [messageAnimations] = useState(new Map());
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const scrollViewRef = React.useRef<ScrollView>(null);
+
+  // Manejo del teclado
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+        setIsKeyboardVisible(true);
+        // Scroll hacia abajo cuando aparece el teclado
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    );
+    
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  const animateMessage = (messageId: number) => {
+    const animValue = new Animated.Value(0);
+    messageAnimations.set(messageId, animValue);
+    
+    Animated.timing(animValue, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const handleSendMessage = () => {
     if (chatInput.trim()) {
@@ -41,9 +88,15 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       };
       
       setChatMessages(prev => [...prev, newMessage]);
+      animateMessage(newMessage.id);
       setChatInput('');
       
-      // Respuesta automática de Sofía
+      // Scroll hacia abajo después de enviar mensaje
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+      
+      // Respuesta automática de SoFia
       setTimeout(() => {
         const sofiaResponse = {
           id: chatMessages.length + 2,
@@ -53,12 +106,22 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
         };
         
         setChatMessages(prev => [...prev, sofiaResponse]);
+        animateMessage(sofiaResponse.id);
+        
+        // Scroll hacia abajo después de la respuesta
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
       }, 1500);
     }
   };
 
   return (
-    <View style={styles.chatContainer}>
+    <KeyboardAvoidingView 
+      style={styles.chatContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
       {/* Header del Chat */}
       <View style={styles.chatHeader}>
         <View style={styles.chatHeaderContent}>
@@ -77,7 +140,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
               />
             </View>
             <View>
-              <Text style={styles.chatUserName}>Sofía</Text>
+              <Text style={styles.chatUserName}>SoFia</Text>
               <Text style={styles.chatUserStatus}>En línea</Text>
             </View>
           </View>
@@ -85,15 +148,34 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       </View>
 
       {/* Chat Messages */}
-      <ScrollView style={styles.chatMessages} contentContainerStyle={styles.chatMessagesContent}>
-        {chatMessages.map((message) => (
-          <View
-            key={message.id}
-            style={[
-              styles.messageContainer,
-              message.sender === 'user' ? styles.userMessageContainer : styles.sofiaMessageContainer
-            ]}
-          >
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.chatMessages} 
+        contentContainerStyle={styles.chatMessagesContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {chatMessages.map((message) => {
+          const animValue = messageAnimations.get(message.id) || new Animated.Value(1);
+          return (
+            <Animated.View
+              key={message.id}
+              style={[
+                styles.messageContainer,
+                message.sender === 'user' ? styles.userMessageContainer : styles.sofiaMessageContainer,
+                {
+                  opacity: animValue,
+                  transform: [
+                    {
+                      translateY: animValue.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
             <View style={styles.messageContent}>
               {message.sender === 'sofia' && (
                 <View style={styles.messageAvatar}>
@@ -127,12 +209,16 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
                 </Text>
               </View>
             </View>
-          </View>
-        ))}
+            </Animated.View>
+          );
+        })}
       </ScrollView>
 
       {/* Chat Input */}
-      <View style={styles.chatInput}>
+      <View style={[
+        styles.chatInput,
+        isKeyboardVisible && { paddingBottom: keyboardHeight > 0 ? keyboardHeight - 50 : 100 }
+      ]}>
         <View style={styles.chatInputContainer}>
           <TextInput
             style={styles.chatTextInput}
@@ -140,13 +226,20 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
             onChangeText={setChatInput}
             placeholder="Pregúntame sobre tus finanzas..."
             placeholderTextColor={COLORS.gray}
+            multiline={false}
+            returnKeyType="send"
+            onSubmitEditing={handleSendMessage}
           />
-          <TouchableOpacity style={styles.chatSendButton} onPress={handleSendMessage}>
+          <TouchableOpacity 
+            style={styles.chatSendButton} 
+            onPress={handleSendMessage}
+            activeOpacity={0.7}
+          >
             <Text style={styles.chatSendButtonText}>→</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -284,6 +377,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Espacio para el navegador flotante
     position: 'relative',
     zIndex: 10,
+    minHeight: 80,
   },
   chatInputContainer: {
     flexDirection: 'row',
