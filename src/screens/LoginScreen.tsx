@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   Platform,
+  Image,
 } from 'react-native';
 import { Alert, Dimensions, SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import { useNavigation } from '@react-navigation/native';
@@ -119,7 +120,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
           >
             <View style={styles.logoContainer}>
               <View style={styles.logoCircle}>
-                <Text style={styles.logoText}>💰</Text>
+                <Image 
+                  source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Logo.imageset/logo.png') : require('../../assets/logo.png')} 
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.title}>SoFinance</Text>
             </View>
@@ -213,6 +218,10 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 32,
+  },
+  logoImage: {
+    width: 50,
+    height: 50,
   },
   title: {
     fontSize: 32,

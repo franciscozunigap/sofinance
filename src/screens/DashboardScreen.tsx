@@ -149,7 +149,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     );
   };
 
-  const scoreStatus = getScoreStatus(userData.currentScore);
+  const scoreStatus = getScoreStatus(userData.currentScore || 0);
 
   if (currentView === 'settings') {
     return (
@@ -292,7 +292,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             </TouchableOpacity>
             <View style={styles.chatUserInfo}>
               <View style={styles.chatAvatar}>
-                <Text style={styles.chatAvatarText}>S</Text>
+                <Image 
+                  source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Avatar.imageset/avatar.png') : require('../../assets/avatar.svg')} 
+                  style={styles.chatAvatarImage}
+                  resizeMode="cover"
+                />
               </View>
               <View>
                 <Text style={styles.chatUserName}>Sofía</Text>
@@ -315,7 +319,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
               <View style={styles.messageContent}>
                 {message.sender === 'sofia' && (
                   <View style={styles.messageAvatar}>
-                    <Text style={styles.messageAvatarText}>S</Text>
+                    <Image 
+                      source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Avatar.imageset/avatar.png') : require('../../assets/avatar.svg')} 
+                      style={styles.messageAvatarImage}
+                      resizeMode="cover"
+                    />
                   </View>
                 )}
                 
@@ -379,9 +387,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           
           {/* Avatar que abarca toda la pantalla */}
           <View style={styles.avatarContainer}>
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>👤</Text>
-            </View>
+            <Image 
+              source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Avatar.imageset/avatar.png') : require('../../assets/avatar.svg')} 
+              style={styles.avatarImage}
+              resizeMode="cover"
+            />
           </View>
         </View>
       </View>
@@ -449,7 +459,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                   stroke: COLORS.primary
                 }
               }}
-              style={styles.chart}
+              style={styles.chartView}
             />
           </View>
         </View>
@@ -545,7 +555,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                     stroke: COLORS.primary
                   }
                 }}
-                style={styles.chart}
+                style={styles.chartView}
               />
             </View>
           </View>
@@ -670,7 +680,7 @@ const styles = StyleSheet.create({
   },
   // Avatar Header styles
   avatarHeader: {
-    height: 200,
+    height: 250, // Aumentado para mejor visualización del avatar
     backgroundColor: '#858bf2',
     position: 'relative',
   },
@@ -692,7 +702,7 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   avatarPlaceholder: {
@@ -706,6 +716,12 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 48,
   },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    alignSelf: 'stretch',
+  },
   // Main content overlay
   mainContentOverlay: {
     flex: 1,
@@ -714,6 +730,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: -8,
     zIndex: 10,
+    maxWidth: 1200, // Para coincidir con max-w-7xl de web
+    alignSelf: 'center',
+    width: '100%',
   },
   // Main content styles
   mainContent: {
@@ -771,6 +790,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    minHeight: 80, // Para coincidir con la altura de web
   },
   percentageValue: {
     fontSize: 24,
@@ -791,8 +811,8 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 8, // Para coincidir con shadow-lg de web
+    elevation: 3,
   },
   registrosTitle: {
     fontSize: 14,
@@ -850,7 +870,7 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 8, // Para coincidir con shadow-lg de web
     elevation: 3,
   },
   healthCardHeader: {
@@ -882,8 +902,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   chartContainer: {
-    height: 200,
-    backgroundColor: COLORS.blue[50], // Azul muy claro
+    height: 208, // Ajustado para coincidir con web (52 * 4)
+    backgroundColor: '#f0f2ff', // Azul muy claro para coincidir con web
     borderRadius: BORDER_RADIUS.lg,
     padding: SIZES.md,
     position: 'relative',
@@ -894,10 +914,10 @@ const styles = StyleSheet.create({
     left: SIZES.md,
     right: SIZES.md,
     bottom: SIZES.xl,
-    backgroundColor: COLORS.primary + '30', // Azul Suave con transparencia
+    backgroundColor: 'rgba(133, 139, 242, 0.3)', // Azul Suave con transparencia
     borderRadius: BORDER_RADIUS.md,
     borderWidth: 2,
-    borderColor: COLORS.primary + '50', // Azul Suave con transparencia
+    borderColor: 'rgba(133, 139, 242, 0.5)', // Azul Suave con transparencia
     borderStyle: 'dashed',
   },
   healthyZoneText: {
@@ -933,8 +953,8 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 8, // Para coincidir con shadow-lg de web
+    elevation: 3,
   },
   metricHeader: {
     flexDirection: 'row',
@@ -978,8 +998,8 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 8, // Para coincidir con shadow-lg de web
+    elevation: 3,
   },
   cardTitle: {
     fontSize: 18,
@@ -1042,8 +1062,8 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 8, // Para coincidir con shadow-lg de web
+    elevation: 3,
   },
   achievementsList: {
     gap: SIZES.md,
@@ -1119,6 +1139,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  chatAvatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    resizeMode: 'cover',
+  },
   chatUserName: {
     fontSize: 16,
     fontWeight: '600',
@@ -1161,6 +1187,12 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  messageAvatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+    resizeMode: 'cover',
   },
   messageBubble: {
     flex: 1,
@@ -1292,7 +1324,7 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 8, // Para coincidir con shadow-lg de web
     elevation: 3,
     width: width < 768 ? '100%' : '48%',
   },
@@ -1317,6 +1349,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.gray,
     textAlign: 'center',
+  },
+  chartView: {
+    borderRadius: 16,
   },
   legendContainer: {
     flexDirection: 'row',
@@ -1344,9 +1379,18 @@ const styles = StyleSheet.create({
   settingsContent: {
     flex: 1,
     padding: SIZES.lg,
+    backgroundColor: COLORS.light, // Para coincidir con web
   },
   settingsSection: {
     marginBottom: SIZES.xl,
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SIZES.md,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   settingsSectionTitle: {
     fontSize: 16,
@@ -1354,17 +1398,21 @@ const styles = StyleSheet.create({
     color: COLORS.dark, // Negro Suave
     marginBottom: SIZES.md,
     marginLeft: SIZES.sm,
+    marginTop: SIZES.sm,
   },
   settingsItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: 'transparent',
     paddingVertical: SIZES.md,
     paddingHorizontal: SIZES.lg,
     marginBottom: 1,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.grayScale[100],
+    borderRadius: BORDER_RADIUS.md, // Para coincidir con web
+    marginHorizontal: SIZES.sm,
+    marginTop: SIZES.sm,
   },
   settingsItemLeft: {
     flexDirection: 'row',
@@ -1377,10 +1425,17 @@ const styles = StyleSheet.create({
     marginLeft: SIZES.md,
   },
   logoutItem: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'transparent',
     borderRadius: BORDER_RADIUS.md,
     marginTop: SIZES.sm,
     borderBottomWidth: 0,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    marginHorizontal: SIZES.sm,
+    marginBottom: SIZES.sm,
   },
   logoutText: {
     color: COLORS.danger, // Rojo Vibrante
