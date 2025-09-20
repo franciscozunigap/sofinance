@@ -17,12 +17,11 @@ import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, Bar
 const { width } = Dimensions.get('window');
 
 interface AnalysisScreenProps {
-  onBack: () => void;
   currentView: string;
   onViewChange: (view: string) => void;
 }
 
-const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ onBack, currentView, onViewChange }) => {
+const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChange }) => {
   const { user } = useUser();
 
   // Datos del usuario
@@ -127,9 +126,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ onBack, currentView, on
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.dark} />
-          </TouchableOpacity>
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>Análisis Financiero</Text>
             <Text style={styles.headerSubtitle}>Insights detallados sobre tu comportamiento financiero</Text>
@@ -453,10 +449,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SIZES.lg,
-  },
-  backButton: {
-    padding: SIZES.sm,
-    marginRight: SIZES.md,
   },
   headerText: {
     flex: 1,

@@ -10,6 +10,7 @@ import {
   TextInput,
   Alert,
   Image,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from '../platform';
 import { useUser } from '../contexts/UserContext';
@@ -29,6 +30,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { user } = useUser();
   const [currentView, setCurrentView] = useState('dashboard');
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [scrollY] = useState(new Animated.Value(0));
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -159,7 +161,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   if (currentView === 'analysis') {
     return (
       <AnalysisScreen 
-        onBack={() => setCurrentView('dashboard')}
         currentView={currentView}
         onViewChange={setCurrentView}
       />
@@ -321,9 +322,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             <View style={styles.chatUserInfo}>
               <View style={styles.chatAvatar}>
                 <Image 
-                  source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Avatar.imageset/avatar.png') : require('../../assets/avatar.svg')} 
+                  source={require('../../assets/avatar.png')} 
                   style={styles.chatAvatarImage}
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
               </View>
               <View>
@@ -348,9 +349,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                 {message.sender === 'sofia' && (
                   <View style={styles.messageAvatar}>
                     <Image 
-                      source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Avatar.imageset/avatar.png') : require('../../assets/avatar.svg')} 
+                      source={require('../../assets/avatar.png')} 
                       style={styles.messageAvatarImage}
-                      resizeMode="cover"
+                      resizeMode="contain"
                     />
                   </View>
                 )}
@@ -405,28 +406,60 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
       {/* Header con Avatar */}
       <View style={styles.avatarHeader}>
         <View style={styles.avatarHeaderContent}>
-          {/* Botón de configuración */}
+          {/* Botón de perfil */}
           <TouchableOpacity
             onPress={() => setCurrentView('settings')}
-            style={styles.settingsButton}
+            style={styles.profileButton}
           >
-            <Settings size={16} color={COLORS.white} />
+            <Ionicons name="person-outline" size={18} color={COLORS.white} />
           </TouchableOpacity>
           
           {/* Avatar que abarca toda la pantalla */}
-          <View style={styles.avatarContainer}>
+          <Animated.View 
+            style={[
+              styles.avatarContainer,
+              {
+                transform: [
+                  {
+                    translateY: scrollY.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: [0, 30],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                  {
+                    scale: scrollY.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: [0.96, 0.84], // Aumentado 20% (0.8*1.2 = 0.96, 0.7*1.2 = 0.84)
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
             <Image 
-              source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Avatar.imageset/avatar.png') : require('../../assets/avatar.svg')} 
+              source={require('../../assets/avatar.png')} 
               style={styles.avatarImage}
               resizeMode="cover"
+              onError={(error) => console.log('Error loading avatar image:', error)}
+              onLoad={() => console.log('Avatar image loaded successfully')}
             />
-          </View>
+          </Animated.View>
         </View>
       </View>
 
       {/* Main Content con superposición */}
       <View style={styles.mainContentOverlay}>
-        <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
+        <Animated.ScrollView 
+          style={styles.mainContent} 
+          showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
+          scrollEventThrottle={16}
+        >
           {/* Bienvenida */}
           <View style={styles.welcomeSection}>
             <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
@@ -534,7 +567,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             </View>
           </View>
 
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
 
       {/* Chat Button - Ocultado */}
@@ -604,11 +637,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.light, // Blanco Roto
+    backgroundColor: '#858bf2', // Color de la app (mismo que el fondo de la imagen)
   },
   // Avatar Header styles
   avatarHeader: {
-    height: 200, // Reducido para mejor proporción
+    height: 320, // Aumentado para acomodar la imagen más grande
     backgroundColor: '#858bf2',
     position: 'relative',
   },
@@ -616,39 +649,45 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
-  settingsButton: {
+  profileButton: {
     position: 'absolute',
     top: 12,
     right: 12,
-    width: 28,
-    height: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    backgroundColor: COLORS.primary, // Color de la app
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   avatarContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
   },
   avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1,
   },
   avatarText: {
     fontSize: 48,
   },
   avatarImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: '100%',
+    height: '100%',
     resizeMode: 'cover',
   },
   // Main content overlay
@@ -657,10 +696,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: -8,
+    marginTop: -8, // Al límite del contenedor inferior
     zIndex: 10,
-    maxWidth: 1200, // Para coincidir con max-w-7xl de web
-    alignSelf: 'center',
     width: '100%',
   },
   // Main content styles
@@ -1026,7 +1063,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 20,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   chatUserName: {
     fontSize: 16,
@@ -1075,7 +1112,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 16,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   messageBubble: {
     flex: 1,
