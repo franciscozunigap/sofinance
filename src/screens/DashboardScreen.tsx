@@ -17,6 +17,7 @@ import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { DollarSign, TrendingUp, Target, AlertTriangle, Award, Mic, Send, Settings, Home, BarChart3, MessageCircle, HelpCircle, LogOut } from 'lucide-react-native';
+import AnalysisScreen from './AnalysisScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -53,13 +54,16 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   // MODIFICADO: El gasto mensual ahora es la suma de las 3 nuevas categorías
   const monthlyExpenses = 3180; // 1800 (Necesidades) + 780 (Consumo) + 600 (Ahorro)
 
-  // MODIFICADO: Gráfico de salud financiera ahora es semanal para el mes actual
+  // Gráfico de salud financiera - 7 días
   const currentMonth = "Septiembre";
-  const monthlyScoreData = [
-    { week: 'Semana 1', score: 45 },
-    { week: 'Semana 2', score: 48 },
-    { week: 'Semana 3', score: 44 },
-    { week: 'Semana 4', score: 52 }
+  const dailyScoreData = [
+    { day: 'Lun', score: 45 },
+    { day: 'Mar', score: 48 },
+    { day: 'Mié', score: 44 },
+    { day: 'Jue', score: 52 },
+    { day: 'Vie', score: 49 },
+    { day: 'Sáb', score: 47 },
+    { day: 'Dom', score: 50 }
   ];
 
   // MODIFICADO: Categorías de gastos simplificadas a 3 tipos
@@ -151,6 +155,17 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
   const scoreStatus = getScoreStatus(userData.currentScore || 0);
 
+  // Vista de Análisis
+  if (currentView === 'analysis') {
+    return (
+      <AnalysisScreen 
+        onBack={() => setCurrentView('dashboard')}
+        currentView={currentView}
+        onViewChange={setCurrentView}
+      />
+    );
+  }
+
   if (currentView === 'settings') {
     return (
       <SafeAreaView style={styles.container}>
@@ -235,44 +250,57 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           </View>
         </ScrollView>
 
-        {/* Navigation Bar (Mobile) */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity 
-            onPress={() => setCurrentView('dashboard')}
-            style={[styles.navItem, currentView === 'dashboard' && styles.navItemActive]}
-          >
-            <Ionicons name="home-outline" size={20} color={currentView === 'dashboard' ? COLORS.primary : COLORS.gray} />
-            <Text style={[styles.navLabel, currentView === 'dashboard' && styles.navLabelActive]}>
-              Inicio
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => setCurrentView('analysis')}
-            style={[styles.navItem, currentView === 'analysis' && styles.navItemActive]}
-          >
-            <Ionicons name="bar-chart-outline" size={20} color={currentView === 'analysis' ? COLORS.primary : COLORS.gray} />
-            <Text style={[styles.navLabel, currentView === 'analysis' && styles.navLabelActive]}>
-              Análisis
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => setCurrentView('chat')}
-            style={[styles.navItem, currentView === 'chat' && styles.navItemActive]}
-          >
-            <Ionicons name="chatbubble-outline" size={20} color={currentView === 'chat' ? COLORS.primary : COLORS.gray} />
-            <Text style={[styles.navLabel, currentView === 'chat' && styles.navLabelActive]}>
-              Sofía
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => setCurrentView('settings')}
-            style={[styles.navItem, currentView === 'settings' && styles.navItemActive]}
-          >
-            <Ionicons name="settings-outline" size={20} color={currentView === 'settings' ? COLORS.primary : COLORS.gray} />
-            <Text style={[styles.navLabel, currentView === 'settings' && styles.navLabelActive]}>
-              Ajustes
-            </Text>
-          </TouchableOpacity>
+        {/* Floating Navigation Panel */}
+        <View style={styles.floatingNavContainer}>
+          <View style={styles.floatingNavPanel}>
+            <TouchableOpacity 
+              onPress={() => setCurrentView('dashboard')}
+              style={[styles.floatingNavItem, currentView === 'dashboard' && styles.floatingNavItemActive]}
+            >
+              <Ionicons 
+                name="home-outline" 
+                size={16} 
+                color={currentView === 'dashboard' ? COLORS.white : COLORS.gray} 
+              />
+              <Text style={[styles.floatingNavLabel, currentView === 'dashboard' && styles.floatingNavLabelActive]}>
+                Finance
+              </Text>
+              {currentView === 'dashboard' && <View style={styles.floatingNavIndicator} />}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={() => setCurrentView('analysis')}
+              style={[styles.floatingNavItem, currentView === 'analysis' && styles.floatingNavItemActive]}
+            >
+              <Ionicons 
+                name="bar-chart-outline" 
+                size={16} 
+                color={currentView === 'analysis' ? COLORS.white : COLORS.gray} 
+              />
+              <Text style={[styles.floatingNavLabel, currentView === 'analysis' && styles.floatingNavLabelActive]}>
+                Análisis
+              </Text>
+              {currentView === 'analysis' && <View style={styles.floatingNavIndicator} />}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={() => setCurrentView('chat')}
+              style={[styles.floatingNavItem, currentView === 'chat' && styles.floatingNavItemActive]}
+            >
+              <Ionicons 
+                name="chatbubble-outline" 
+                size={16} 
+                color={currentView === 'chat' ? COLORS.white : COLORS.gray} 
+              />
+              <Text style={[styles.floatingNavLabel, currentView === 'chat' && styles.floatingNavLabelActive]}>
+                SofIA
+              </Text>
+              {currentView === 'chat' && <View style={styles.floatingNavIndicator} />}
+            </TouchableOpacity>
+          </View>
+          
+          {/* Línea decorativa superior */}
+          <View style={styles.floatingNavTopLine} />
         </View>
       </SafeAreaView>
     );
@@ -414,41 +442,26 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
         {/* Zona Financiera Saludable */}
         <View style={styles.healthCard}>
-          <View style={styles.healthCardHeader}>
-            <View>
-              <Text style={styles.healthCardTitle}>Salud Financiera de {currentMonth}</Text>
-              <Text style={styles.healthCardSubtitle}>Evolución semanal de tu score</Text>
-            </View>
-            <View style={styles.scoreStatusContainer}>
-              <Text style={styles.scoreEmoji}>{scoreStatus.emoji}</Text>
-              <Text style={[styles.scoreStatusText, { color: scoreStatus.color }]}>
-                {scoreStatus.text}
-              </Text>
-            </View>
-          </View>
 
           {/* Gráfica de Zona Saludable */}
           <View style={styles.chartContainer}>
-            <View style={styles.healthyZone}>
-              <Text style={styles.healthyZoneText}>Zona Saludable (40-80 pts)</Text>
-            </View>
             <LineChart
               data={{
-                labels: monthlyScoreData.map(item => item.week),
+                labels: dailyScoreData.map(item => item.day),
                 datasets: [{
-                  data: monthlyScoreData.map(item => item.score),
-                  color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`,
+                  data: dailyScoreData.map(item => item.score),
+                  color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`,
                   strokeWidth: 3
                 }]
               }}
-              width={width - 80}
+              width={width - 120}
               height={200}
               chartConfig={{
-                backgroundColor: 'transparent',
-                backgroundGradientFrom: 'transparent',
-                backgroundGradientTo: 'transparent',
+                backgroundColor: '#f0f2ff',
+                backgroundGradientFrom: '#f0f2ff',
+                backgroundGradientTo: '#f0f2ff',
                 decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`,
+                color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 style: {
                   borderRadius: 16
@@ -456,7 +469,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                 propsForDots: {
                   r: "6",
                   strokeWidth: "2",
-                  stroke: COLORS.primary
+                  stroke: '#858BF2'
                 }
               }}
               style={styles.chartView}
@@ -484,80 +497,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           <View style={styles.percentageCard}>
             <Text style={[styles.percentageValue, { color: '#7c3aed' }]}>8%</Text>
             <Text style={styles.percentageLabel}>Deuda</Text>
-          </View>
-        </View>
-
-        {/* Gráficos */}
-        <View style={styles.chartsContainer}>
-          {/* Gastos por Categoría */}
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Distribución de Gastos</Text>
-            <View style={styles.chartContainer}>
-              <PieChart
-                data={expenseCategories}
-                width={width - 80}
-                height={200}
-                chartConfig={{
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                }}
-                accessor="value"
-                backgroundColor="transparent"
-                paddingLeft="15"
-                center={[10, 0]}
-                absolute
-              />
-            </View>
-            
-            {/* Leyenda */}
-            <View style={styles.legendContainer}>
-              {expenseCategories.map((category, index) => (
-                <View key={index} style={styles.legendItem}>
-                  <View 
-                    style={[
-                      styles.legendDot, 
-                      { backgroundColor: category.color }
-                    ]} 
-                  />
-                  <Text style={styles.legendText}>{category.name}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* Evolución Semanal */}
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Evolución Semanal</Text>
-            <View style={styles.chartContainer}>
-              <BarChart
-                data={{
-                  labels: weeklyTrend.map(item => item.week),
-                  datasets: [{
-                    data: weeklyTrend.map(item => item.gastos)
-                  }]
-                }}
-                width={width - 80}
-                height={200}
-                yAxisLabel="$"
-                yAxisSuffix=""
-                chartConfig={{
-                  backgroundColor: COLORS.white,
-                  backgroundGradientFrom: COLORS.white,
-                  backgroundGradientTo: COLORS.white,
-                  decimalPlaces: 0,
-                  color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  style: {
-                    borderRadius: 16
-                  },
-                  propsForDots: {
-                    r: "6",
-                    strokeWidth: "2",
-                    stroke: COLORS.primary
-                  }
-                }}
-                style={styles.chartView}
-              />
-            </View>
           </View>
         </View>
 
@@ -595,30 +534,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             </View>
           </View>
 
-          {/* Logros */}
-        <View style={styles.achievementsCard}>
-          <Text style={styles.cardTitle}>Tus Logros</Text>
-          <View style={styles.achievementsList}>
-              {achievements.map((achievement) => (
-              <View 
-                  key={achievement.id}
-                style={[
-                  styles.achievementItem,
-                  achievement.unlocked ? styles.achievementUnlocked : styles.achievementLocked
-                ]}
-              >
-                <Text style={styles.achievementIcon}>{achievement.icon}</Text>
-                <View style={styles.achievementContent}>
-                  <Text style={styles.achievementTitle}>{achievement.title}</Text>
-                  <Text style={styles.achievementDescription}>{achievement.description}</Text>
-                </View>
-                    {achievement.unlocked && (
-                  <Ionicons name="trophy-outline" size={20} color={COLORS.primary} />
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
         </ScrollView>
       </View>
 
@@ -630,44 +545,57 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         <Ionicons name="chatbubble-outline" size={24} color={COLORS.white} />
       </TouchableOpacity> */}
 
-      {/* Navigation Bar (Mobile) */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity 
-          onPress={() => setCurrentView('dashboard')}
-          style={[styles.navItem, currentView === 'dashboard' && styles.navItemActive]}
-        >
-          <Ionicons name="home-outline" size={20} color={currentView === 'dashboard' ? COLORS.primary : COLORS.gray} />
-          <Text style={[styles.navLabel, currentView === 'dashboard' && styles.navLabelActive]}>
-            Inicio
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => setCurrentView('analysis')}
-          style={[styles.navItem, currentView === 'analysis' && styles.navItemActive]}
-        >
-          <Ionicons name="bar-chart-outline" size={20} color={currentView === 'analysis' ? COLORS.primary : COLORS.gray} />
-          <Text style={[styles.navLabel, currentView === 'analysis' && styles.navLabelActive]}>
-            Análisis
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => setCurrentView('chat')}
-          style={[styles.navItem, currentView === 'chat' && styles.navItemActive]}
-        >
-          <Ionicons name="chatbubble-outline" size={20} color={currentView === 'chat' ? COLORS.primary : COLORS.gray} />
-          <Text style={[styles.navLabel, currentView === 'chat' && styles.navLabelActive]}>
-            Sofía
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => setCurrentView('settings')}
-          style={[styles.navItem, currentView === 'settings' && styles.navItemActive]}
-        >
-          <Ionicons name="settings-outline" size={20} color={currentView === 'settings' ? COLORS.primary : COLORS.gray} />
-          <Text style={[styles.navLabel, currentView === 'settings' && styles.navLabelActive]}>
-            Ajustes
-          </Text>
-        </TouchableOpacity>
+      {/* Floating Navigation Panel */}
+      <View style={styles.floatingNavContainer}>
+        <View style={styles.floatingNavPanel}>
+          <TouchableOpacity 
+            onPress={() => setCurrentView('dashboard')}
+            style={[styles.floatingNavItem, currentView === 'dashboard' && styles.floatingNavItemActive]}
+          >
+            <Ionicons 
+              name="home-outline" 
+              size={16} 
+              color={currentView === 'dashboard' ? COLORS.white : COLORS.gray} 
+            />
+            <Text style={[styles.floatingNavLabel, currentView === 'dashboard' && styles.floatingNavLabelActive]}>
+              Finance
+            </Text>
+            {currentView === 'dashboard' && <View style={styles.floatingNavIndicator} />}
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            onPress={() => setCurrentView('analysis')}
+            style={[styles.floatingNavItem, currentView === 'analysis' && styles.floatingNavItemActive]}
+          >
+            <Ionicons 
+              name="bar-chart-outline" 
+              size={16} 
+              color={currentView === 'analysis' ? COLORS.white : COLORS.gray} 
+            />
+            <Text style={[styles.floatingNavLabel, currentView === 'analysis' && styles.floatingNavLabelActive]}>
+              Análisis
+            </Text>
+            {currentView === 'analysis' && <View style={styles.floatingNavIndicator} />}
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            onPress={() => setCurrentView('chat')}
+            style={[styles.floatingNavItem, currentView === 'chat' && styles.floatingNavItemActive]}
+          >
+            <Ionicons 
+              name="chatbubble-outline" 
+              size={16} 
+              color={currentView === 'chat' ? COLORS.white : COLORS.gray} 
+            />
+            <Text style={[styles.floatingNavLabel, currentView === 'chat' && styles.floatingNavLabelActive]}>
+              SofIA
+            </Text>
+            {currentView === 'chat' && <View style={styles.floatingNavIndicator} />}
+          </TouchableOpacity>
+        </View>
+        
+        {/* Línea decorativa superior */}
+        <View style={styles.floatingNavTopLine} />
       </View>
     </SafeAreaView>
   );
@@ -874,60 +802,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8, // Para coincidir con shadow-lg de web
     elevation: 3,
   },
-  healthCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SIZES.lg,
-  },
-  healthCardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.dark, // Negro Suave
-  },
-  healthCardSubtitle: {
-    fontSize: 14,
-    color: COLORS.gray,
-    marginTop: SIZES.xs,
-  },
-  scoreStatusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  scoreEmoji: {
-    fontSize: 24,
-    marginRight: SIZES.sm,
-  },
-  scoreStatusText: {
-    fontWeight: '500',
-    fontSize: 14,
-  },
   chartContainer: {
     height: 208, // Ajustado para coincidir con web (52 * 4)
     backgroundColor: '#f0f2ff', // Azul muy claro para coincidir con web
     borderRadius: BORDER_RADIUS.lg,
     padding: SIZES.md,
     position: 'relative',
-  },
-  healthyZone: {
-    position: 'absolute',
-    top: SIZES.md,
-    left: SIZES.md,
-    right: SIZES.md,
-    bottom: SIZES.xl,
-    backgroundColor: 'rgba(133, 139, 242, 0.3)', // Azul Suave con transparencia
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 2,
-    borderColor: 'rgba(133, 139, 242, 0.5)', // Azul Suave con transparencia
-    borderStyle: 'dashed',
-  },
-  healthyZoneText: {
-    position: 'absolute',
-    top: SIZES.xs,
-    left: SIZES.xs,
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.primary, // Azul Suave
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   chartPlaceholder: {
     flex: 1,
@@ -1284,31 +1166,71 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  // Bottom navigation
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.grayScale[200],
-    paddingVertical: SIZES.sm,
-    paddingHorizontal: SIZES.lg,
-  },
-  navItem: {
-    flex: 1,
+  // Floating Navigation Panel
+  floatingNavContainer: {
+    position: 'absolute',
+    bottom: 16,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    paddingVertical: SIZES.sm,
+    zIndex: 50,
   },
-  navItemActive: {
-    // Active state styling
+  floatingNavPanel: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 25 },
+    shadowOpacity: 0.25,
+    shadowRadius: 50,
+    elevation: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  navLabel: {
-    fontSize: 12,
+  floatingNavItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    position: 'relative',
+    minWidth: 60,
+  },
+  floatingNavItemActive: {
+    backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500/70
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  floatingNavLabel: {
+    fontSize: 10,
     color: COLORS.gray,
-    marginTop: SIZES.xs,
-  },
-  navLabelActive: {
-    color: COLORS.primary, // Azul Suave
+    marginTop: 4,
     fontWeight: '500',
+  },
+  floatingNavLabelActive: {
+    color: COLORS.white,
+  },
+  floatingNavIndicator: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 8,
+    height: 8,
+    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+    borderRadius: 4,
+  },
+  floatingNavTopLine: {
+    position: 'absolute',
+    top: -4,
+    width: 32,
+    height: 4,
+    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+    borderRadius: 2,
   },
   // Chart styles
   chartsContainer: {
