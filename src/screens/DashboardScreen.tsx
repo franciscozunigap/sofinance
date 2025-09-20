@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,20 +6,31 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  Platform,
-  TextInput,
-  Alert,
   Image,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from '../platform';
 import { useUser } from '../contexts/UserContext';
-import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
-import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
-import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
-import { DollarSign, TrendingUp, Target, AlertTriangle, Award, Mic, Send, Settings, Home, BarChart3, MessageCircle, HelpCircle, LogOut } from 'lucide-react-native';
+import { COLORS, SIZES, BORDER_RADIUS } from '../constants';
+import { Ionicons } from '@expo/vector-icons';
+import { LineChart } from 'react-native-chart-kit';
 import AnalysisScreen from './AnalysisScreen';
 import FloatingNavBar from '../components/FloatingNavBar';
+import ChatComponent from '../components/ChatComponent';
+import SettingsComponent from '../components/SettingsComponent';
+import { Header, Card, TransactionItem, PercentageCard } from '../components/shared';
+import { 
+  MOCK_USER_DATA, 
+  DAILY_SCORE_DATA, 
+  RECENT_TRANSACTIONS, 
+  PERCENTAGE_DATA,
+  CHAT_RESPONSES,
+  INITIAL_CHAT_MESSAGES
+} from '../data/mockData';
+import { useViewNavigation } from '../hooks/useViewNavigation';
+import { useChat } from '../hooks/useChat';
+import { getScoreStatus } from '../utils/financialUtils';
+import { DollarSign } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -29,133 +40,14 @@ interface DashboardScreenProps {
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { user } = useUser();
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const { currentView, navigateTo, goBack } = useViewNavigation();
+  const { messages: chatMessages, input: chatInput, setInput: setChatInput, sendMessage: handleSendMessage } = useChat();
   const [scrollY] = useState(new Animated.Value(0));
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: 1,
-      sender: 'sofia',
-      text: '¡Hola! 👋 Veo que tu score financiero está mejorando. ¿Te gustaría revisar algunas recomendaciones para este mes?',
-      timestamp: '10:30 AM'
-    }
-  ]);
-  const [chatInput, setChatInput] = useState('');
 
   // Datos del usuario desde el contexto
-  const userData = user || {
-    name: 'María',
-    monthlyIncome: 4200,
-    currentScore: 52,
-    riskScore: 48,
-    monthlyExpenses: 3180,
-    currentSavings: 12500,
-    savingsGoal: 18000,
-    alerts: 3
-  };
+  const userData = user || MOCK_USER_DATA;
 
-  // MODIFICADO: El gasto mensual ahora es la suma de las 3 nuevas categorías
-  const monthlyExpenses = 3180; // 1800 (Necesidades) + 780 (Consumo) + 600 (Ahorro)
-
-  // Gráfico de salud financiera - 7 días
-  const currentMonth = "Septiembre";
-  const dailyScoreData = [
-    { day: 'Lun', score: 45 },
-    { day: 'Mar', score: 48 },
-    { day: 'Mié', score: 44 },
-    { day: 'Jue', score: 52 },
-    { day: 'Vie', score: 49 },
-    { day: 'Sáb', score: 47 },
-    { day: 'Dom', score: 50 }
-  ];
-
-  // MODIFICADO: Categorías de gastos simplificadas a 3 tipos
-  const expenseCategories = [
-    { name: 'Necesidades', value: 1800, color: '#ea580c' }, // Gastos fijos, vivienda, etc.
-    { name: 'Consumo', value: 780, color: '#fb923c' },     // Salidas, compras no esenciales, etc.
-    { name: 'Ahorro', value: 600, color: '#fed7aa' }       // Inversión, metas, etc.
-  ];
-
-  const weeklyTrend = [
-    { week: 'S1', gastos: 720 },
-    { week: 'S2', gastos: 890 },
-    { week: 'S3', gastos: 650 },
-    { week: 'S4', gastos: 920 }
-  ];
-
-  const recentTransactions = [
-    { id: 1, description: 'Supermercado Jumbo', amount: -85.50, category: 'Necesidades', date: '08 Sep', time: '14:30' },
-    { id: 2, description: 'Cena en restaurante', amount: -45.00, category: 'Consumo', date: '08 Sep', time: '21:15' },
-    { id: 3, description: 'Netflix', amount: -9.99, category: 'Consumo', date: '07 Sep', time: '16:45' },
-    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Ahorro', date: '07 Sep', time: '08:00' },
-    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingresos', date: '05 Sep', time: '09:00' }
-  ];
-
-  const achievements = [
-    { id: 1, title: 'Consistencia Semanal', description: 'Registraste tus gastos 7 días seguidos', icon: '🎯', unlocked: true },
-    { id: 2, title: 'Consumo Consciente', description: 'Redujiste gastos de consumo esta semana', icon: '🏆', unlocked: true },
-    { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de ahorro mensual', icon: '💎', unlocked: false }
-  ];
-
-  const handleSendMessage = () => {
-    if (chatInput.trim()) {
-      const newMessage = {
-        id: chatMessages.length + 1,
-        sender: 'user',
-        text: chatInput,
-        timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-      };
-      
-      setChatMessages(prev => [...prev, newMessage]);
-      setChatInput('');
-      
-      // Respuesta automática de Sofía
-      setTimeout(() => {
-        const responses = [
-          '¡Perfecto! Te ayudo a optimizar tus gastos. Veo que puedes reducir 15% en entretenimiento 📊',
-          'Basándome en tu historial, te recomiendo ahorrar $300 este mes para alcanzar tu meta 💪',
-          'Tu score está mejorando. ¿Te interesa ver estrategias para llegar a 60 puntos? 📈',
-          'Detecté que gastas más los fines de semana. ¿Quieres un plan para controlarlo? 💡'
-        ];
-        
-        const sofiaResponse = {
-          id: chatMessages.length + 2,
-          sender: 'sofia',
-          text: responses[Math.floor(Math.random() * responses.length)],
-          timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-        };
-        
-        setChatMessages(prev => [...prev, sofiaResponse]);
-      }, 1500);
-    }
-  };
-
-  const getScoreStatus = (score: number) => {
-    if (score >= 60) return { text: '¡Excelente! Estás en zona óptima', color: '#16a34a', emoji: '🚀' };
-    if (score >= 40) return { text: 'Bien, mantén el ritmo', color: '#ea580c', emoji: '💪' };
-    return { text: 'Necesitas mejorar', color: '#dc2626', emoji: '⚠️' };
-  };
-
-  const handleLogout = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro de que quieres cerrar sesión?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Cerrar Sesión',
-          style: 'destructive',
-          onPress: () => {
-            onLogout();
-          },
-        },
-      ]
-    );
-  };
-
+  // Obtener el estado del score
   const scoreStatus = getScoreStatus(userData.currentScore || 0);
 
   // Vista de Análisis
@@ -163,7 +55,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     return (
       <AnalysisScreen 
         currentView={currentView}
-        onViewChange={setCurrentView}
+        onViewChange={navigateTo}
       />
     );
   }
@@ -171,91 +63,13 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   if (currentView === 'settings') {
     return (
       <SafeAreaView style={styles.container}>
-        {/* Header de Ajustes */}
-        <View style={styles.chatHeader}>
-          <View style={styles.chatHeaderContent}>
-            <TouchableOpacity 
-              onPress={() => setCurrentView('dashboard')}
-              style={styles.backButton}
-            >
-              <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
-            <View style={styles.chatUserInfo}>
-              <View style={styles.chatAvatar}>
-                <Text style={styles.chatAvatarText}>⚙️</Text>
-              </View>
-              <View>
-                <Text style={styles.chatUserName}>Ajustes</Text>
-                <Text style={styles.chatUserStatus}>Configuración</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Contenido de Ajustes */}
-        <ScrollView style={styles.settingsContent}>
-          <View style={styles.settingsSection}>
-            <Text style={styles.settingsSectionTitle}>Cuenta</Text>
-            
-            <TouchableOpacity style={styles.settingsItem}>
-              <View style={styles.settingsItemLeft}>
-                <Ionicons name="person-outline" size={24} color={COLORS.gray} />
-                <Text style={styles.settingsItemText}>Perfil</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.settingsItem}>
-              <View style={styles.settingsItemLeft}>
-                <Ionicons name="shield-outline" size={24} color={COLORS.gray} />
-                <Text style={styles.settingsItemText}>Privacidad</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.settingsItem}>
-              <View style={styles.settingsItemLeft}>
-                <Ionicons name="notifications-outline" size={24} color={COLORS.gray} />
-                <Text style={styles.settingsItemText}>Notificaciones</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.settingsSection}>
-            <Text style={styles.settingsSectionTitle}>Aplicación</Text>
-            
-            <TouchableOpacity style={styles.settingsItem}>
-              <View style={styles.settingsItemLeft}>
-                <Ionicons name="help-circle-outline" size={24} color={COLORS.gray} />
-                <Text style={styles.settingsItemText}>Ayuda</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.settingsItem}>
-              <View style={styles.settingsItemLeft}>
-                <Ionicons name="information-circle-outline" size={24} color={COLORS.gray} />
-                <Text style={styles.settingsItemText}>Acerca de</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.settingsSection}>
-            <TouchableOpacity style={[styles.settingsItem, styles.logoutItem]} onPress={handleLogout}>
-              <View style={styles.settingsItemLeft}>
-                <Ionicons name="log-out-outline" size={24} color={COLORS.danger} />
-                <Text style={[styles.settingsItemText, styles.logoutText]}>Cerrar Sesión</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        {/* Floating Navigation Panel */}
+        <SettingsComponent 
+          onBack={goBack}
+          onLogout={onLogout}
+        />
         <FloatingNavBar 
           currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
-          onViewChange={setCurrentView}
+          onViewChange={navigateTo}
         />
       </SafeAreaView>
     );
@@ -264,96 +78,15 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   if (currentView === 'chat') {
     return (
       <SafeAreaView style={styles.container}>
-        {/* Contenedor con fondo gris como AnalysisScreen */}
-        <View style={styles.chatContainer}>
-          {/* Header del Chat */}
-          <View style={styles.chatHeader}>
-            <View style={styles.chatHeaderContent}>
-              <TouchableOpacity 
-                onPress={() => setCurrentView('dashboard')}
-                style={styles.backButton}
-              >
-                <Text style={styles.backButtonText}>←</Text>
-              </TouchableOpacity>
-              <View style={styles.chatUserInfo}>
-                <View style={styles.chatAvatar}>
-                  <Image 
-                    source={require('../../assets/avatar.png')} 
-                    style={styles.chatAvatarImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <View>
-                  <Text style={styles.chatUserName}>Sofía</Text>
-                  <Text style={styles.chatUserStatus}>En línea</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Chat Messages */}
-          <ScrollView style={styles.chatMessages} contentContainerStyle={styles.chatMessagesContent}>
-          {chatMessages.map((message) => (
-            <View
-              key={message.id}
-              style={[
-                styles.messageContainer,
-                message.sender === 'user' ? styles.userMessageContainer : styles.sofiaMessageContainer
-              ]}
-            >
-              <View style={styles.messageContent}>
-                {message.sender === 'sofia' && (
-                  <View style={styles.messageAvatar}>
-                    <Image 
-                      source={require('../../assets/avatar.png')} 
-                      style={styles.messageAvatarImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
-                
-                <View style={styles.messageBubble}>
-                  <View
-                    style={[
-                      styles.messageBubbleContent,
-                      message.sender === 'user' ? styles.userMessageBubble : styles.sofiaMessageBubble
-                    ]}
-                  >
-                    <Text style={[
-                      styles.messageText,
-                      message.sender === 'user' ? styles.userMessageText : styles.sofiaMessageText
-                    ]}>
-                      {message.text}
-                    </Text>
-                  </View>
-                  <Text style={[
-                    styles.messageTime,
-                    message.sender === 'user' ? styles.userMessageTime : styles.sofiaMessageTime
-                  ]}>
-                    {message.timestamp}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          ))}
-          </ScrollView>
-
-          {/* Chat Input */}
-          <View style={styles.chatInput}>
-            <View style={styles.chatInputContainer}>
-              <TextInput
-                style={styles.chatTextInput}
-                  value={chatInput}
-                onChangeText={setChatInput}
-                  placeholder="Pregúntame sobre tus finanzas..."
-                placeholderTextColor={COLORS.gray}
-              />
-              <TouchableOpacity style={styles.chatSendButton} onPress={handleSendMessage}>
-                <Text style={styles.chatSendButtonText}>→</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+        <ChatComponent 
+          onBack={goBack}
+          initialMessages={INITIAL_CHAT_MESSAGES}
+          responses={CHAT_RESPONSES}
+        />
+        <FloatingNavBar 
+          currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
+          onViewChange={navigateTo}
+        />
       </SafeAreaView>
     );
   }
@@ -365,7 +98,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         <View style={styles.avatarHeaderContent}>
           {/* Botón de perfil */}
           <TouchableOpacity
-            onPress={() => setCurrentView('settings')}
+            onPress={() => navigateTo('settings')}
             style={styles.profileButton}
           >
             <Ionicons name="person-outline" size={18} color={COLORS.white} />
@@ -437,9 +170,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           <View style={styles.chartContainer}>
             <LineChart
               data={{
-                labels: dailyScoreData.map(item => item.day),
+                labels: DAILY_SCORE_DATA.map(item => item.day),
                 datasets: [{
-                  data: dailyScoreData.map(item => item.score),
+                  data: DAILY_SCORE_DATA.map(item => item.score),
                   color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`,
                   strokeWidth: 3
                 }]
@@ -469,57 +202,32 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
         {/* 4 Columnas de Porcentajes */}
         <View style={styles.percentageGrid}>
-          <View style={styles.percentageCard}>
-            <Text style={[styles.percentageValue, { color: '#ea580c' }]}>42%</Text>
-            <Text style={styles.percentageLabel}>Consumo</Text>
-          </View>
-
-          <View style={styles.percentageCard}>
-            <Text style={[styles.percentageValue, { color: '#dc2626' }]}>57%</Text>
-            <Text style={styles.percentageLabel}>Necesidades</Text>
-          </View>
-
-          <View style={styles.percentageCard}>
-            <Text style={[styles.percentageValue, { color: '#16a34a' }]}>19%</Text>
-            <Text style={styles.percentageLabel}>Ahorro</Text>
-          </View>
-
-          <View style={styles.percentageCard}>
-            <Text style={[styles.percentageValue, { color: '#7c3aed' }]}>8%</Text>
-            <Text style={styles.percentageLabel}>Deuda</Text>
-          </View>
+          {PERCENTAGE_DATA.map((item, index) => (
+            <PercentageCard
+              key={index}
+              label={item.label}
+              percentage={item.value}
+              amount={item.amount}
+              color={item.color}
+              style={styles.percentageCard}
+            />
+          ))}
         </View>
 
           {/* Lista de Registros */}
           <View style={styles.registrosCard}>
             <Text style={styles.registrosTitle}>Registros Recientes</Text>
             <View style={styles.registrosList}>
-              {recentTransactions.map((transaction) => (
-                <View key={transaction.id} style={styles.registroItem}>
-                  <View style={styles.registroLeft}>
-                    <View style={[
-                      styles.registroIcon,
-                      { backgroundColor: transaction.amount > 0 ? '#dcfce7' : '#fef2f2' }
-                    ]}>
-                      <DollarSign 
-                        size={16} 
-                        color={transaction.amount > 0 ? '#16a34a' : '#dc2626'} 
-                      />
-                    </View>
-                    <View>
-                      <Text style={styles.registroDescription}>{transaction.description}</Text>
-                      <Text style={styles.registroCategory}>{transaction.category} • {transaction.date} {transaction.time}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.registroRight}>
-                    <Text style={[
-                      styles.registroAmount,
-                      { color: transaction.amount > 0 ? '#16a34a' : '#dc2626' }
-                    ]}>
-                      {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
-                    </Text>
-                  </View>
-                </View>
+              {RECENT_TRANSACTIONS.map((transaction) => (
+                <TransactionItem
+                  key={transaction.id}
+                  id={transaction.id}
+                  description={transaction.description}
+                  amount={transaction.amount}
+                  category={transaction.category}
+                  date={transaction.date}
+                  time={transaction.time}
+                />
               ))}
             </View>
           </View>
@@ -538,7 +246,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
       {/* Floating Navigation Panel */}
       <FloatingNavBar 
         currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
-        onViewChange={setCurrentView}
+        onViewChange={navigateTo}
       />
     </SafeAreaView>
   );

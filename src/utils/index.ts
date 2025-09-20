@@ -1,9 +1,15 @@
+// Re-exportar utilidades desde archivos específicos
+export * from './validation';
+export * from './financialUtils';
+
 import { Transaction } from '../types';
 
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount: number, currency: string = 'EUR'): string => {
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
-    currency: 'EUR',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(amount);
 };
 
@@ -47,13 +53,4 @@ export const calculateMonthlyExpenses = (transactions: Transaction[]): number =>
       transaction.date.getFullYear() === currentYear
     )
     .reduce((total, transaction) => total + transaction.amount, 0);
-};
-
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-export const validatePassword = (password: string): boolean => {
-  return password.length >= 6;
 };
