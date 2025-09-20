@@ -193,7 +193,7 @@ const SofinanceAppContent = () => {
   if (currentView === 'analysis') {
     return (
       <div className="min-h-screen bg-gray-50">
-        <WebAnalysisScreen onSettingsClick={() => setIsSettingsOpen(true)} />
+        <WebAnalysisScreen />
         <FloatingNavigationPanel 
           currentView={currentView} 
           onViewChange={setCurrentView} 
@@ -211,37 +211,26 @@ const SofinanceAppContent = () => {
   // Vista de Chat (SofIA)
   if (currentView === 'sofia') {
     return (
-      <div className="min-h-screen bg-light">
+      <div className="min-h-screen bg-light flex flex-col pb-20">
         {/* Header del Chat */}
         <div className="bg-white shadow-sm border-b px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-light rounded-full shadow-sm overflow-hidden">
-                  <img 
-                    src={avatar} 
-                    alt="Sofía Avatar" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-dark">Sofía</h3>
-                  <p className="text-sm text-green-500">En línea</p>
-                </div>
-              </div>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-light rounded-full shadow-sm overflow-hidden">
+              <img 
+                src={avatar} 
+                alt="Sofía Avatar" 
+                className="w-full h-full object-cover"
+              />
             </div>
-            <button
-              onClick={handleLogout}
-              className="p-2 hover:bg-gray-100 rounded-full text-gray-600"
-              title="Cerrar sesión"
-            >
-              <LogOut className="h-5 w-5" />
-            </button>
+            <div>
+              <h3 className="font-semibold text-dark">Sofía</h3>
+              <p className="text-sm text-green-500">En línea</p>
+            </div>
           </div>
         </div>
 
-        {/* Chat Messages */}
-        <div className="flex-1 p-4 space-y-4 max-h-[calc(100vh-140px)] overflow-y-auto">
+        {/* Chat Messages - Área que se expande */}
+        <div className="flex-1 p-4 space-y-4 overflow-y-auto">
           {chatMessages.map((message) => (
             <div
               key={message.id}
@@ -277,7 +266,7 @@ const SofinanceAppContent = () => {
           ))}
         </div>
 
-        {/* Chat Input */}
+        {/* Chat Input - Siempre abajo */}
         <div className="bg-white border-t p-4">
           <div className="flex items-center space-x-2">
             <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">

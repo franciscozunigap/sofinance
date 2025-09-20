@@ -1,13 +1,11 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, AreaChart, Area } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon, Settings } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
-interface WebAnalysisScreenProps {
-  onSettingsClick?: () => void;
-}
+interface WebAnalysisScreenProps {}
 
-const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = ({ onSettingsClick }) => {
+const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
   const { user } = useUser();
 
   // Datos del usuario
@@ -116,19 +114,12 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = ({ onSettingsClick }
               <p className="text-sm text-gray-600 mt-1">Insights detallados sobre tu comportamiento financiero</p>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="text-right">
-                <p className="text-xs text-gray-500">Score Actual</p>
-                <p className="text-lg font-bold text-blue-600">{userData.currentScore}/100</p>
-              </div>
-              {onSettingsClick && (
-                <button
-                  onClick={onSettingsClick}
-                  className="w-7 h-7 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
-                  title="Configuración"
-                >
-                  <Settings className="h-4 w-4" />
-                </button>
-              )}
+              <button
+                className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                title="Agregar movimiento"
+              >
+                <span className="text-xl font-bold">+</span>
+              </button>
             </div>
           </div>
         </div>
