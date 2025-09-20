@@ -37,22 +37,19 @@ body {
   }
 }
 
-/* Scrollbar personalizado */
+/* Scrollbar oculto */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: #F2F2F2; /* Blanco Roto para el track */
+/* Para Firefox */
+* {
+  scrollbar-width: none;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #858BF2; /* Azul Suave para el thumb */
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #1B3BF2; /* Azul Intenso al hacer hover */
+/* Para IE/Edge */
+* {
+  -ms-overflow-style: none;
 }
 
 /* Animaciones */

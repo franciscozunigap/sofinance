@@ -1,5 +1,17 @@
 # 💰 SoFinance - Aplicación de Finanzas Personales Multiplataforma
 
+## Paleta de colores
+
+A partir del código CSS que proporcionaste, la paleta de colores de SoFinance Web incluye los siguientes tonos:
+
+Blanco Roto: #F2F2F2 (Usado para el color de fondo principal y la pista de la barra de desplazamiento).
+
+Negro Suave: #212226 (Usado para el color del texto principal).
+
+Azul Suave: #858BF2 (Usado para el pulgar de la barra de desplazamiento).
+
+Azul Intenso: #1B3BF2 (Usado para el pulgar de la barra de desplazamiento al pasar el cursor sobre él).
+
 Una aplicación moderna y optimizada para la gestión de finanzas personales, desarrollada con **React Native**, **Expo** y **React Native Web** para funcionar en **Web**, **iOS** y **Android** simultáneamente.
 
 ## 🚀 Características

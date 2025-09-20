@@ -111,7 +111,7 @@ const WebDashboardScreen = () => {
     return { text: 'Necesitas mejorar', color: 'text-red-600', emoji: '⚠️' };
   };
 
-  const scoreStatus = getScoreStatus(userData.currentScore);
+  const scoreStatus = getScoreStatus(userData.currentScore || 0);
 
   if (currentView === 'chat') {
     return (
@@ -209,43 +209,24 @@ const WebDashboardScreen = () => {
 
   return (
     <div className="min-h-screen bg-light">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
-                </div>
-                <h1 className="text-xl font-bold text-dark">Sofinance</h1>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Bell className="h-6 w-6 text-gray-600" />
-                <span className="absolute -top-2 -right-2 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {userData.alerts}
-                </span>
-              </div>
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="h-5 w-5 text-primary-400" />
-              </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 hover:bg-gray-100 rounded-full text-gray-600"
-                title="Cerrar sesión"
-              >
-                <LogOut className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Círculo flotante de configuración */}
+      <button
+        className="fixed top-6 right-6 z-50 w-12 h-12 bg-white hover:bg-gray-50 text-gray-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+        title="Configuración"
+      >
+        <Settings className="h-6 w-6" />
+      </button>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Título y descripción principal */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-dark mb-4">Tu Salud Financiera</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Monitorea tu progreso financiero y mantén el control de tus gastos con nuestro dashboard inteligente
+          </p>
+        </div>
+
         {/* Bienvenida */}
         <div className="mb-8">
           <div>
@@ -294,236 +275,72 @@ const WebDashboardScreen = () => {
           </div>
         </div>
 
-        {/* Métricas Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Score de Riesgo</p>
-                <p className="text-2xl font-bold text-primary-400">{userData.riskScore}/100</p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-primary-400" />
-            </div>
-            <div className="mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-primary-400 h-2 rounded-full" 
-                  style={{ width: `${userData.riskScore}%` }}
-                ></div>
-              </div>
-            </div>
+        {/* 4 Columnas de Porcentajes */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl shadow p-6 text-center">
+            <div className="text-3xl font-bold text-orange-600 mb-2">42%</div>
+            <p className="text-sm font-medium text-gray-600">Consumo</p>
+            <p className="text-xs text-gray-500 mt-1">$780</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Gastos del Mes</p>
-                <p className="text-2xl font-bold text-danger">${userData.monthlyExpenses.toLocaleString()}</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-danger" />
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              {((userData.monthlyExpenses / userData.monthlyIncome) * 100).toFixed(1)}% de tus ingresos
-            </p>
+          <div className="bg-white rounded-xl shadow p-6 text-center">
+            <div className="text-3xl font-bold text-red-600 mb-2">57%</div>
+            <p className="text-sm font-medium text-gray-600">Necesidades</p>
+            <p className="text-xs text-gray-500 mt-1">$1,800</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Ahorros Actuales</p>
-                <p className="text-2xl font-bold text-green-600">${userData.currentSavings.toLocaleString()}</p>
-              </div>
-              <DollarSign className="h-8 w-8 text-green-500" />
-            </div>
-            <p className="text-xs text-green-600 mt-2">+5.2% vs mes anterior</p>
+          <div className="bg-white rounded-xl shadow p-6 text-center">
+            <div className="text-3xl font-bold text-green-600 mb-2">19%</div>
+            <p className="text-sm font-medium text-gray-600">Ahorro</p>
+            <p className="text-xs text-gray-500 mt-1">$600</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Meta de Ahorro</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  ${userData.savingsGoal.toLocaleString()}
-                </p>
-              </div>
-              <Target className="h-8 w-8 text-blue-500" />
-            </div>
-            <div className="mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full" 
-                  style={{ width: `${(userData.currentSavings / userData.savingsGoal) * 100}%` }}
-                ></div>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                {((userData.currentSavings / userData.savingsGoal) * 100).toFixed(1)}% completado
-              </p>
-            </div>
+          <div className="bg-white rounded-xl shadow p-6 text-center">
+            <div className="text-3xl font-bold text-purple-600 mb-2">8%</div>
+            <p className="text-sm font-medium text-gray-600">Deuda</p>
+            <p className="text-xs text-gray-500 mt-1">$250</p>
           </div>
         </div>
 
-        {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Gastos por Categoría */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-dark mb-4">Distribución de Gastos</h3>
-            <div className="h-64 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie 
-                    data={expenseCategories} 
-                    cx="50%" 
-                    cy="50%" 
-                    innerRadius={60} 
-                    outerRadius={80} 
-                    dataKey="value" 
-                    paddingAngle={5}
-                  >
-                    {expenseCategories.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            
-            {/* Leyenda */}
-            <div className="flex justify-center space-x-6 mt-4">
-              {expenseCategories.map((category, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: category.color }}
-                  ></div>
-                  <span className="text-sm text-gray-600">{category.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Evolución Semanal */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-dark mb-4">Evolución Semanal</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="gastos" fill="#858BF2" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Transacciones Recientes y Logros */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Transacciones Recientes */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-dark mb-4">Transacciones Recientes</h3>
-            <div className="space-y-3">
-              {recentTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
-                    }`}>
-                      <DollarSign className={`h-5 w-5 ${
-                        transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                      }`} />
-                    </div>
-                    <div>
-                      <p className="font-medium text-dark">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">{transaction.category}</p>
-                    </div>
+        {/* Lista de Registros */}
+        <div className="bg-white rounded-xl shadow p-6">
+          <h3 className="text-lg font-semibold text-dark mb-6">Registros Recientes</h3>
+          <div className="space-y-4">
+            {recentTransactions.map((transaction) => (
+              <div key={transaction.id} className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0">
+                <div className="flex items-center space-x-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
+                  }`}>
+                    <DollarSign className={`h-6 w-6 ${
+                      transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                    }`} />
                   </div>
-                  <div className="text-right">
-                    <p className={`font-semibold ${
-                      transaction.amount > 0 ? 'text-green-600' : 'text-danger'
-                    }`}>
-                      {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-500">{transaction.date} {transaction.time}</p>
+                  <div>
+                    <p className="font-medium text-dark text-lg">{transaction.description}</p>
+                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Logros */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold text-dark mb-4">Tus Logros</h3>
-            <div className="space-y-4">
-              {achievements.map((achievement) => (
-                <div 
-                  key={achievement.id}
-                  className={`p-3 rounded-lg border-2 ${
-                    achievement.unlocked 
-                      ? 'border-primary-200 bg-primary-50' 
-                      : 'border-gray-200 bg-gray-50 opacity-60'
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <span className="text-2xl">{achievement.icon}</span>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-dark">{achievement.title}</h4>
-                      <p className="text-sm text-gray-600">{achievement.description}</p>
-                    </div>
-                    {achievement.unlocked && (
-                      <Award className="h-5 w-5 text-primary-400" />
-                    )}
-                  </div>
+                <div className="text-right">
+                  <p className={`font-bold text-lg ${
+                    transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
+                  </p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </main>
 
-      {/* Chat Button */}
-      <button
+      {/* Chat Button - Ocultado */}
+      {/* <button
         onClick={() => setCurrentView('chat')}
         className="fixed bottom-6 right-6 bg-primary-400 hover:bg-primary-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
       >
         <MessageCircle className="h-6 w-6" />
-      </button>
-
-      {/* Navigation Bar (Mobile) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t lg:hidden">
-        <div className="flex items-center justify-around py-2">
-          <button 
-            onClick={() => setCurrentView('dashboard')}
-            className={`flex flex-col items-center p-2 ${currentView === 'dashboard' ? 'text-primary-400' : 'text-gray-400'}`}
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs mt-1">Inicio</span>
-          </button>
-          <button 
-            onClick={() => setCurrentView('analysis')}
-            className={`flex flex-col items-center p-2 ${currentView === 'analysis' ? 'text-primary-400' : 'text-gray-400'}`}
-          >
-            <BarChart3 className="h-5 w-5" />
-            <span className="text-xs mt-1">Análisis</span>
-          </button>
-          <button 
-            onClick={() => setCurrentView('chat')}
-            className={`flex flex-col items-center p-2 ${currentView === 'chat' ? 'text-primary-400' : 'text-gray-400'}`}
-          >
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-xs mt-1">Sofía</span>
-          </button>
-          <button 
-            onClick={handleLogout}
-            className="flex flex-col items-center p-2 text-gray-400"
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="text-xs mt-1">Salir</span>
-          </button>
-        </div>
-      </nav>
+      </button> */}
     </div>
   );
 };

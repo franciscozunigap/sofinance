@@ -655,13 +655,13 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         </View>
       </ScrollView>
 
-      {/* Chat Button */}
-      <TouchableOpacity
+      {/* Chat Button - Ocultado */}
+      {/* <TouchableOpacity
         onPress={() => setCurrentView('chat')}
         style={styles.chatButton}
       >
         <Ionicons name="chatbubble-outline" size={24} color={COLORS.white} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* Navigation Bar (Mobile) */}
       <View style={styles.bottomNav}>

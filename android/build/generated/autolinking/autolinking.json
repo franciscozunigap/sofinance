@@ -36,7 +36,7 @@
       "platforms": {
         "ios": {
           "podspecPath": "/Users/usuario/code/GIT/sofinance/node_modules/expo/Expo.podspec",
-          "version": "54.0.1",
+          "version": "54.0.7",
           "configurations": [],
           "scriptPhases": []
         },
