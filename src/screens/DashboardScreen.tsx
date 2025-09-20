@@ -9,12 +9,14 @@ import {
   Platform,
   TextInput,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from '../platform';
 import { useUser } from '../contexts/UserContext';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
+import { DollarSign, TrendingUp, Target, AlertTriangle, Award, Mic, Send, Settings, Home, BarChart3, MessageCircle, HelpCircle, LogOut } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -121,10 +123,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     }
   };
 
-  const getScoreStatus = (score) => {
-    if (score >= 60) return { text: '¡Excelente! Estás en zona óptima', color: 'text-green-600', emoji: '🚀' };
-    if (score >= 40) return { text: 'Bien, mantén el ritmo', color: 'text-orange-600', emoji: '💪' };
-    return { text: 'Necesitas mejorar', color: 'text-red-600', emoji: '⚠️' };
+  const getScoreStatus = (score: number) => {
+    if (score >= 60) return { text: '¡Excelente! Estás en zona óptima', color: '#16a34a', emoji: '🚀' };
+    if (score >= 40) return { text: 'Bien, mantén el ritmo', color: '#ea580c', emoji: '💪' };
+    return { text: 'Necesitas mejorar', color: '#dc2626', emoji: '⚠️' };
   };
 
   const handleLogout = () => {
@@ -364,39 +366,41 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>S</Text>
-            </View>
-            <Text style={styles.headerTitle}>Sofinance</Text>
-          </View>
+      {/* Header con Avatar */}
+      <View style={styles.avatarHeader}>
+        <View style={styles.avatarHeaderContent}>
+          {/* Botón de configuración */}
+          <TouchableOpacity
+            onPress={() => setCurrentView('settings')}
+            style={styles.settingsButton}
+          >
+            <Settings size={16} color={COLORS.white} />
+          </TouchableOpacity>
           
-          <View style={styles.headerRight}>
-            <View style={styles.notificationContainer}>
-              <Ionicons name="notifications-outline" size={24} color={COLORS.gray} />
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationText}>{userData.alerts}</Text>
-              </View>
-            </View>
-            <View style={styles.userAvatar}>
-              <Ionicons name="person-outline" size={20} color={COLORS.primary} />
+          {/* Avatar que abarca toda la pantalla */}
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarText}>👤</Text>
             </View>
           </View>
         </View>
       </View>
 
-      {/* Main Content */}
-      <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
-        {/* Bienvenida */}
-        <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
-          <Text style={styles.welcomeSubtitle}>
-            Score actual: <Text style={styles.scoreText}>{userData.currentScore}/100</Text> - Tu progreso mensual es constante
-          </Text>
-        </View>
+      {/* Main Content con superposición */}
+      <View style={styles.mainContentOverlay}>
+        <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
+          {/* Bienvenida */}
+          <View style={styles.welcomeSection}>
+            <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
+          </View>
+
+          {/* Título y descripción principal */}
+          <View style={styles.titleSection}>
+            <Text style={styles.mainTitle}>Tu Salud Financiera</Text>
+            <Text style={styles.mainDescription}>
+              Optimiza tus finanzas diariamente con nuestro análisis inteligente. Visualiza tendencias, identifica oportunidades de ahorro y toma decisiones financieras más inteligentes.
+            </Text>
+          </View>
 
         {/* Zona Financiera Saludable */}
         <View style={styles.healthCard}>
@@ -450,74 +454,26 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           </View>
         </View>
 
-        {/* Métricas Principales */}
-        <View style={styles.metricsGrid}>
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <View>
-                <Text style={styles.metricLabel}>Score de Riesgo</Text>
-                <Text style={styles.metricValue}>{userData.riskScore}/100</Text>
-              </View>
-              <Ionicons name="warning-outline" size={32} color={COLORS.primary} />
-            </View>
-            <View style={styles.progressBar}>
-              <View 
-                style={[styles.progressFill, { width: `${userData.riskScore}%` }]}
-              />
-            </View>
+        {/* 4 Columnas de Porcentajes */}
+        <View style={styles.percentageGrid}>
+          <View style={styles.percentageCard}>
+            <Text style={[styles.percentageValue, { color: '#ea580c' }]}>42%</Text>
+            <Text style={styles.percentageLabel}>Consumo</Text>
           </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <View>
-                <Text style={styles.metricLabel}>Gastos del Mes</Text>
-                <Text style={[styles.metricValue, { color: COLORS.danger }]}>
-                  ${userData.monthlyExpenses.toLocaleString()}
-                </Text>
-              </View>
-              <Ionicons name="trending-up-outline" size={32} color={COLORS.danger} />
-            </View>
-            <Text style={styles.metricSubtext}>
-              {((userData.monthlyExpenses / userData.monthlyIncome) * 100).toFixed(1)}% de tus ingresos
-            </Text>
+          <View style={styles.percentageCard}>
+            <Text style={[styles.percentageValue, { color: '#dc2626' }]}>57%</Text>
+            <Text style={styles.percentageLabel}>Necesidades</Text>
           </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <View>
-                <Text style={styles.metricLabel}>Ahorros Actuales</Text>
-                <Text style={[styles.metricValue, { color: COLORS.success }]}>
-                  ${userData.currentSavings.toLocaleString()}
-                </Text>
-              </View>
-              <Ionicons name="cash-outline" size={32} color={COLORS.success} />
-            </View>
-            <Text style={[styles.metricSubtext, { color: COLORS.success }]}>
-              +5.2% vs mes anterior
-            </Text>
+          <View style={styles.percentageCard}>
+            <Text style={[styles.percentageValue, { color: '#16a34a' }]}>19%</Text>
+            <Text style={styles.percentageLabel}>Ahorro</Text>
           </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <View>
-                <Text style={styles.metricLabel}>Meta de Ahorro</Text>
-                <Text style={[styles.metricValue, { color: '#3b82f6' }]}>
-                  ${userData.savingsGoal.toLocaleString()}
-                </Text>
-              </View>
-              <Ionicons name="flag-outline" size={32} color="#3b82f6" />
-            </View>
-            <View style={styles.progressBar}>
-              <View 
-                style={[styles.progressFill, { 
-                  width: `${(userData.currentSavings / userData.savingsGoal) * 100}%`,
-                  backgroundColor: '#3b82f6'
-                }]}
-              />
-            </View>
-            <Text style={styles.metricSubtext}>
-                {((userData.currentSavings / userData.savingsGoal) * 100).toFixed(1)}% completado
-            </Text>
+          <View style={styles.percentageCard}>
+            <Text style={[styles.percentageValue, { color: '#7c3aed' }]}>8%</Text>
+            <Text style={styles.percentageLabel}>Deuda</Text>
           </View>
         </View>
 
@@ -571,6 +527,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                 }}
                 width={width - 80}
                 height={200}
+                yAxisLabel="$"
+                yAxisSuffix=""
                 chartConfig={{
                   backgroundColor: COLORS.white,
                   backgroundGradientFrom: COLORS.white,
@@ -593,41 +551,39 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           </View>
         </View>
 
-          {/* Transacciones Recientes */}
-        <View style={styles.transactionsCard}>
-          <Text style={styles.cardTitle}>Transacciones Recientes</Text>
-          <View style={styles.transactionsList}>
+          {/* Lista de Registros */}
+          <View style={styles.registrosCard}>
+            <Text style={styles.registrosTitle}>Registros Recientes</Text>
+            <View style={styles.registrosList}>
               {recentTransactions.map((transaction) => (
-              <View key={transaction.id} style={styles.transactionItem}>
-                <View style={styles.transactionLeft}>
-                  <View style={[
-                    styles.transactionIcon,
-                    { backgroundColor: transaction.amount > 0 ? COLORS.success + '20' : COLORS.danger + '20' }
-                  ]}>
-                    <Ionicons 
-                      name="cash-outline" 
-                      size={20} 
-                      color={transaction.amount > 0 ? COLORS.success : COLORS.danger} 
-                    />
+                <View key={transaction.id} style={styles.registroItem}>
+                  <View style={styles.registroLeft}>
+                    <View style={[
+                      styles.registroIcon,
+                      { backgroundColor: transaction.amount > 0 ? '#dcfce7' : '#fef2f2' }
+                    ]}>
+                      <DollarSign 
+                        size={16} 
+                        color={transaction.amount > 0 ? '#16a34a' : '#dc2626'} 
+                      />
+                    </View>
+                    <View>
+                      <Text style={styles.registroDescription}>{transaction.description}</Text>
+                      <Text style={styles.registroCategory}>{transaction.category} • {transaction.date} {transaction.time}</Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.transactionDescription}>{transaction.description}</Text>
-                    <Text style={styles.transactionCategory}>{transaction.category}</Text>
-                  </View>
-                </View>
-                <View style={styles.transactionRight}>
-                  <Text style={[
-                    styles.transactionAmount,
-                    { color: transaction.amount > 0 ? COLORS.success : COLORS.danger }
-                  ]}>
+                  <View style={styles.registroRight}>
+                    <Text style={[
+                      styles.registroAmount,
+                      { color: transaction.amount > 0 ? '#16a34a' : '#dc2626' }
+                    ]}>
                       {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
-                  </Text>
-                  <Text style={styles.transactionTime}>{transaction.date} {transaction.time}</Text>
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
-        </View>
 
           {/* Logros */}
         <View style={styles.achievementsCard}>
@@ -653,7 +609,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             ))}
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* Chat Button - Ocultado */}
       {/* <TouchableOpacity
@@ -711,74 +668,52 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.light, // Blanco Roto
   },
-  // Header styles
-  header: {
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.grayScale[200],
-    paddingTop: Platform.OS === 'ios' ? 0 : 20,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SIZES.lg,
-    paddingVertical: SIZES.md,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: SIZES.sm,
-  },
-  logoText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.dark, // Negro Suave
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  notificationContainer: {
+  // Avatar Header styles
+  avatarHeader: {
+    height: 200,
+    backgroundColor: '#858bf2',
     position: 'relative',
-    marginRight: SIZES.md,
   },
-  notificationBadge: {
+  avatarHeaderContent: {
+    flex: 1,
+    position: 'relative',
+  },
+  settingsButton: {
     position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: COLORS.danger,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
+    top: 12,
+    right: 12,
+    width: 28,
+    height: 28,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  avatarContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  notificationText: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  userAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: COLORS.orange[100],
+  avatarPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  avatarText: {
+    fontSize: 48,
+  },
+  // Main content overlay
+  mainContentOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -8,
+    zIndex: 10,
   },
   // Main content styles
   mainContent: {
@@ -801,6 +736,110 @@ const styles = StyleSheet.create({
   scoreText: {
     fontWeight: '600',
     color: COLORS.primary, // Azul Suave
+  },
+  // Title section
+  titleSection: {
+    marginBottom: SIZES.lg,
+  },
+  mainTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.dark,
+    marginBottom: SIZES.sm,
+  },
+  mainDescription: {
+    fontSize: 14,
+    color: COLORS.gray,
+    lineHeight: 20,
+  },
+  // Percentage grid
+  percentageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: SIZES.lg,
+  },
+  percentageCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: SIZES.md,
+    width: (width - SIZES.lg * 3) / 2,
+    marginBottom: SIZES.sm,
+    alignItems: 'center',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  percentageValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: SIZES.xs,
+  },
+  percentageLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.gray,
+  },
+  // Registros styles
+  registrosCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: SIZES.md,
+    marginBottom: SIZES.lg,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  registrosTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.dark,
+    marginBottom: SIZES.md,
+  },
+  registrosList: {
+    gap: SIZES.sm,
+  },
+  registroItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: SIZES.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  registroLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  registroIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.sm,
+  },
+  registroDescription: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.dark,
+  },
+  registroCategory: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: 2,
+  },
+  registroRight: {
+    alignItems: 'flex-end',
+  },
+  registroAmount: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   // Health card styles
   healthCard: {
@@ -1017,8 +1056,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   achievementUnlocked: {
-    borderColor: COLORS.orange[200],
-    backgroundColor: COLORS.orange[50],
+    borderColor: '#fed7aa',
+    backgroundColor: '#fff7ed',
   },
   achievementLocked: {
     borderColor: COLORS.grayScale[200],
@@ -1260,7 +1299,7 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.dark, // Negro Suave
+    color: COLORS.dark,
     marginBottom: SIZES.md,
   },
   chartPlaceholder: {
@@ -1346,16 +1385,6 @@ const styles = StyleSheet.create({
   logoutText: {
     color: COLORS.danger, // Rojo Vibrante
     fontWeight: '500',
-  },
-  // Chart styles
-  chartContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: SIZES.sm,
-  },
-  chart: {
-    marginVertical: SIZES.sm,
-    borderRadius: BORDER_RADIUS.md,
   },
 });
 

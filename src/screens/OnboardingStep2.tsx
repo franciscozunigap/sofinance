@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.blue[100], // Azul claro
+    backgroundColor: COLORS.blue[100],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.sm,
@@ -369,17 +369,17 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.primary, // Azul Suave
+    color: COLORS.primary,
   },
   stepText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary, // Azul Suave
+    color: COLORS.primary,
   },
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.dark, // Negro Suave
+    color: COLORS.dark,
     textAlign: 'center',
     marginBottom: SIZES.md,
   },
@@ -407,18 +407,18 @@ const styles = StyleSheet.create({
   amountsSection: {
     marginBottom: SIZES.xl,
     padding: SIZES.lg,
-    backgroundColor: COLORS.blue[100], // Azul claro
+    backgroundColor: COLORS.blue[100],
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.blue[200], // Azul medio
+    borderColor: COLORS.blue[200],
   },
   distributionSection: {
     marginBottom: SIZES.xl,
     padding: SIZES.lg,
-    backgroundColor: COLORS.blue[50], // Azul muy claro
+    backgroundColor: COLORS.blue[50],
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.blue[200], // Azul medio
+    borderColor: COLORS.blue[200],
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -431,8 +431,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: FONTS.semiBold,
-    color: COLORS.dark, // Negro Suave
+    fontFamily: FONTS.medium,
+    color: COLORS.dark,
   },
   sectionSubtitle: {
     fontSize: 14,
@@ -442,12 +442,11 @@ const styles = StyleSheet.create({
   },
   recommendButton: {
     margin: SIZES.md,
-    backgroundColor: COLORS.blue[100], // Azul claro
-    borderColor: COLORS.blue[200], // Azul medio
+    backgroundColor: COLORS.blue[100],
+    borderColor: COLORS.blue[200],
     padding: 6,
     width: '80%',
     alignSelf: 'center',
-    fontSize: 8,
   },
   slidersContainer: {
     marginBottom: SIZES.lg,
@@ -464,11 +463,11 @@ const styles = StyleSheet.create({
   sliderLabel: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.dark, // Negro Suave
+    color: COLORS.dark,
   },
   sliderValue: {
     fontSize: 18,
-    fontFamily: FONTS.semiBold,
+    fontFamily: FONTS.medium,
   },
   slider: {
     width: '100%',
@@ -500,7 +499,7 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.dark, // Negro Suave
+    color: COLORS.dark,
   },
   totalValue: {
     fontSize: 18,
@@ -509,12 +508,12 @@ const styles = StyleSheet.create({
   successText: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: '#10b981', // green-600
+    color: '#10b981',
   },
   errorText: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: COLORS.danger, // Rojo Vibrante
+    color: COLORS.danger,
     textAlign: 'center',
   },
   buttonContainer: {
@@ -530,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grayScale[200],
   },
   nextButton: {
-    backgroundColor: COLORS.primary, // Azul Suave
+    backgroundColor: COLORS.primary,
   },
 });
 

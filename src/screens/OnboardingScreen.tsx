@@ -12,6 +12,7 @@ import OnboardingStep3 from './OnboardingStep3';
 import { OnboardingData } from '../types';
 import { AuthService } from '../services/authService';
 import { Alert } from '../platform';
+import { COLORS } from '../constants';
 
 interface OnboardingScreenProps {
   onComplete: () => void;

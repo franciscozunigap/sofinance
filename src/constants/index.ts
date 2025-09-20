@@ -17,6 +17,8 @@ export const COLORS = {
   white: '#ffffff',
   black: '#000000',
   gray: '#6b7280', // Gris medio para textos secundarios
+  lightGray: '#e5e7eb', // Gris claro para bordes y fondos
+  error: '#F20505', // Rojo para errores (alias de danger)
   
   // Escalas de azul basadas en el primario
   blue: {
@@ -70,18 +72,11 @@ export const FONTS = {
   bold: 'System',
 } as const;
 
-export const SPACING = {
+export const BORDER_RADIUS = {
   xs: 4,
   sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 40,
-} as const;
-
-export const BORDER_RADIUS = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
 } as const;
