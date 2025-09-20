@@ -121,7 +121,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
             <View style={styles.logoContainer}>
               <View style={styles.logoCircle}>
                 <Image 
-                  source={Platform.OS === 'ios' ? require('../../ios/SoFinance/Images.xcassets/Logo.imageset/logo.png') : require('../../assets/logo.png')} 
+                  source={require('../../assets/logo.png')} 
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
@@ -200,19 +200,21 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: COLORS.primary, // Azul Suave
+    width: 70,
+    height: 70,
+    borderRadius: 45,
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.lg,
+    borderWidth: 5,
+    borderColor: COLORS.lightGray,
     shadowColor: COLORS.primary,
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 8,
   },
@@ -220,8 +222,9 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   logoImage: {
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
+    borderRadius: 35,
   },
   title: {
     fontSize: 32,

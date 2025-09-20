@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   },
   chatMessages: {
     flex: 1,
-    paddingBottom: 80,
+    paddingBottom: 20, // Reducido para dar más espacio al input
   },
   chatMessagesContent: {
     padding: SIZES.lg,
@@ -281,6 +281,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.grayScale[200],
     padding: SIZES.lg,
+    paddingBottom: 100, // Espacio para el navegador flotante
+    position: 'relative',
+    zIndex: 10,
   },
   chatInputContainer: {
     flexDirection: 'row',
