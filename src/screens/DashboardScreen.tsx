@@ -547,7 +547,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#858bf2', // Color de la app (mismo que el fondo de la imagen)
+    backgroundColor: '#F2F2F2', // Color gris claro para unificar con AnalysisScreen
   },
   // Avatar Header styles
   avatarHeader: {
