@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Platform,
   Dimensions,
+  Image,
 } from 'react-native';
 import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import { useNavigation } from '@react-navigation/native';
@@ -70,7 +71,11 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           >
             <View style={styles.header}>
               <View style={styles.logoContainer}>
-                <Text style={styles.logoText}>💰</Text>
+                <Image 
+                  source={require('../../assets/logo.png')} 
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
               <Text style={styles.subtitle}>
@@ -161,24 +166,28 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: COLORS.primary,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.lg,
+    borderWidth: 5,
+    borderColor: COLORS.lightGray,
     shadowColor: COLORS.primary,
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 8,
   },
-  logoText: {
-    fontSize: 32,
+  logoImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   title: {
     fontSize: 28,

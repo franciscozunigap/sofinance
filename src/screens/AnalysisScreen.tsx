@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons'
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon } from 'lucide-react-native';
 import FloatingNavBar from '../components/FloatingNavBar';
+import BalanceRegistrationScreen from './BalanceRegistrationScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ interface AnalysisScreenProps {
 
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChange }) => {
   const { user } = useUser();
+  const [showBalanceRegistration, setShowBalanceRegistration] = useState(false);
 
   // Datos del usuario
   const userData = user || {
@@ -122,6 +124,16 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
     }
   };
 
+  // Si se está mostrando el registro de balance, renderizar esa pantalla
+  if (showBalanceRegistration) {
+    return (
+      <BalanceRegistrationScreen
+        onComplete={() => setShowBalanceRegistration(false)}
+        currentBalance={userData.currentSavings || 0}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Main Content con superposición */}
@@ -133,7 +145,10 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
               <Text style={styles.headerTitle}>Análisis Financiero</Text>
               <Text style={styles.headerSubtitle}>Insights detallados sobre tu comportamiento financiero</Text>
             </View>
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity 
+              style={styles.addButton}
+              onPress={() => setShowBalanceRegistration(true)}
+            >
               <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
           </View>

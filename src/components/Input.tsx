@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { COLORS, SIZES, FONTS } from '../constants';
+import { formatChileanPesoWithoutSymbol, parseChileanPeso } from '../utils/currencyUtils';
 
 interface InputProps {
   label?: string;
@@ -23,6 +24,7 @@ interface InputProps {
   multiline?: boolean;
   numberOfLines?: number;
   style?: any;
+  currencyFormat?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -38,6 +40,7 @@ const Input: React.FC<InputProps> = ({
   multiline = false,
   numberOfLines = 1,
   style,
+  currencyFormat = false,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -45,6 +48,19 @@ const Input: React.FC<InputProps> = ({
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
+
+  const handleTextChange = (text: string) => {
+    if (currencyFormat) {
+      // Para formato de moneda, solo permitir números
+      const cleanText = text.replace(/[^\d]/g, '');
+      const numericValue = parseFloat(cleanText) || 0;
+      onChangeText(numericValue.toString());
+    } else {
+      onChangeText(text);
+    }
+  };
+
+  const displayValue = currencyFormat && value ? formatChileanPesoWithoutSymbol(parseFloat(value)) : value;
 
   const inputStyle = [
     styles.input,
@@ -63,8 +79,8 @@ const Input: React.FC<InputProps> = ({
           style={inputStyle}
           placeholder={placeholder}
           placeholderTextColor={COLORS.gray}
-          value={value}
-          onChangeText={onChangeText}
+          value={displayValue}
+          onChangeText={handleTextChange}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}

@@ -1,6 +1,7 @@
 // Re-exportar utilidades desde archivos específicos
 export * from './validation';
 export * from './financialUtils';
+export * from './currencyUtils';
 
 import { Transaction } from '../types';
 

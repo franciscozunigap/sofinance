@@ -63,6 +63,20 @@ export interface LoginCredentials {
   password: string;
 }
 
+// Nuevos tipos para el registro de balance
+export interface BalanceRecord {
+  id: string;
+  amount: number;
+  category: BalanceCategory;
+}
+
+export type BalanceCategory = 'Ingreso' | 'Deuda' | 'Consumo' | 'Necesidad' | 'Inversión';
+
+export interface BalanceRegistrationData {
+  currentAmount: number;
+  records: BalanceRecord[];
+}
+
 export type RootStackParamList = {
   Login: { onLoginSuccess: () => void };
   Register: { onRegistrationSuccess: () => void };
@@ -70,4 +84,5 @@ export type RootStackParamList = {
   Dashboard: undefined;
   Transactions: undefined;
   Profile: undefined;
+  BalanceRegistration: { onComplete: () => void };
 };
