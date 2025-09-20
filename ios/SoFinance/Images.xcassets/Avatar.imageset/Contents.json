@@ -4,6 +4,11 @@
       "filename" : "avatar.png",
       "idiom" : "universal",
       "scale" : "1x"
+    },
+    {
+      "filename" : "avatar.svg",
+      "idiom" : "universal",
+      "scale" : "1x"
     }
   ],
   "info" : {

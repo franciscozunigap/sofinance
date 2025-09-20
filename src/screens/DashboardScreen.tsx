@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
   },
   // Avatar Header styles
   avatarHeader: {
-    height: 250, // Aumentado para mejor visualización del avatar
+    height: 200, // Reducido para mejor proporción
     backgroundColor: '#858bf2',
     position: 'relative',
   },
@@ -702,8 +702,9 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   avatarPlaceholder: {
     width: 120,
@@ -717,10 +718,10 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   avatarImage: {
-    width: '100%',
-    height: '100%',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     resizeMode: 'cover',
-    alignSelf: 'stretch',
   },
   // Main content overlay
   mainContentOverlay: {
