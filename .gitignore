@@ -41,3 +41,26 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/build/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Expo
+.expo/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
