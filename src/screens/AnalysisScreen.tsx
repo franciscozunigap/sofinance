@@ -13,6 +13,7 @@ import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon } from 'lucide-react-native';
+import FloatingNavBar from '../components/FloatingNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -123,20 +124,22 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerText}>
-            <Text style={styles.headerTitle}>Análisis Financiero</Text>
-            <Text style={styles.headerSubtitle}>Insights detallados sobre tu comportamiento financiero</Text>
+      {/* Main Content con superposición */}
+      <View style={styles.mainContentOverlay}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <View style={styles.headerText}>
+              <Text style={styles.headerTitle}>Análisis Financiero</Text>
+              <Text style={styles.headerSubtitle}>Insights detallados sobre tu comportamiento financiero</Text>
+            </View>
+            <TouchableOpacity style={styles.addButton}>
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.addButton}>
-            <Text style={styles.addButtonText}>+</Text>
-          </TouchableOpacity>
         </View>
-      </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Métricas Principales */}
         <View style={styles.metricsGrid}>
           <View style={styles.metricCard}>
@@ -376,60 +379,14 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
             })}
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* Floating Navigation Panel */}
-      <View style={styles.floatingNavContainer}>
-        <View style={styles.floatingNavPanel}>
-          <TouchableOpacity 
-            onPress={() => onViewChange('dashboard')}
-            style={[styles.floatingNavItem, currentView === 'dashboard' && styles.floatingNavItemActive]}
-          >
-            <Ionicons 
-              name="home-outline" 
-              size={16} 
-              color={currentView === 'dashboard' ? '#ffffff' : COLORS.gray} 
-            />
-            <Text style={[styles.floatingNavLabel, currentView === 'dashboard' && styles.floatingNavLabelActive]}>
-              Finance
-            </Text>
-            {currentView === 'dashboard' && <View style={styles.floatingNavIndicator} />}
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            onPress={() => onViewChange('analysis')}
-            style={[styles.floatingNavItem, currentView === 'analysis' && styles.floatingNavItemActive]}
-          >
-            <Ionicons 
-              name="bar-chart-outline" 
-              size={16} 
-              color={currentView === 'analysis' ? '#ffffff' : COLORS.gray} 
-            />
-            <Text style={[styles.floatingNavLabel, currentView === 'analysis' && styles.floatingNavLabelActive]}>
-              Análisis
-            </Text>
-            {currentView === 'analysis' && <View style={styles.floatingNavIndicator} />}
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            onPress={() => onViewChange('chat')}
-            style={[styles.floatingNavItem, currentView === 'chat' && styles.floatingNavItemActive]}
-          >
-            <Ionicons 
-              name="chatbubble-outline" 
-              size={16} 
-              color={currentView === 'chat' ? '#ffffff' : COLORS.gray} 
-            />
-            <Text style={[styles.floatingNavLabel, currentView === 'chat' && styles.floatingNavLabelActive]}>
-              SofIA
-            </Text>
-            {currentView === 'chat' && <View style={styles.floatingNavIndicator} />}
-          </TouchableOpacity>
-        </View>
-        
-        {/* Línea decorativa superior */}
-        <View style={styles.floatingNavTopLine} />
-      </View>
+      <FloatingNavBar 
+        currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
+        onViewChange={onViewChange}
+      />
     </SafeAreaView>
   );
 };
@@ -437,10 +394,22 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#858bf2', // Color de la app (mismo que el fondo de la imagen)
+  },
+  // Main content overlay
+  mainContentOverlay: {
+    flex: 1,
+    backgroundColor: '#F2F2F2', // Color gris claro como en DashboardScreen
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -5, // Aumentado para cubrir completamente el área
+    zIndex: 10,
+    marginBottom: -120,
+    width: '100%',
+    paddingBottom: 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
   header: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.white, // Fondo blanco sólido sobre el gris
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
     paddingVertical: SIZES.md,
@@ -484,6 +453,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: SIZES.lg,
+    paddingBottom: 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
   metricsGrid: {
     flexDirection: 'row',
@@ -492,7 +462,7 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.lg,
   },
   metricCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.white, // Fondo blanco sólido sobre el gris
     borderRadius: 12,
     padding: SIZES.md,
     width: (width - SIZES.lg * 3) / 2,
@@ -534,7 +504,7 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.lg,
   },
   chartCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.white, // Fondo blanco sólido sobre el gris
     borderRadius: 12,
     padding: SIZES.md,
     marginBottom: SIZES.md,
@@ -679,72 +649,6 @@ const styles = StyleSheet.create({
   insightAction: {
     fontSize: 12,
     fontWeight: '500',
-  },
-  // Floating Navigation Panel
-  floatingNavContainer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 50,
-  },
-  floatingNavPanel: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 25 },
-    shadowOpacity: 0.25,
-    shadowRadius: 50,
-    elevation: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  floatingNavItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    position: 'relative',
-    minWidth: 60,
-  },
-  floatingNavItemActive: {
-    backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500/70
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  floatingNavLabel: {
-    fontSize: 10,
-    color: COLORS.gray,
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  floatingNavLabelActive: {
-    color: '#ffffff',
-  },
-  floatingNavIndicator: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 8,
-    height: 8,
-    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-    borderRadius: 4,
-  },
-  floatingNavTopLine: {
-    position: 'absolute',
-    top: -4,
-    width: 32,
-    height: 4,
-    backgroundColor: 'rgba(59, 130, 246, 0.6)',
-    borderRadius: 2,
   },
 });
 

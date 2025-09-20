@@ -19,6 +19,7 @@ import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons'
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { DollarSign, TrendingUp, Target, AlertTriangle, Award, Mic, Send, Settings, Home, BarChart3, MessageCircle, HelpCircle, LogOut } from 'lucide-react-native';
 import AnalysisScreen from './AnalysisScreen';
+import FloatingNavBar from '../components/FloatingNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -252,57 +253,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         </ScrollView>
 
         {/* Floating Navigation Panel */}
-        <View style={styles.floatingNavContainer}>
-          <View style={styles.floatingNavPanel}>
-            <TouchableOpacity 
-              onPress={() => setCurrentView('dashboard')}
-              style={[styles.floatingNavItem, currentView === 'dashboard' && styles.floatingNavItemActive]}
-            >
-              <Ionicons 
-                name="home-outline" 
-                size={16} 
-                color={currentView === 'dashboard' ? COLORS.white : COLORS.gray} 
-              />
-              <Text style={[styles.floatingNavLabel, currentView === 'dashboard' && styles.floatingNavLabelActive]}>
-                Finance
-              </Text>
-              {currentView === 'dashboard' && <View style={styles.floatingNavIndicator} />}
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => setCurrentView('analysis')}
-              style={[styles.floatingNavItem, currentView === 'analysis' && styles.floatingNavItemActive]}
-            >
-              <Ionicons 
-                name="bar-chart-outline" 
-                size={16} 
-                color={currentView === 'analysis' ? COLORS.white : COLORS.gray} 
-              />
-              <Text style={[styles.floatingNavLabel, currentView === 'analysis' && styles.floatingNavLabelActive]}>
-                Análisis
-              </Text>
-              {currentView === 'analysis' && <View style={styles.floatingNavIndicator} />}
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => setCurrentView('chat')}
-              style={[styles.floatingNavItem, currentView === 'chat' && styles.floatingNavItemActive]}
-            >
-              <Ionicons 
-                name="chatbubble-outline" 
-                size={16} 
-                color={currentView === 'chat' ? COLORS.white : COLORS.gray} 
-              />
-              <Text style={[styles.floatingNavLabel, currentView === 'chat' && styles.floatingNavLabelActive]}>
-                SofIA
-              </Text>
-              {currentView === 'chat' && <View style={styles.floatingNavIndicator} />}
-            </TouchableOpacity>
-          </View>
-          
-          {/* Línea decorativa superior */}
-          <View style={styles.floatingNavTopLine} />
-        </View>
+        <FloatingNavBar 
+          currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
+          onViewChange={setCurrentView}
+        />
       </SafeAreaView>
     );
   }
@@ -310,33 +264,35 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   if (currentView === 'chat') {
     return (
       <SafeAreaView style={styles.container}>
-        {/* Header del Chat */}
-        <View style={styles.chatHeader}>
-          <View style={styles.chatHeaderContent}>
-            <TouchableOpacity 
-              onPress={() => setCurrentView('dashboard')}
-              style={styles.backButton}
-            >
-              <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
-            <View style={styles.chatUserInfo}>
-              <View style={styles.chatAvatar}>
-                <Image 
-                  source={require('../../assets/avatar.png')} 
-                  style={styles.chatAvatarImage}
-                  resizeMode="contain"
-                />
-              </View>
-              <View>
-                <Text style={styles.chatUserName}>Sofía</Text>
-                <Text style={styles.chatUserStatus}>En línea</Text>
+        {/* Contenedor con fondo gris como AnalysisScreen */}
+        <View style={styles.chatContainer}>
+          {/* Header del Chat */}
+          <View style={styles.chatHeader}>
+            <View style={styles.chatHeaderContent}>
+              <TouchableOpacity 
+                onPress={() => setCurrentView('dashboard')}
+                style={styles.backButton}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+              <View style={styles.chatUserInfo}>
+                <View style={styles.chatAvatar}>
+                  <Image 
+                    source={require('../../assets/avatar.png')} 
+                    style={styles.chatAvatarImage}
+                    resizeMode="contain"
+                  />
+                </View>
+                <View>
+                  <Text style={styles.chatUserName}>Sofía</Text>
+                  <Text style={styles.chatUserStatus}>En línea</Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Chat Messages */}
-        <ScrollView style={styles.chatMessages} contentContainerStyle={styles.chatMessagesContent}>
+          {/* Chat Messages */}
+          <ScrollView style={styles.chatMessages} contentContainerStyle={styles.chatMessagesContent}>
           {chatMessages.map((message) => (
             <View
               key={message.id}
@@ -380,21 +336,22 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
               </View>
             </View>
           ))}
-        </ScrollView>
+          </ScrollView>
 
-        {/* Chat Input */}
-        <View style={styles.chatInput}>
-          <View style={styles.chatInputContainer}>
-            <TextInput
-              style={styles.chatTextInput}
-                value={chatInput}
-              onChangeText={setChatInput}
-                placeholder="Pregúntame sobre tus finanzas..."
-              placeholderTextColor={COLORS.gray}
-            />
-            <TouchableOpacity style={styles.chatSendButton} onPress={handleSendMessage}>
-              <Text style={styles.chatSendButtonText}>→</Text>
-            </TouchableOpacity>
+          {/* Chat Input */}
+          <View style={styles.chatInput}>
+            <View style={styles.chatInputContainer}>
+              <TextInput
+                style={styles.chatTextInput}
+                  value={chatInput}
+                onChangeText={setChatInput}
+                  placeholder="Pregúntame sobre tus finanzas..."
+                placeholderTextColor={COLORS.gray}
+              />
+              <TouchableOpacity style={styles.chatSendButton} onPress={handleSendMessage}>
+                <Text style={styles.chatSendButtonText}>→</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -579,57 +536,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
       </TouchableOpacity> */}
 
       {/* Floating Navigation Panel */}
-      <View style={styles.floatingNavContainer}>
-        <View style={styles.floatingNavPanel}>
-          <TouchableOpacity 
-            onPress={() => setCurrentView('dashboard')}
-            style={[styles.floatingNavItem, currentView === 'dashboard' && styles.floatingNavItemActive]}
-          >
-            <Ionicons 
-              name="home-outline" 
-              size={16} 
-              color={currentView === 'dashboard' ? COLORS.white : COLORS.gray} 
-            />
-            <Text style={[styles.floatingNavLabel, currentView === 'dashboard' && styles.floatingNavLabelActive]}>
-              Finance
-            </Text>
-            {currentView === 'dashboard' && <View style={styles.floatingNavIndicator} />}
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            onPress={() => setCurrentView('analysis')}
-            style={[styles.floatingNavItem, currentView === 'analysis' && styles.floatingNavItemActive]}
-          >
-            <Ionicons 
-              name="bar-chart-outline" 
-              size={16} 
-              color={currentView === 'analysis' ? COLORS.white : COLORS.gray} 
-            />
-            <Text style={[styles.floatingNavLabel, currentView === 'analysis' && styles.floatingNavLabelActive]}>
-              Análisis
-            </Text>
-            {currentView === 'analysis' && <View style={styles.floatingNavIndicator} />}
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            onPress={() => setCurrentView('chat')}
-            style={[styles.floatingNavItem, currentView === 'chat' && styles.floatingNavItemActive]}
-          >
-            <Ionicons 
-              name="chatbubble-outline" 
-              size={16} 
-              color={currentView === 'chat' ? COLORS.white : COLORS.gray} 
-            />
-            <Text style={[styles.floatingNavLabel, currentView === 'chat' && styles.floatingNavLabelActive]}>
-              SofIA
-            </Text>
-            {currentView === 'chat' && <View style={styles.floatingNavIndicator} />}
-          </TouchableOpacity>
-        </View>
-        
-        {/* Línea decorativa superior */}
-        <View style={styles.floatingNavTopLine} />
-      </View>
+      <FloatingNavBar 
+        currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
+        onViewChange={setCurrentView}
+      />
     </SafeAreaView>
   );
 };
@@ -641,7 +551,7 @@ const styles = StyleSheet.create({
   },
   // Avatar Header styles
   avatarHeader: {
-    height: 320, // Aumentado para acomodar la imagen más grande
+    height: 200, // Reducido a 1/3 de la vista (aproximadamente 200px de 600px)
     backgroundColor: '#858bf2',
     position: 'relative',
   },
@@ -693,17 +603,20 @@ const styles = StyleSheet.create({
   // Main content overlay
   mainContentOverlay: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: '#F2F2F2', // Color gris claro como en AnalysisScreen
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: -8, // Al límite del contenedor inferior
+    marginTop: -5, // Aumentado para cubrir completamente el área del avatar
     zIndex: 10,
+    marginBottom: -120,
     width: '100%',
+    paddingBottom: 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
   // Main content styles
   mainContent: {
     flex: 1,
     paddingHorizontal: SIZES.lg,
+    paddingBottom: 20, // Añadido padding inferior para evitar que el navegador tape el contenido
   },
   welcomeSection: {
     marginVertical: SIZES.lg,
@@ -1022,6 +935,10 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
   },
   // Chat styles
+  chatContainer: {
+    flex: 1,
+    backgroundColor: '#F2F2F2', // Color gris claro como en AnalysisScreen
+  },
   chatHeader: {
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
@@ -1076,6 +993,7 @@ const styles = StyleSheet.create({
   },
   chatMessages: {
     flex: 1,
+    paddingBottom: 80, // Reducido para quitar espacio vacío
   },
   chatMessagesContent: {
     padding: SIZES.lg,
@@ -1203,72 +1121,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  // Floating Navigation Panel
-  floatingNavContainer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 50,
-  },
-  floatingNavPanel: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 25 },
-    shadowOpacity: 0.25,
-    shadowRadius: 50,
-    elevation: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  floatingNavItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    position: 'relative',
-    minWidth: 60,
-  },
-  floatingNavItemActive: {
-    backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500/70
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  floatingNavLabel: {
-    fontSize: 10,
-    color: COLORS.gray,
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  floatingNavLabelActive: {
-    color: COLORS.white,
-  },
-  floatingNavIndicator: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 8,
-    height: 8,
-    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-    borderRadius: 4,
-  },
-  floatingNavTopLine: {
-    position: 'absolute',
-    top: -4,
-    width: 32,
-    height: 4,
-    backgroundColor: 'rgba(59, 130, 246, 0.6)',
-    borderRadius: 2,
-  },
   // Chart styles
   chartsContainer: {
     flexDirection: 'row',
@@ -1293,17 +1145,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.dark,
     marginBottom: SIZES.md,
-  },
-  chartPlaceholder: {
-    height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.grayScale[50],
-    borderRadius: BORDER_RADIUS.md,
-  },
-  chartPlaceholderText: {
-    fontSize: 48,
-    marginBottom: SIZES.sm,
   },
   chartPlaceholderSubtext: {
     fontSize: 14,
@@ -1339,7 +1180,8 @@ const styles = StyleSheet.create({
   settingsContent: {
     flex: 1,
     padding: SIZES.lg,
-    backgroundColor: COLORS.light, // Para coincidir con web
+    paddingBottom: 80, // Reducido para quitar espacio vacío
+    backgroundColor: '#F2F2F2', // Color gris claro como en AnalysisScreen
   },
   settingsSection: {
     marginBottom: SIZES.xl,

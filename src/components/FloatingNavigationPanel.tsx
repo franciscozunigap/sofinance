@@ -32,9 +32,9 @@ const FloatingNavigationPanel: React.FC<FloatingNavigationPanelProps> = ({
   ];
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl px-4 py-3 shadow-2xl">
-        <div className="flex items-center space-x-1">
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-sm px-4">
+      <div className="bg-white/15 backdrop-blur-2xl border border-white/30 rounded-2xl px-6 py-4 shadow-2xl ring-1 ring-white/10">
+        <div className="flex items-center justify-center space-x-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -47,7 +47,7 @@ const FloatingNavigationPanel: React.FC<FloatingNavigationPanelProps> = ({
                   onViewChange(item.id);
                 }}
                 className={`
-                  floating-nav-item relative flex flex-col items-center justify-center p-2 rounded-lg group cursor-pointer
+                  floating-nav-item relative flex flex-col items-center justify-center p-2 rounded-lg group cursor-pointer min-w-[60px]
                   ${isActive ? 'active bg-blue-500/70 text-white shadow-lg' : 'text-gray-600 hover:text-blue-500 hover:bg-blue-50/50'}
                 `}
                 title={item.description}
@@ -76,8 +76,8 @@ const FloatingNavigationPanel: React.FC<FloatingNavigationPanelProps> = ({
           })}
         </div>
         
-        {/* Línea decorativa */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-blue-400/60 to-purple-400/60 rounded-full -translate-y-1" />
+        {/* Línea decorativa superior */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-blue-400/60 to-blue-400/60 rounded-full -translate-y-1" />
       </div>
     </div>
   );
