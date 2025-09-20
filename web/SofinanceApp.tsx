@@ -5,14 +5,18 @@ import WebAppNavigator from '../src/navigation/WebAppNavigator';
 import { AuthService } from '../src/services/authService';
 import { User } from '../src/types';
 import { UserProvider, useUser } from '../src/contexts/UserContext';
+import FloatingNavigationPanel from '../src/components/FloatingNavigationPanel';
+import WebAnalysisScreen from '../src/screens/web/WebAnalysisScreen';
+import SettingsMenu from '../src/components/SettingsMenu';
 import logo from '../assets/logo.png';
 import avatar from '../assets/avatar.svg';
 
 const SofinanceAppContent = () => {
-  const [currentView, setCurrentView] = useState('dashboard');
+  const [currentView, setCurrentView] = useState('finance');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [scrollY, setScrollY] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { user, setUser } = useUser();
   const [chatMessages, setChatMessages] = useState([
     {
@@ -67,13 +71,16 @@ const SofinanceAppContent = () => {
     alerts: 3
   };
 
-  // Gráfico de salud financiera
+  // Gráfico de salud financiera - 7 días
   const currentMonth = "Septiembre";
-  const monthlyScoreData = [
-    { week: 'Semana 1', score: 45 },
-    { week: 'Semana 2', score: 48 },
-    { week: 'Semana 3', score: 44 },
-    { week: 'Semana 4', score: 52 }
+  const dailyScoreData = [
+    { day: 'Lun', score: 45 },
+    { day: 'Mar', score: 48 },
+    { day: 'Mié', score: 44 },
+    { day: 'Jue', score: 46 },
+    { day: 'Vie', score: 50 },
+    { day: 'Sáb', score: 48 },
+    { day: 'Dom', score: 52 }
   ];
 
   // Categorías de gastos
@@ -118,7 +125,8 @@ const SofinanceAppContent = () => {
     await AuthService.logout();
     setUser(null);
     setIsAuthenticated(false);
-    setCurrentView('dashboard');
+    setCurrentView('finance');
+    setIsSettingsOpen(false);
   };
 
   const handleSendMessage = () => {
@@ -181,24 +189,38 @@ const SofinanceAppContent = () => {
     );
   }
 
-  if (currentView === 'chat') {
+  // Vista de Análisis
+  if (currentView === 'analysis') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <WebAnalysisScreen onSettingsClick={() => setIsSettingsOpen(true)} />
+        <FloatingNavigationPanel 
+          currentView={currentView} 
+          onViewChange={setCurrentView} 
+        />
+        <SettingsMenu 
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          onLogout={handleLogout}
+          user={user}
+        />
+      </div>
+    );
+  }
+
+  // Vista de Chat (SofIA)
+  if (currentView === 'sofia') {
     return (
       <div className="min-h-screen bg-light">
         {/* Header del Chat */}
         <div className="bg-white shadow-sm border-b px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <button 
-                onClick={() => setCurrentView('dashboard')}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <ArrowLeft className="h-5 w-5 text-gray-600" />
-              </button>
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-light rounded-full shadow-sm overflow-hidden">
                   <img 
-                    src={logo} 
-                    alt="SoFinance Logo" 
+                    src={avatar} 
+                    alt="Sofía Avatar" 
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -229,8 +251,8 @@ const SofinanceAppContent = () => {
                 {message.sender === 'sofia' && (
                   <div className="w-8 h-8 flex-shrink-0 bg-light rounded-full shadow-sm overflow-hidden">
                     <img 
-                      src={logo} 
-                      alt="SoFinance Logo" 
+                      src={avatar} 
+                      alt="Sofía Avatar" 
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -279,28 +301,39 @@ const SofinanceAppContent = () => {
             </button>
           </div>
         </div>
+
+        <FloatingNavigationPanel 
+          currentView={currentView} 
+          onViewChange={setCurrentView} 
+        />
+        <SettingsMenu 
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          onLogout={handleLogout}
+          user={user}
+        />
       </div>
     );
   }
 
   return (
     <div 
-      className="min-h-screen bg-light overflow-x-hidden" 
+      className="min-h-screen bg-light overflow-x-hidden pb-20" 
       style={{ 
         scrollbarWidth: 'none', 
-        msOverflowStyle: 'none',
-        WebkitScrollbar: { display: 'none' }
+        msOverflowStyle: 'none'
       }}
     >
       {/* Header con Avatar */}
-      <div className="relative w-full h-2/5 overflow-hidden" style={{ backgroundColor: '#858bf2' }}>
-        <div className="absolute top-4 right-4 z-10">
+      <div className="relative w-full h-52 overflow-hidden" style={{ backgroundColor: '#858bf2' }}>
+        <div className="absolute top-3 right-3 z-10">
           {/* Botón de configuración */}
           <button
-            className="w-10 h-10 bg-white hover:bg-gray-50 text-gray-600 rounded-full shadow-md flex items-center justify-center transition-all duration-200 hover:scale-110"
+            onClick={() => setIsSettingsOpen(true)}
+            className="w-7 h-7 bg-white hover:bg-gray-50 text-gray-600 rounded-full shadow-md flex items-center justify-center transition-all duration-200 hover:scale-110"
             title="Configuración"
           >
-            <Settings className="h-5 w-5" />
+            <Settings className="h-4 w-4" />
           </button>
         </div>
         
@@ -320,26 +353,24 @@ const SofinanceAppContent = () => {
       </div>
 
       {/* Main Content con superposición */}
-      <main className="relative z-10 bg-white rounded-t-3xl -mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="relative z-10 bg-white rounded-t-3xl -mt-2 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6">
         {/* Bienvenida */}
-        <div className="mb-8">
-          <p className="text-lg text-gray-600">¡Hola {userData.name}! 👋</p>
+        <div className="mb-6">
+          <p className="text-sm text-gray-600">¡Hola {userData.name}! 👋</p>
         </div>
 
         {/* Título y descripción principal */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-dark mb-2">Tu Salud Financiera</h1>
-          <p className="text-lg text-gray-600">
-            Monitorea tu progreso financiero y mantén el control de tus gastos con nuestro dashboard inteligente
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-dark mb-2">Tu Salud Financiera</h1>
+          <p className="text-sm text-gray-600">
+          Optimiza tus finanzas diariamente con nuestro análisis inteligente. Visualiza tendencias, identifica oportunidades de ahorro y toma decisiones financieras más inteligentes.
           </p>
         </div>
 
         {/* Zona Financiera Saludable */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-
-
+        <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
           {/* Gráfica de Zona Saludable */}
-          <div className="h-64 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-4 relative">
+          <div className="h-52 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-3 relative">
             {/* Zona Saludable */}
             <div className="absolute inset-x-4 top-8 bottom-16 bg-primary-200 bg-opacity-30 rounded border-2 border-dashed border-primary-300">
               <div className="absolute top-2 left-2 text-xs font-medium text-primary-700">
@@ -347,11 +378,10 @@ const SofinanceAppContent = () => {
               </div>
             </div>
             
-
             {/* Línea de Progreso */}
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyScoreData}>
-                <XAxis dataKey="week" axisLine={false} tickLine={false} />
+              <LineChart data={dailyScoreData}>
+                <XAxis dataKey="day" axisLine={false} tickLine={false} />
                 <YAxis domain={[30, 70]} hide />
                 <Line 
                   type="monotone" 
@@ -364,54 +394,52 @@ const SofinanceAppContent = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-
-
         </div>
 
         {/* 4 Columnas de Porcentajes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-orange-600 mb-2">42%</div>
-            <p className="text-sm font-medium text-gray-600">Consumo</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="bg-white rounded-xl shadow p-4 text-center">
+            <div className="text-2xl font-bold text-orange-600 mb-1">42%</div>
+            <p className="text-xs font-medium text-gray-600">Consumo</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-red-600 mb-2">57%</div>
-            <p className="text-sm font-medium text-gray-600">Necesidades</p>
+          <div className="bg-white rounded-xl shadow p-4 text-center">
+            <div className="text-2xl font-bold text-red-600 mb-1">57%</div>
+            <p className="text-xs font-medium text-gray-600">Necesidades</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">19%</div>
-            <p className="text-sm font-medium text-gray-600">Ahorro</p>
+          <div className="bg-white rounded-xl shadow p-4 text-center">
+            <div className="text-2xl font-bold text-green-600 mb-1">19%</div>
+            <p className="text-xs font-medium text-gray-600">Ahorro</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-purple-600 mb-2">8%</div>
-            <p className="text-sm font-medium text-gray-600">Deuda</p>
+          <div className="bg-white rounded-xl shadow p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600 mb-1">8%</div>
+            <p className="text-xs font-medium text-gray-600">Deuda</p>
           </div>
         </div>
 
         {/* Lista de Registros */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-lg font-semibold text-dark mb-6">Registros Recientes</h3>
-          <div className="space-y-4">
+        <div className="bg-white rounded-xl shadow p-4">
+          <h3 className="text-sm font-semibold text-dark mb-4">Registros Recientes</h3>
+          <div className="space-y-3">
             {recentTransactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0">
-                <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
                   }`}>
-                    <DollarSign className={`h-6 w-6 ${
+                    <DollarSign className={`h-4 w-4 ${
                       transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                     }`} />
                   </div>
                   <div>
-                    <p className="font-medium text-dark text-lg">{transaction.description}</p>
-                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
+                    <p className="font-medium text-dark text-sm">{transaction.description}</p>
+                    <p className="text-xs text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold text-lg ${
+                  <p className={`font-bold text-sm ${
                     transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
@@ -423,13 +451,19 @@ const SofinanceAppContent = () => {
         </div>
       </main>
 
-      {/* Chat Button - Ocultado */}
-      {/* <button
-        onClick={() => setCurrentView('chat')}
-        className="fixed bottom-6 right-6 bg-primary-400 hover:bg-primary-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-      >
-        <MessageCircle className="h-6 w-6" />
-      </button> */}
+      {/* Panel de Navegación Flotante */}
+      <FloatingNavigationPanel 
+        currentView={currentView} 
+        onViewChange={setCurrentView} 
+      />
+      
+      {/* Menú de Configuración */}
+      <SettingsMenu 
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onLogout={handleLogout}
+        user={user}
+      />
     </div>
   );
 };
