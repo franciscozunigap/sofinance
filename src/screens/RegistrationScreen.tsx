@@ -80,7 +80,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               </View>
               <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
               <Text style={styles.subtitle}>
-                Vamos a configurar tu cuenta paso a paso
+                Vamos a crear tu cuenta paso a paso
               </Text>
             </View>
             
@@ -112,6 +112,16 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                   <Text style={styles.stepNumberText}>3</Text>
                 </View>
                 <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Perfil financiero</Text>
+                  <Text style={styles.stepDescription}>Selecciona tu perfil financiero y objetivos</Text>
+                </View>
+              </View>
+
+              <View style={styles.stepItem}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>4</Text>
+                </View>
+                <View style={styles.stepContent}>
                   <Text style={styles.stepTitle}>Contraseña</Text>
                   <Text style={styles.stepDescription}>Crea una contraseña segura para tu cuenta</Text>
                 </View>
@@ -120,7 +130,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
             
             <View style={styles.buttonContainer}>
               <Button
-                title="Comenzar configuración"
+                title="Crear cuenta"
                 onPress={handleStartOnboarding}
                 style={styles.startButton}
               />

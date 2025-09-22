@@ -13,6 +13,13 @@ export interface User {
   currentSavings?: number;
   savingsGoal?: number;
   alerts?: number;
+  // Financial data structure
+  financialData?: {
+    consumo: { percentage: number; amount: number; previousChange: number };
+    necesidades: { percentage: number; amount: number; previousChange: number };
+    ahorro: { percentage: number; amount: number; previousChange: number };
+    invertido: { percentage: number; amount: number; previousChange: number };
+  };
   // Preferences
   preferences?: {
     needs_percent: number;

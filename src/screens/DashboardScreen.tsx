@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
-import { COLORS, SIZES, BORDER_RADIUS } from '../constants';
+import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import AnalysisScreen from './AnalysisScreen';
@@ -48,7 +48,16 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const [fadeAnim] = useState(new Animated.Value(1));
 
   // Datos del usuario desde el contexto
-  const userData = user || MOCK_USER_DATA;
+  const userData = user || {
+    ...MOCK_USER_DATA,
+    // Datos financieros mejorados como en la versión web
+    financialData: {
+      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
+      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+    }
+  };
 
   // Simular carga de datos del usuario
   useEffect(() => {
@@ -240,18 +249,82 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           </View>
         </View>
 
-        {/* 4 Columnas de Porcentajes */}
-        <View style={styles.percentageGrid}>
-          {PERCENTAGE_DATA.map((item, index) => (
-            <PercentageCard
-              key={index}
-              label={item.label}
-              percentage={item.value}
-              amount={item.amount}
-              color={item.color}
-              style={styles.percentageCard}
-            />
-          ))}
+        {/* Métricas Financieras Mejoradas */}
+        <View style={styles.financialMetricsContainer}>
+          <Text style={styles.financialMetricsTitle}>Distribución Financiera</Text>
+          <View style={styles.financialMetricsGrid}>
+            {/* Ahorro */}
+            <View style={[styles.financialMetricCard, { backgroundColor: '#f0fdf4', borderColor: '#10b981' }]}>
+              <View style={styles.financialMetricHeader}>
+                <Text style={[styles.financialMetricLabel, { color: '#10b981' }]}>💚 Ahorro</Text>
+                <Text style={[styles.financialMetricPercentage, { color: '#10b981' }]}>
+                  {userData.financialData?.ahorro?.percentage || 19}%
+                </Text>
+              </View>
+              <Text style={[styles.financialMetricAmount, { color: '#10b981' }]}>
+                ${userData.financialData?.ahorro?.amount?.toLocaleString() || '60,000'}
+              </Text>
+              <View style={styles.financialMetricTrend}>
+                <Text style={[styles.financialMetricTrendText, { color: '#10b981' }]}>
+                  +{userData.financialData?.ahorro?.previousChange || 3}% vs mes anterior
+                </Text>
+              </View>
+            </View>
+
+            {/* Necesidades */}
+            <View style={[styles.financialMetricCard, { backgroundColor: '#fff7ed', borderColor: '#ea580c' }]}>
+              <View style={styles.financialMetricHeader}>
+                <Text style={[styles.financialMetricLabel, { color: '#ea580c' }]}>🏠 Necesidades</Text>
+                <Text style={[styles.financialMetricPercentage, { color: '#ea580c' }]}>
+                  {userData.financialData?.necesidades?.percentage || 57}%
+                </Text>
+              </View>
+              <Text style={[styles.financialMetricAmount, { color: '#ea580c' }]}>
+                ${userData.financialData?.necesidades?.amount?.toLocaleString() || '181,300'}
+              </Text>
+              <View style={styles.financialMetricTrend}>
+                <Text style={[styles.financialMetricTrendText, { color: '#ea580c' }]}>
+                  {userData.financialData?.necesidades?.previousChange || -1}% vs mes anterior
+                </Text>
+              </View>
+            </View>
+
+            {/* Consumo */}
+            <View style={[styles.financialMetricCard, { backgroundColor: '#eff6ff', borderColor: '#3b82f6' }]}>
+              <View style={styles.financialMetricHeader}>
+                <Text style={[styles.financialMetricLabel, { color: '#3b82f6' }]}>🛒 Consumo</Text>
+                <Text style={[styles.financialMetricPercentage, { color: '#3b82f6' }]}>
+                  {userData.financialData?.consumo?.percentage || 42}%
+                </Text>
+              </View>
+              <Text style={[styles.financialMetricAmount, { color: '#3b82f6' }]}>
+                ${userData.financialData?.consumo?.amount?.toLocaleString() || '133,500'}
+              </Text>
+              <View style={styles.financialMetricTrend}>
+                <Text style={[styles.financialMetricTrendText, { color: '#3b82f6' }]}>
+                  +{userData.financialData?.consumo?.previousChange || 2}% vs mes anterior
+                </Text>
+              </View>
+            </View>
+
+            {/* Inversión */}
+            <View style={[styles.financialMetricCard, { backgroundColor: '#faf5ff', borderColor: '#8b5cf6' }]}>
+              <View style={styles.financialMetricHeader}>
+                <Text style={[styles.financialMetricLabel, { color: '#8b5cf6' }]}>📈 Inversión</Text>
+                <Text style={[styles.financialMetricPercentage, { color: '#8b5cf6' }]}>
+                  {userData.financialData?.invertido?.percentage || 8}%
+                </Text>
+              </View>
+              <Text style={[styles.financialMetricAmount, { color: '#8b5cf6' }]}>
+                ${userData.financialData?.invertido?.amount?.toLocaleString() || '25,000'}
+              </Text>
+              <View style={styles.financialMetricTrend}>
+                <Text style={[styles.financialMetricTrendText, { color: '#8b5cf6' }]}>
+                  +{userData.financialData?.invertido?.previousChange || 5}% vs mes anterior
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
 
           {/* Lista de Registros */}
@@ -423,6 +496,64 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: SIZES.xs,
+  },
+  // Nuevos estilos para métricas financieras
+  financialMetricsContainer: {
+    marginBottom: SIZES.lg,
+  },
+  financialMetricsTitle: {
+    fontSize: 18,
+    fontFamily: FONTS.bold,
+    color: COLORS.dark,
+    marginBottom: SIZES.md,
+    textAlign: 'center',
+  },
+  financialMetricsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  financialMetricCard: {
+    width: '48%',
+    padding: SIZES.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: SIZES.md,
+    shadowColor: COLORS.dark,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  financialMetricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.sm,
+  },
+  financialMetricLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.medium,
+  },
+  financialMetricPercentage: {
+    fontSize: 16,
+    fontFamily: FONTS.bold,
+  },
+  financialMetricAmount: {
+    fontSize: 18,
+    fontFamily: FONTS.bold,
+    marginBottom: SIZES.xs,
+  },
+  financialMetricTrend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  financialMetricTrendText: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
   },
   percentageLabel: {
     fontSize: 12,

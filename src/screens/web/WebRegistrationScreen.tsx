@@ -68,11 +68,35 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
       
       onRegistrationSuccess(user);
     } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        alert('Error: El correo electrónico ya está en uso.');
+      let errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
+      let title = 'Error';
+      
+      if (error.code === 'auth/email-already-in-use' || error.message?.includes('correo electrónico ya está registrado')) {
+        title = 'Email ya registrado';
+        errorMessage = 'Este correo electrónico ya está en uso. ¿Te gustaría iniciar sesión en su lugar?';
+        
+        const userChoice = confirm(`${title}\n\n${errorMessage}\n\n¿Quieres iniciar sesión? (Cancelar para cambiar email)`);
+        
+        if (userChoice) {
+          // Mostrar pantalla de login
+          onShowLogin();
+        } else {
+          // Limpiar el campo de email para que el usuario pueda cambiarlo
+          setFormData(prev => ({ ...prev, email: '' }));
+          setErrors(prev => ({ ...prev, email: 'Por favor, usa un email diferente' }));
+        }
+        return;
+      } else if (error.message?.includes('contraseña')) {
+        title = 'Error de contraseña';
+        errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+      } else if (error.message?.includes('email')) {
+        title = 'Error de email';
+        errorMessage = 'Por favor, ingresa un email válido.';
       } else {
-        alert(`Error al crear la cuenta: ${error.message}`);
+        errorMessage = error.message || errorMessage;
       }
+      
+      alert(`${title}\n\n${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -257,7 +281,7 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
                   onClick={onShowOnboarding}
                   className="w-full bg-gradient-to-r from-primary-400 to-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:from-primary-500 hover:to-primary-700 transition-all duration-200 shadow-md"
                 >
-                  Configuración completa paso a paso
+                  Crear cuenta paso a paso
                 </button>
               )}
               <button

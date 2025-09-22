@@ -31,48 +31,55 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
   // Datos del usuario
   const userData = user || {
     name: 'Usuario',
-    monthlyIncome: 4200,
+    monthlyIncome: 420000,
     currentScore: 52,
     riskScore: 48,
-    monthlyExpenses: 3180,
-    currentSavings: 12500,
-    savingsGoal: 18000,
-    alerts: 3
+    monthlyExpenses: 318000,
+    currentSavings: 1250000,
+    savingsGoal: 1800000,
+    alerts: 3,
+    // Datos financieros mejorados como en la versión web
+    financialData: {
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
+    }
   };
 
   // Datos para análisis financiero
   const monthlyTrend = [
-    { month: 'Ene', income: 4200, expenses: 3500, savings: 700 },
-    { month: 'Feb', income: 4200, expenses: 3200, savings: 1000 },
-    { month: 'Mar', income: 4200, expenses: 3800, savings: 400 },
-    { month: 'Abr', income: 4200, expenses: 3100, savings: 1100 },
-    { month: 'May', income: 4200, expenses: 3300, savings: 900 },
-    { month: 'Jun', income: 4200, expenses: 3180, savings: 1020 }
+    { month: 'Ene', income: 420000, expenses: 350000, savings: 70000 },
+    { month: 'Feb', income: 420000, expenses: 320000, savings: 100000 },
+    { month: 'Mar', income: 420000, expenses: 380000, savings: 40000 },
+    { month: 'Abr', income: 420000, expenses: 310000, savings: 110000 },
+    { month: 'May', income: 420000, expenses: 330000, savings: 90000 },
+    { month: 'Jun', income: 420000, expenses: 318000, savings: 102000 }
   ];
 
   const categoryAnalysis = [
-    { name: 'Vivienda', value: 1200, color: '#ef4444' },
-    { name: 'Alimentación', value: 600, color: '#f97316' },
-    { name: 'Transporte', value: 400, color: '#eab308' },
-    { name: 'Entretenimiento', value: 300, color: '#8b5cf6' },
-    { name: 'Salud', value: 200, color: '#06b6d4' },
-    { name: 'Otros', value: 480, color: '#10b981' }
+    { name: 'Vivienda', value: 120000, color: '#ef4444' },
+    { name: 'Alimentación', value: 60000, color: '#f97316' },
+    { name: 'Transporte', value: 40000, color: '#eab308' },
+    { name: 'Entretenimiento', value: 30000, color: '#8b5cf6' },
+    { name: 'Salud', value: 20000, color: '#06b6d4' },
+    { name: 'Otros', value: 48000, color: '#10b981' }
   ];
 
   const weeklySpending = [
-    { day: 'Lun', amount: 120 },
-    { day: 'Mar', amount: 85 },
-    { day: 'Mié', amount: 200 },
-    { day: 'Jue', amount: 150 },
-    { day: 'Vie', amount: 300 },
-    { day: 'Sáb', amount: 450 },
-    { day: 'Dom', amount: 180 }
+    { day: 'Lun', amount: 12000 },
+    { day: 'Mar', amount: 8500 },
+    { day: 'Mié', amount: 20000 },
+    { day: 'Jue', amount: 15000 },
+    { day: 'Vie', amount: 30000 },
+    { day: 'Sáb', amount: 45000 },
+    { day: 'Dom', amount: 18000 }
   ];
 
   const financialGoals = [
-    { name: 'Fondo de Emergencia', target: 10000, current: 8000, deadline: 'Dic 2024', priority: 'high' },
-    { name: 'Vacaciones', target: 3000, current: 1200, deadline: 'Ago 2024', priority: 'medium' },
-    { name: 'Casa Propia', target: 50000, current: 12500, deadline: '2026', priority: 'high' }
+    { name: 'Fondo de Emergencia', target: 1000000, current: 800000, deadline: 'Dic 2024', priority: 'high' },
+    { name: 'Vacaciones', target: 300000, current: 120000, deadline: 'Ago 2024', priority: 'medium' },
+    { name: 'Casa Propia', target: 5000000, current: 1250000, deadline: '2026', priority: 'high' }
   ];
 
   const insights = [
@@ -163,10 +170,14 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
               <Text style={styles.metricLabel}>Ahorro Mensual</Text>
               <DollarSign size={20} color={COLORS.success} />
             </View>
-            <Text style={[styles.metricValue, { color: COLORS.success }]}>$1,020</Text>
+            <Text style={[styles.metricValue, { color: COLORS.success }]}>
+              ${userData.financialData?.ahorro?.amount?.toLocaleString() || '60,000'}
+            </Text>
             <View style={styles.metricTrend}>
               <TrendingUp size={12} color={COLORS.success} />
-              <Text style={[styles.metricTrendText, { color: COLORS.success }]}>+12% vs mes anterior</Text>
+              <Text style={[styles.metricTrendText, { color: COLORS.success }]}>
+                +{userData.financialData?.ahorro?.previousChange || 3}% vs mes anterior
+              </Text>
             </View>
           </View>
 
@@ -175,7 +186,9 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
               <Text style={styles.metricLabel}>Gastos Promedio</Text>
               <BarChart3 size={20} color={COLORS.danger} />
             </View>
-            <Text style={[styles.metricValue, { color: COLORS.danger }]}>$3,180</Text>
+            <Text style={[styles.metricValue, { color: COLORS.danger }]}>
+              ${userData.monthlyExpenses?.toLocaleString() || '318,000'}
+            </Text>
             <View style={styles.metricTrend}>
               <TrendingDown size={12} color={COLORS.danger} />
               <Text style={[styles.metricTrendText, { color: COLORS.danger }]}>-5% vs mes anterior</Text>
@@ -184,25 +197,33 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
 
           <View style={styles.metricCard}>
             <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>Eficiencia</Text>
-              <Target size={20} color={COLORS.primary} />
+              <Text style={styles.metricLabel}>Consumo</Text>
+              <Target size={20} color="#3b82f6" />
             </View>
-            <Text style={[styles.metricValue, { color: COLORS.primary }]}>76%</Text>
+            <Text style={[styles.metricValue, { color: '#3b82f6' }]}>
+              {userData.financialData?.consumo?.percentage || 42}%
+            </Text>
             <View style={styles.metricTrend}>
-              <TrendingUp size={12} color={COLORS.primary} />
-              <Text style={[styles.metricTrendText, { color: COLORS.primary }]}>+3% vs mes anterior</Text>
+              <TrendingUp size={12} color="#3b82f6" />
+              <Text style={[styles.metricTrendText, { color: '#3b82f6' }]}>
+                +{userData.financialData?.consumo?.previousChange || 2}% vs mes anterior
+              </Text>
             </View>
           </View>
 
           <View style={styles.metricCard}>
             <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>Meta Ahorro</Text>
-              <Award size={20} color="#8b5cf6" />
+              <Text style={styles.metricLabel}>Necesidades</Text>
+              <Award size={20} color="#ea580c" />
             </View>
-            <Text style={[styles.metricValue, { color: '#8b5cf6' }]}>69%</Text>
+            <Text style={[styles.metricValue, { color: '#ea580c' }]}>
+              {userData.financialData?.necesidades?.percentage || 57}%
+            </Text>
             <View style={styles.metricTrend}>
-              <Target size={12} color="#8b5cf6" />
-              <Text style={[styles.metricTrendText, { color: '#8b5cf6' }]}>$5,500 restantes</Text>
+              <TrendingDown size={12} color="#ea580c" />
+              <Text style={[styles.metricTrendText, { color: '#ea580c' }]}>
+                {userData.financialData?.necesidades?.previousChange || -1}% vs mes anterior
+              </Text>
             </View>
           </View>
         </View>

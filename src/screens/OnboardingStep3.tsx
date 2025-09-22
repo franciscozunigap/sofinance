@@ -172,7 +172,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
                     title="Atrás"
                     onPress={onBack}
                     variant="secondary"
-                    style={[styles.button, styles.backButton]}
+                    style={StyleSheet.flatten([styles.button, styles.backButton])}
                   />
                 )}
                 <Button
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: FONTS.semiBold,
+    fontFamily: FONTS.medium,
     color: COLORS.dark,
   },
   sectionSubtitle: {

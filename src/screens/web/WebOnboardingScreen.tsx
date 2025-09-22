@@ -55,8 +55,40 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
       onComplete();
     } catch (error) {
       console.error('Error en registro:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error al crear la cuenta. Inténtalo de nuevo.';
-      alert(errorMessage);
+      
+      let errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
+      let title = 'Error';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('correo electrónico ya está registrado')) {
+          title = 'Email ya registrado';
+          errorMessage = 'Este correo electrónico ya está en uso. ¿Te gustaría iniciar sesión en su lugar?';
+          
+          // Mostrar opciones al usuario
+          const userChoice = confirm(`${title}\n\n${errorMessage}\n\n¿Quieres iniciar sesión? (Cancelar para cambiar email)`);
+          
+          if (userChoice) {
+            // Regresar a la pantalla de login
+            if (onBack) {
+              onBack();
+            }
+          } else {
+            // Regresar al paso 1 para cambiar el email
+            setCurrentStep(1);
+          }
+          return;
+        } else if (error.message.includes('contraseña')) {
+          title = 'Error de contraseña';
+          errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+        } else if (error.message.includes('email')) {
+          title = 'Error de email';
+          errorMessage = 'Por favor, ingresa un email válido.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      alert(`${title}\n\n${errorMessage}`);
     } finally {
       setLoading(false);
     }

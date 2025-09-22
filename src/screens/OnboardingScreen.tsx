@@ -15,6 +15,8 @@ import { OnboardingData } from '../types';
 import { AuthService } from '../services/authService';
 import { Alert } from '../platform';
 import { COLORS } from '../constants';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -26,6 +28,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData>>({});
   const [loading, setLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const { toast, showError, hideToast } = useToast();
 
   const handleStep1Next = (stepData: Partial<OnboardingData>) => {
     setOnboardingData(prev => ({ ...prev, ...stepData }));
@@ -66,8 +69,55 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
       onComplete();
     } catch (error) {
       console.error('Error en registro:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error al crear la cuenta. Inténtalo de nuevo.';
-      Alert.alert('Error', errorMessage);
+      
+      let errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
+      let title = 'Error';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('correo electrónico ya está registrado')) {
+          // Mostrar toast con opciones
+          showError(
+            'Este correo electrónico ya está en uso. ¿Te gustaría iniciar sesión?',
+            6000,
+            () => {
+              // Regresar a la pantalla de login
+              if (onBack) {
+                onBack();
+              }
+            },
+            'Iniciar sesión'
+          );
+          
+          // También mostrar opción de cambiar email después de un delay
+          setTimeout(() => {
+            Alert.alert(
+              '¿Cambiar email?',
+              'También puedes regresar al paso 1 para usar un email diferente.',
+              [
+                {
+                  text: 'Cambiar email',
+                  onPress: () => setCurrentStep(1)
+                },
+                {
+                  text: 'Cancelar',
+                  style: 'cancel'
+                }
+              ]
+            );
+          }, 2000);
+          return;
+        } else if (error.message.includes('contraseña')) {
+          title = 'Error de contraseña';
+          errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+        } else if (error.message.includes('email')) {
+          title = 'Error de email';
+          errorMessage = 'Por favor, ingresa un email válido.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      showError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -142,6 +192,16 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
       >
         {renderCurrentStep()}
       </Animated.View>
+      
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        duration={toast.duration}
+        onHide={hideToast}
+        onAction={toast.onAction}
+        actionText={toast.actionText}
+      />
     </SafeAreaView>
   );
 };
