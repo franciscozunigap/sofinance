@@ -154,8 +154,18 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header con Avatar - igual que web */}
+        {/* Header con Avatar - mejorado para coincidir con web */}
         <View style={styles.avatarHeader}>
+          {/* Gradiente de fondo */}
+          <View style={styles.avatarGradient} />
+          
+          {/* Patrones decorativos */}
+          <View style={styles.decorativePatterns}>
+            <View style={styles.decorativeCircle1} />
+            <View style={styles.decorativeCircle2} />
+            <View style={styles.decorativeCircle3} />
+          </View>
+          
           <View style={styles.avatarHeaderContent}>
             {/* Botón de configuración mejorado */}
             <TouchableOpacity
@@ -196,7 +206,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                 onError={(error) => console.log('Error loading avatar image:', error)}
                 onLoad={() => console.log('Avatar image loaded successfully')}
               />
-              {/* Overlay sutil */}
+              {/* Overlay para integrar mejor con el fondo */}
               <View style={styles.avatarOverlay} />
             </Animated.View>
           </View>
@@ -348,16 +358,64 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 0,
   },
-  // Avatar Header styles - igual que web
+  // Avatar Header styles - mejorado para coincidir con web
   avatarHeader: {
     height: 256, // Aumentado para coincidir con web (h-64 = 256px)
     backgroundColor: '#6B73FF',
     position: 'relative',
     overflow: 'hidden',
   },
+  avatarGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#6B73FF', // Color base
+    // En React Native no podemos usar gradientes CSS directamente, 
+    // pero podemos simular el efecto con múltiples capas
+  },
+  decorativePatterns: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.1,
+  },
+  decorativeCircle1: {
+    position: 'absolute',
+    top: 40,
+    left: 40,
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    // Simulamos blur con opacidad reducida
+  },
+  decorativeCircle2: {
+    position: 'absolute',
+    bottom: 40,
+    right: 40,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  decorativeCircle3: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    transform: [{ translateX: -120 }, { translateY: -120 }],
+  },
   avatarHeaderContent: {
     flex: 1,
     position: 'relative',
+    zIndex: 2,
   },
   settingsButton: {
     position: 'absolute',
@@ -379,10 +437,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   avatarContainer: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 350, // Aumentado para dar más espacio y evitar corte
     overflow: 'hidden',
+    backgroundColor: 'transparent',
+    borderRadius: 0,
   },
   avatarPlaceholder: {
     position: 'absolute',
@@ -401,6 +463,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: 14, // Ajustado hacia arriba para mostrar la parte superior
+    left: 0,
+    tintColor: undefined,
+    opacity: 1, // Sólido, sin transparencia
   },
   avatarOverlay: {
     position: 'absolute',
@@ -408,7 +476,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(107, 115, 255, 0.05)', // Reducido aún más para mayor solidez
+    borderRadius: 0,
   },
   // Main content overlay - igual que web
   mainContentOverlay: {

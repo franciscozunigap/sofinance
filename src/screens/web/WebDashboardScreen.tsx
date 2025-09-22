@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 import { RECENT_TRANSACTIONS } from '../../data/mockData';
-import avatar from '../../../assets/avatar.svg';
+import avatar from '../../../assets/avatar.png';
 
 const WebDashboardScreen = () => {
   const { user } = useUser();
@@ -246,7 +246,7 @@ const WebDashboardScreen = () => {
       }}
     >
       {/* Header Mejorado con Gradiente */}
-      <div className="relative w-full h-64 lg:h-80 overflow-hidden">
+      <div className="relative w-full h-64 lg:h-80 overflow-hidden" style={{ minHeight: '256px', maxHeight: '320px' }}>
         {/* Gradiente de fondo */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
         
@@ -267,20 +267,48 @@ const WebDashboardScreen = () => {
           </button>
         </div>
         
-        {/* Avatar con efecto parallax mejorado */}
+        {/* Avatar con efecto parallax mejorado y tamaño fijo */}
         <div 
-          className="relative w-full h-full transition-all duration-500 ease-out"
+          className="relative w-full h-full transition-all duration-500 ease-out overflow-hidden"
           style={{
             transform: `translateY(${Math.min(scrollY * 0.2, 20)}px) scale(${Math.max(1 - scrollY * 0.0008, 0.95)})`,
+            background: 'linear-gradient(135deg, #6B73FF 0%, #8B5CF6 50%, #A855F7 100%)',
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            minHeight: '256px',
+            maxHeight: '320px',
+            // Asegurar que el contenedor no se redimensione
+            flexShrink: 0,
+            flexGrow: 0
           }}
         >
           <img 
             src={avatar} 
             alt="Avatar" 
-            className="w-full h-full object-cover object-top"
+            className="absolute inset-0"
+            style={{
+              filter: 'brightness(1.2) contrast(1.1) saturate(1.1)',
+              mixBlendMode: 'multiply',
+              opacity: 0.9,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'top center',
+              // Asegurar consistencia en el redimensionamiento
+              minWidth: '100%',
+              minHeight: '100%',
+              maxWidth: 'none',
+              maxHeight: 'none',
+              // Mejoras para consistencia
+              imageRendering: 'crisp-edges',
+              backfaceVisibility: 'hidden',
+              transform: 'translateZ(0)', // Forzar aceleración por hardware
+              willChange: 'transform'
+            }}
           />
-          {/* Overlay sutil */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+          {/* Overlay para integrar mejor con el fondo */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 via-transparent to-primary-600/20"></div>
         </div>
 
         {/* Información del usuario en el header */}

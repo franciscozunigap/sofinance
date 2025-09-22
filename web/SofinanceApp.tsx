@@ -12,7 +12,7 @@ import { RECENT_TRANSACTIONS } from '../src/data/mockData';
 import AllTransactionsModal from '../src/components/AllTransactionsModal';
 import BalanceChart from '../src/components/BalanceChart';
 import logo from '../assets/logo.png';
-import avatar from '../assets/avatar.svg';
+import avatar from '../assets/avatar.png';
 
 const SofinanceAppContent = () => {
   const [currentView, setCurrentView] = useState('finance');
