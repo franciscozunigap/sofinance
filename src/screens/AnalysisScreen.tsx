@@ -31,15 +31,15 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
   const [selectedRecommendation, setSelectedRecommendation] = useState<typeof insights[0] | null>(null);
 
   // Datos del usuario
-  const userData = user || {
-    name: 'Usuario',
-    monthlyIncome: 420000,
-    currentScore: 52,
-    riskScore: 48,
-    monthlyExpenses: 318000,
-    currentSavings: 1250000,
-    savingsGoal: 1800000,
-    alerts: 3,
+  const userData = {
+    name: user?.name || 'Usuario',
+    monthlyIncome: user?.monthlyIncome || 420000,
+    currentScore: user?.currentScore || 52,
+    riskScore: user?.riskScore || 48,
+    monthlyExpenses: user?.monthlyExpenses || 318000,
+    currentSavings: user?.currentSavings || 1500000,
+    savingsGoal: user?.savingsGoal || 1800000,
+    alerts: user?.alerts || 3,
     // Datos financieros mejorados como en la versión web
     financialData: {
       consumo: { percentage: 42, amount: 133500, previousChange: 2 },
@@ -86,28 +86,28 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
 
   const insights = [
     {
+      type: 'info',
+      title: 'Regla del 50/30/20',
+      description: 'Asigna el 50% de tus ingresos a necesidades básicas, 30% a deseos personales y 20% a ahorros e inversiones. Esta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.',
+      icon: 'information-circle',
+      action: 'Ver detalle',
+      detail: 'La regla del 50/30/20 es una estrategia de presupuesto simple y efectiva:\n\n• 50% para necesidades básicas (vivienda, alimentación, transporte, servicios)\n• 30% para deseos personales (entretenimiento, viajes, hobbies)\n• 20% para ahorros e inversiones (fondo de emergencia, jubilación, inversiones)\n\nEsta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.'
+    },
+    {
       type: 'warning',
-      title: 'Optimiza tus Gastos de Entretenimiento',
-      description: 'Has gastado 15% más en entretenimiento este mes. Considera reducir actividades costosas.',
+      title: 'Fondo de Emergencia',
+      description: 'Mantén un fondo de emergencia equivalente a 3-6 meses de gastos. Este dinero debe estar en una cuenta de fácil acceso y te protegerá ante imprevistos como pérdida de empleo, gastos médicos inesperados o reparaciones urgentes en tu hogar.',
       icon: 'warning',
-      action: 'Ver detalles',
-      detail: 'Tu gasto en entretenimiento ha aumentado significativamente. Te recomendamos:\n\n• Reducir salidas a restaurantes caros\n• Buscar alternativas gratuitas de entretenimiento\n• Establecer un presupuesto mensual para diversión\n• Aprovechar descuentos y promociones\n\nEsto te permitirá ahorrar hasta $50,000 mensuales.'
+      action: 'Ver detalle',
+      detail: 'Un fondo de emergencia es tu red de seguridad financiera:\n\n• Equivalente a 3-6 meses de gastos básicos\n• Debe estar en una cuenta de fácil acceso\n• Te protege ante imprevistos como pérdida de empleo\n• Cubre gastos médicos inesperados\n• Permite reparaciones urgentes en tu hogar\n\nEste fondo te dará tranquilidad y estabilidad financiera.'
     },
     {
       type: 'success',
-      title: 'Excelente Control de Alimentación',
-      description: 'Redujiste 8% tus gastos en alimentación manteniendo una dieta saludable.',
+      title: 'Presupuesto Mensual',
+      description: 'Crea y sigue un presupuesto mensual detallado. Registra todos tus ingresos y gastos, categorízalos y revisa tu progreso semanalmente. Un presupuesto bien estructurado es la base de una buena salud financiera.',
       icon: 'checkmark-circle',
-      action: 'Ver estrategias',
-      detail: '¡Felicitaciones! Has logrado un excelente balance entre economía y salud:\n\n• Planificación de comidas semanales\n• Compra en mercados locales\n• Cocina en casa más frecuentemente\n• Aprovechamiento de ofertas en supermercados\n\nMantén estas estrategias para seguir ahorrando.'
-    },
-    {
-      type: 'info',
-      title: 'Oportunidad de Ahorro en Transporte',
-      description: 'Podrías ahorrar $200 extra si optimizas tus gastos de transporte.',
-      icon: 'information-circle',
-      action: 'Crear plan',
-      detail: 'Tu gasto en transporte puede optimizarse significativamente:\n\n• Usar transporte público en lugar de taxi\n• Compartir viajes con compañeros de trabajo\n• Caminar distancias cortas\n• Usar bicicleta para trayectos medios\n• Planificar rutas eficientes\n\nEsto podría ahorrarte hasta $200,000 anuales.'
+      action: 'Ver detalle',
+      detail: 'Un presupuesto mensual es la base de tu salud financiera:\n\n• Registra todos tus ingresos y gastos\n• Categoriza cada transacción\n• Revisa tu progreso semanalmente\n• Ajusta según sea necesario\n• Te ayuda a tomar decisiones informadas\n\nUn presupuesto bien estructurado te da control total sobre tu dinero.'
     }
   ];
 
@@ -137,6 +137,36 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
     }
   };
 
+  // Función para determinar el estado de riesgo del saldo
+  const getRiskStatus = (currentSavings: number, monthlyExpenses: number) => {
+    const monthsCoverage = currentSavings / monthlyExpenses;
+    
+    if (monthsCoverage < 3) {
+      return {
+        status: 'Riesgoso',
+        color: COLORS.danger,
+        backgroundColor: '#fef2f2',
+        description: 'Riesgoso'
+      };
+    } else if (monthsCoverage >= 3 && monthsCoverage < 6) {
+      return {
+        status: 'Seguro',
+        color: COLORS.success,
+        backgroundColor: '#f0fdf4',
+        description: 'Seguro'
+      };
+    } else {
+      return {
+        status: 'Sobre Recomendado',
+        color: '#3b82f6',
+        backgroundColor: '#eff6ff',
+        description: 'Sobre Recomendado'
+      };
+    }
+  };
+
+  const riskStatus = getRiskStatus(userData.currentSavings || 0, userData.monthlyExpenses || 0);
+
   // Si se está mostrando el registro de balance, renderizar esa pantalla
   if (showBalanceRegistration) {
     return (
@@ -151,93 +181,184 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Main Content con superposición */}
       <View style={styles.mainContentOverlay}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <View style={styles.headerText}>
-              <Text style={styles.headerTitle}>Análisis Financiero</Text>
-              <Text style={styles.headerSubtitle}>Insights detallados sobre tu comportamiento financiero</Text>
+        {/* Header Mejorado con Métricas Dinámicas */}
+        <View style={styles.enhancedHeader}>
+          <View style={styles.enhancedHeaderContent}>
+            {/* Primera fila: Título y Botón + */}
+            <View style={styles.headerTopRow}>
+              <View style={styles.headerTitleSection}>
+                <View style={styles.headerIconContainer}>
+                  <BarChart3 size={24} color={COLORS.white} />
+                </View>
+                <View style={styles.headerTextContainer}>
+                  <Text style={styles.enhancedHeaderTitle}>Dashboard Financiero</Text>
+                  <Text style={styles.enhancedHeaderSubtitle}>
+                    Última actualización: {new Date().toLocaleDateString('es-ES', { 
+                      day: 'numeric', 
+                      month: 'long', 
+                      year: 'numeric' 
+                    })}
+                  </Text>
+                </View>
+              </View>
+              
+              {/* Botón + en la esquina superior derecha */}
+              <TouchableOpacity 
+                style={styles.enhancedAddButton}
+                onPress={() => setShowBalanceRegistration(true)}
+              >
+                <Text style={styles.enhancedAddButtonText}>+</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity 
-              style={styles.addButton}
-              onPress={() => setShowBalanceRegistration(true)}
-            >
-              <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
+            
           </View>
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Métricas Principales */}
-        <View style={styles.metricsGrid}>
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>Ahorro Mensual</Text>
-              <DollarSign size={20} color={COLORS.success} />
+        {/* Saldo Actual */}
+        <View style={styles.singleMetricContainer}>
+          <View style={styles.singleMetricCard}>
+            <View style={styles.singleMetricHeader}>
+              <Text style={styles.singleMetricLabel}>Saldo Actual</Text>
+              <DollarSign size={24} color={COLORS.primary} />
             </View>
-            <Text style={[styles.metricValue, { color: COLORS.success }]}>
-              ${userData.financialData?.ahorro?.amount?.toLocaleString() || '60,000'}
+            <Text style={[styles.singleMetricValue, { color: COLORS.primary }]}>
+              ${userData.currentSavings?.toLocaleString() || '1,500,000'}
             </Text>
-            <View style={styles.metricTrend}>
-              <TrendingUp size={12} color={COLORS.success} />
-              <Text style={[styles.metricTrendText, { color: COLORS.success }]}>
-                +{userData.financialData?.ahorro?.previousChange || 3}% vs mes anterior
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>Gastos Promedio</Text>
-              <BarChart3 size={20} color={COLORS.danger} />
-            </View>
-            <Text style={[styles.metricValue, { color: COLORS.danger }]}>
-              ${userData.monthlyExpenses?.toLocaleString() || '318,000'}
-            </Text>
-            <View style={styles.metricTrend}>
-              <TrendingDown size={12} color={COLORS.danger} />
-              <Text style={[styles.metricTrendText, { color: COLORS.danger }]}>-5% vs mes anterior</Text>
-            </View>
-          </View>
-
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>Consumo</Text>
-              <Target size={20} color="#3b82f6" />
-            </View>
-            <Text style={[styles.metricValue, { color: '#3b82f6' }]}>
-              {userData.financialData?.consumo?.percentage || 42}%
-            </Text>
-            <View style={styles.metricTrend}>
-              <TrendingUp size={12} color="#3b82f6" />
-              <Text style={[styles.metricTrendText, { color: '#3b82f6' }]}>
-                +{userData.financialData?.consumo?.previousChange || 2}% vs mes anterior
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>Necesidades</Text>
-              <Award size={20} color="#ea580c" />
-            </View>
-            <Text style={[styles.metricValue, { color: '#ea580c' }]}>
-              {userData.financialData?.necesidades?.percentage || 57}%
-            </Text>
-            <View style={styles.metricTrend}>
-              <TrendingDown size={12} color="#ea580c" />
-              <Text style={[styles.metricTrendText, { color: '#ea580c' }]}>
-                {userData.financialData?.necesidades?.previousChange || -1}% vs mes anterior
+            <View style={[styles.riskStatusContainer, { backgroundColor: riskStatus.backgroundColor }]}>
+              <Text style={[styles.riskStatusText, { color: riskStatus.color }]}>
+                {riskStatus.status}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Gráficos Principales */}
+        {/* Montos y Análisis - Ahorro, Consumo, Necesidades, Invertido */}
+        <View style={styles.verticalMetricsContainer}>
+          <View style={styles.verticalMetricCard}>
+            <View style={styles.verticalMetricHeader}>
+              <View style={[styles.verticalMetricIcon, { backgroundColor: '#d1fae5' }]}>
+                <TrendingUp size={20} color={COLORS.success} />
+              </View>
+              <View style={styles.verticalMetricContent}>
+                <Text style={styles.verticalMetricLabel}>Ahorro Mensual</Text>
+                <View style={styles.verticalMetricValues}>
+                  <Text style={[styles.verticalMetricPercentage, { color: COLORS.success }]}>
+                    {userData.financialData?.ahorro?.percentage || 19}%
+                  </Text>
+                  <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
+                    ${userData.financialData?.ahorro?.amount?.toLocaleString() || '60,000'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.verticalMetricTrend}>
+              <TrendingUp size={12} color={COLORS.success} />
+              <Text style={[styles.verticalMetricTrendText, { color: COLORS.success }]}>
+                +{userData.financialData?.ahorro?.previousChange || 3}% vs mes anterior
+              </Text>
+            </View>
+          </View>
+          <View style={styles.verticalMetricCard}>
+            <View style={styles.verticalMetricHeader}>
+              <View style={[styles.verticalMetricIcon, { backgroundColor: '#fef3c7' }]}>
+                <Target size={20} color="#f59e0b" />
+              </View>
+              <View style={styles.verticalMetricContent}>
+                <Text style={styles.verticalMetricLabel}>Consumo</Text>
+                <View style={styles.verticalMetricValues}>
+                  <Text style={[styles.verticalMetricPercentage, { color: '#f59e0b' }]}>
+                    {userData.financialData?.consumo?.percentage || 42}%
+                  </Text>
+                  <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
+                    ${userData.financialData?.consumo?.amount?.toLocaleString() || '133,500'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.verticalMetricTrend}>
+              {(userData.financialData?.consumo?.previousChange || 0) >= 0 ? (
+                <TrendingUp size={12} color="#f59e0b" />
+              ) : (
+                <TrendingDown size={12} color={COLORS.success} />
+              )}
+              <Text style={[styles.verticalMetricTrendText, { 
+                color: (userData.financialData?.consumo?.previousChange || 0) >= 0 ? '#f59e0b' : COLORS.success 
+              }]}>
+                {(userData.financialData?.consumo?.previousChange || 0) >= 0 ? '+' : ''}{userData.financialData?.consumo?.previousChange || 2}% vs mes anterior
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.verticalMetricCard}>
+            <View style={styles.verticalMetricHeader}>
+              <View style={[styles.verticalMetricIcon, { backgroundColor: '#dbeafe' }]}>
+                <Award size={20} color="#3b82f6" />
+              </View>
+              <View style={styles.verticalMetricContent}>
+                <Text style={styles.verticalMetricLabel}>Necesidades</Text>
+                <View style={styles.verticalMetricValues}>
+                  <Text style={[styles.verticalMetricPercentage, { color: '#3b82f6' }]}>
+                    {userData.financialData?.necesidades?.percentage || 57}%
+                  </Text>
+                  <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
+                    ${userData.financialData?.necesidades?.amount?.toLocaleString() || '181,300'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.verticalMetricTrend}>
+              {(userData.financialData?.necesidades?.previousChange || 0) >= 0 ? (
+                <TrendingUp size={12} color="#3b82f6" />
+              ) : (
+                <TrendingDown size={12} color={COLORS.success} />
+              )}
+              <Text style={[styles.verticalMetricTrendText, { 
+                color: (userData.financialData?.necesidades?.previousChange || 0) >= 0 ? '#3b82f6' : COLORS.success 
+              }]}>
+                {(userData.financialData?.necesidades?.previousChange || 0) >= 0 ? '+' : ''}{userData.financialData?.necesidades?.previousChange || -1}% vs mes anterior
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.verticalMetricCard}>
+            <View style={styles.verticalMetricHeader}>
+              <View style={[styles.verticalMetricIcon, { backgroundColor: '#d1fae5' }]}>
+                <TrendingUp size={20} color={COLORS.success} />
+              </View>
+              <View style={styles.verticalMetricContent}>
+                <Text style={styles.verticalMetricLabel}>Invertido</Text>
+                <View style={styles.verticalMetricValues}>
+                  <Text style={[styles.verticalMetricPercentage, { color: COLORS.success }]}>
+                    {userData.financialData?.invertido?.percentage || 8}%
+                  </Text>
+                  <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
+                    ${userData.financialData?.invertido?.amount?.toLocaleString() || '25,000'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.verticalMetricTrend}>
+              {(userData.financialData?.invertido?.previousChange || 0) >= 0 ? (
+                <TrendingUp size={12} color={COLORS.success} />
+              ) : (
+                <TrendingDown size={12} color={COLORS.danger} />
+              )}
+              <Text style={[styles.verticalMetricTrendText, { 
+                color: (userData.financialData?.invertido?.previousChange || 0) >= 0 ? COLORS.success : COLORS.danger 
+              }]}>
+                {(userData.financialData?.invertido?.previousChange || 0) >= 0 ? '+' : ''}{userData.financialData?.invertido?.previousChange || 5}% vs mes anterior
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Tendencias Últimos 6 Meses */}
         <View style={styles.chartsContainer}>
           {/* Tendencias Mensuales - Porcentual */}
           <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Tendencias de los Últimos 6 Meses (%)</Text>
+            <Text style={styles.chartTitle}>Tendencias Últimos 6 Meses</Text>
+            <Text style={styles.chartSubtitle}>Evolución de Categorías Financieras</Text>
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
@@ -279,9 +400,9 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
 
         </View>
 
-        {/* Insights y Recomendaciones */}
+        {/* Recomendaciones Generales */}
         <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Insights y Recomendaciones</Text>
+          <Text style={styles.chartTitle}>Recomendaciones Generales</Text>
           <View style={styles.insightsContainer}>
             {insights.map((insight, index) => {
               const insightStyle = getInsightColor(insight.type);
@@ -387,93 +508,287 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingBottom: Platform.OS === 'ios' ? 120 : 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
-  header: {
-    backgroundColor: COLORS.white, // Fondo blanco sólido sobre el gris
+  // Header mejorado
+  enhancedHeader: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    paddingVertical: SIZES.md,
+    borderBottomColor: 'rgba(255, 255, 255, 0.3)',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  enhancedHeaderContent: {
+    paddingVertical: SIZES.lg,
     paddingHorizontal: SIZES.lg,
   },
-  headerText: {
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerTitleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
-  headerTitle: {
-    fontSize: 20,
+  headerIconContainer: {
+    width: 48,
+    height: 48,
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  enhancedHeaderTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.dark,
+    marginBottom: 4,
   },
-  headerSubtitle: {
+  enhancedHeaderSubtitle: {
     fontSize: 12,
     color: COLORS.gray,
-    marginTop: 2,
   },
-  addButton: {
-    width: 40,
-    height: 40,
+  enhancedAddButton: {
+    width: 48,
+    height: 48,
     backgroundColor: COLORS.primary,
-    borderRadius: 20,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 4,
   },
-  addButtonText: {
+  enhancedAddButtonText: {
     color: COLORS.white,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+  },
+  // Métricas rápidas en el header
+  quickMetricsContainer: {
+    flexDirection: 'row',
+    gap: SIZES.sm,
+  },
+  quickMetricCard: {
+    flex: 1,
+    backgroundColor: '#eff6ff',
+    borderRadius: 12,
+    padding: SIZES.sm,
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+  },
+  quickMetricCardPurple: {
+    flex: 1,
+    backgroundColor: '#faf5ff',
+    borderRadius: 12,
+    padding: SIZES.sm,
+    borderWidth: 1,
+    borderColor: '#e9d5ff',
+  },
+  quickMetricContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  quickMetricLabel: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: COLORS.primary,
+    marginBottom: 2,
+  },
+  quickMetricLabelPurple: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#8b5cf6',
+    marginBottom: 2,
+  },
+  quickMetricValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  quickMetricValuePurple: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
   },
   content: {
     flex: 1,
     padding: SIZES.lg,
     paddingBottom: 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
-  metricsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  // Saldo Actual único
+  singleMetricContainer: {
     marginBottom: SIZES.lg,
   },
-  metricCard: {
-    backgroundColor: COLORS.white, // Fondo blanco sólido sobre el gris
-    borderRadius: 12,
-    padding: SIZES.md,
-    width: (width - SIZES.lg * 3) / 2,
-    marginBottom: SIZES.sm,
+  singleMetricCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: SIZES.lg,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  metricHeader: {
+  singleMetricHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SIZES.sm,
   },
-  metricLabel: {
+  singleMetricLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.gray,
+  },
+  singleMetricValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: SIZES.sm,
+  },
+  // Indicador de estado de riesgo
+  riskStatusContainer: {
+    padding: SIZES.sm,
+    borderRadius: 8,
+    marginTop: SIZES.sm,
+  },
+  riskStatusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  riskStatusDescription: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  // Métricas detalladas (Consumo, Necesidades, Invertido)
+  detailedMetricsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SIZES.lg,
+    gap: SIZES.sm,
+  },
+  detailedMetricCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: SIZES.md,
+    flex: 1,
+    marginHorizontal: SIZES.xs,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  detailedMetricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.sm,
+  },
+  detailedMetricIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  detailedMetricValues: {
+    alignItems: 'flex-end',
+  },
+  detailedMetricPercentage: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  detailedMetricAmount: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  detailedMetricLabel: {
     fontSize: 12,
     fontWeight: '500',
     color: COLORS.gray,
-  },
-  metricValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: SIZES.xs,
   },
-  metricTrend: {
+  detailedMetricTrend: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  metricTrendText: {
+  detailedMetricTrendText: {
     fontSize: 10,
+    marginLeft: 4,
+  },
+  // Métricas verticales (Consumo, Necesidades, Invertido en filas completas)
+  verticalMetricsContainer: {
+    marginBottom: SIZES.lg,
+  },
+  verticalMetricCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: SIZES.lg,
+    marginBottom: SIZES.md,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  verticalMetricHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.sm,
+  },
+  verticalMetricIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
+  },
+  verticalMetricContent: {
+    flex: 1,
+  },
+  verticalMetricLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.gray,
+    marginBottom: SIZES.xs,
+  },
+  verticalMetricValues: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  verticalMetricPercentage: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  verticalMetricAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  verticalMetricTrend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  verticalMetricTrendText: {
+    fontSize: 12,
     marginLeft: 4,
   },
   chartsContainer: {
@@ -495,10 +810,18 @@ const styles = StyleSheet.create({
     width: width < 768 ? '100%' : '48%',
   },
   chartTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: COLORS.dark,
+    marginBottom: SIZES.xs,
+    textAlign: 'center',
+  },
+  chartSubtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.gray,
     marginBottom: SIZES.md,
+    textAlign: 'center',
   },
   chartContainer: {
     height: 200,
