@@ -50,7 +50,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   // Datos del usuario desde el contexto
   const userData = user || {
     ...MOCK_USER_DATA,
-    // Datos financieros mejorados como en la versión web
+    // Datos financieros mejorados como en la versión web (en pesos chilenos)
     financialData: {
       consumo: { percentage: 42, amount: 133500, previousChange: 2 },
       necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
@@ -296,14 +296,14 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                   ]}>
                     <Ionicons 
                       name="cash-outline" 
-                      size={20} 
+                      size={16} 
                       color={transaction.amount > 0 ? '#16a34a' : '#dc2626'} 
                     />
                   </View>
                   <View>
                     <Text style={styles.registroDescription}>{transaction.description}</Text>
                     <Text style={styles.registroCategory}>
-                      {transaction.category} • {transaction.date} {transaction.time}
+                      {transaction.category} • {transaction.date}
                     </Text>
                   </View>
                 </View>
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   // Avatar Header styles - igual que web
   avatarHeader: {
     height: 256, // Aumentado para coincidir con web (h-64 = 256px)
-    backgroundColor: '#858bf2',
+    backgroundColor: '#6B73FF',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -420,13 +420,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
     marginBottom: isIOS ? -100 : -120,
     width: '100%',
-    paddingBottom: isIOS ? 120 : 100, // Aumentado para evitar que el navegador flotante tape el contenido
+    paddingBottom: isIOS ? 190 : 120, // Aumentado para evitar que el navegador flotante tape el contenido
   },
   // Main content styles
   mainContent: {
     flex: 1,
     paddingHorizontal: SIZES.lg,
-    paddingBottom: 20, // Añadido padding inferior para evitar que el navegador tape el contenido
+    paddingBottom: 80, // Aumentado padding inferior para evitar que el navegador tape el contenido
   },
   welcomeSection: {
     marginVertical: SIZES.lg,
@@ -603,29 +603,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   registroIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: SIZES.md,
+    marginRight: SIZES.sm,
   },
   registroDescription: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.dark,
   },
   registroCategory: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.gray,
     marginTop: 2,
   },
   registroRight: {
     alignItems: 'flex-end',
+    minWidth: 80,
+    marginLeft: SIZES.sm,
   },
   registroAmount: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
+    textAlign: 'right',
   },
   // Balance chart card styles - igual que web
   balanceChartCard: {

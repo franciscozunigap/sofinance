@@ -138,13 +138,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FONTS.medium,
     color: COLORS.dark,
     marginRight: SIZES.sm,
   },
   amountPreview: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FONTS.bold,
     color: COLORS.primary,
   },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   fieldLabel: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FONTS.medium,
     color: COLORS.dark,
     marginBottom: SIZES.xs,

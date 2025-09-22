@@ -194,10 +194,10 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                   <Text style={styles.enhancedHeaderTitle}>Dashboard</Text>
                   <Text style={styles.enhancedHeaderSubtitle}>
                     Última actualización: {new Date().toLocaleDateString('es-ES', { 
-                      day: 'numeric', 
-                      month: 'long', 
-                      year: 'numeric' 
-                    })}
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    }).replace(/\//g, '/')}
                   </Text>
                 </View>
               </View>

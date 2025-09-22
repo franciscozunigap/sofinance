@@ -167,9 +167,9 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                 </h1>
                 <p className="text-sm text-gray-600 mt-1">
                   Última actualización: {new Date().toLocaleDateString('es-ES', { 
-                    day: 'numeric', 
-                    month: 'long', 
-                    year: 'numeric' 
+                    day: '2-digit',
+                    month: '2-digit', 
+                    year: 'numeric'
                   })}
                 </p>
               </div>
