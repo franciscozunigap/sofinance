@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import WebOnboardingStep1 from './WebOnboardingStep1';
 import WebOnboardingStep2 from './WebOnboardingStep2';
 import WebOnboardingStep3 from './WebOnboardingStep3';
+import WebOnboardingStep4 from './WebOnboardingStep4';
 import { OnboardingData } from '../../types';
 import { AuthService } from '../../services/authService';
 
@@ -25,7 +26,12 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
     setCurrentStep(3);
   };
 
-  const handleStep3Complete = async (stepData: Partial<OnboardingData>) => {
+  const handleStep3Next = (stepData: Partial<OnboardingData>) => {
+    setOnboardingData(prev => ({ ...prev, ...stepData }));
+    setCurrentStep(4);
+  };
+
+  const handleStep4Complete = async (stepData: Partial<OnboardingData>) => {
     const completeData = { ...onboardingData, ...stepData } as OnboardingData;
     
     setLoading(true);
@@ -41,6 +47,7 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
         savingsPercentage: completeData.savingsPercentage,
         needsPercentage: completeData.needsPercentage,
         consumptionPercentage: completeData.consumptionPercentage,
+        investmentPercentage: completeData.investmentPercentage,
         currentSavings: completeData.currentSavings,
         financialProfile: completeData.financialProfile,
       });
@@ -85,7 +92,16 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
         return (
           <WebOnboardingStep3
             data={onboardingData}
-            onComplete={handleStep3Complete}
+            onComplete={handleStep3Next}
+            onBack={handleBack}
+            loading={loading}
+          />
+        );
+      case 4:
+        return (
+          <WebOnboardingStep4
+            data={onboardingData}
+            onComplete={handleStep4Complete}
             onBack={handleBack}
             loading={loading}
           />
@@ -96,7 +112,7 @@ const WebOnboardingScreen: React.FC<WebOnboardingScreenProps> = ({ onComplete, o
   };
 
   return (
-    <div className="min-h-screen bg-light">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
       {renderCurrentStep()}
     </div>
   );

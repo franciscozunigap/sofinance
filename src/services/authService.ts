@@ -47,10 +47,11 @@ export class AuthService {
         needs_percent: data.needsPercentage,
         saving_percent: data.savingsPercentage,
         wants_percent: data.consumptionPercentage,
+        investment_percent: data.investmentPercentage,
       },
       wallet: {
         monthly_income: data.monthlyIncome,
-        savings: data.currentSavings,
+        amount: data.currentSavings,
       },
       financial_profile: data.financialProfile || '', // Guardar el perfil financiero
     };

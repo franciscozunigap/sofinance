@@ -80,3 +80,5 @@ export const BORDER_RADIUS = {
   xl: 20,
   xxl: 24,
 } as const;
+
+export { FINANCIAL_PROFILE_TAGS, getTagsByCategory } from './financialProfile';

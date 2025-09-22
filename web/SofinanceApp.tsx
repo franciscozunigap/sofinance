@@ -9,6 +9,7 @@ import FloatingNavigationPanel from '../src/components/FloatingNavigationPanel';
 import WebAnalysisScreen from '../src/screens/web/WebAnalysisScreen';
 import SettingsMenu from '../src/components/SettingsMenu';
 import AllTransactionsModal from '../src/components/AllTransactionsModal';
+import BalanceChart from '../src/components/BalanceChart';
 import logo from '../assets/logo.png';
 import avatar from '../assets/avatar.svg';
 
@@ -52,38 +53,38 @@ const SofinanceAppContent = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Datos del usuario desde el contexto
+  // Datos del usuario desde el contexto (en pesos chilenos)
   const userData = user ? {
     name: user.name || 'Usuario',
-    monthlyIncome: user.monthlyIncome || 4200,
+    monthlyIncome: user.monthlyIncome || 420000,
     currentScore: user.currentScore || 52,
     riskScore: user.riskScore || 48,
-    monthlyExpenses: user.monthlyExpenses || 3180,
-    currentSavings: user.currentSavings || 12500,
-    savingsGoal: user.savingsGoal || 18000,
+    monthlyExpenses: user.monthlyExpenses || 318000,
+    currentSavings: user.currentSavings || 1250000,
+    savingsGoal: user.savingsGoal || 1800000,
     alerts: user.alerts || 3,
     // Nuevos datos financieros
     financialData: {
-      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
-      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
     }
   } : {
     name: 'Usuario',
-    monthlyIncome: 4200,
+    monthlyIncome: 420000,
     currentScore: 52,
     riskScore: 48,
-    monthlyExpenses: 3180,
-    currentSavings: 12500,
-    savingsGoal: 18000,
+    monthlyExpenses: 318000,
+    currentSavings: 1250000,
+    savingsGoal: 1800000,
     alerts: 3,
     // Nuevos datos financieros
     financialData: {
-      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
-      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
     }
   };
 
@@ -97,6 +98,30 @@ const SofinanceAppContent = () => {
     { day: 'Vie', score: 50 },
     { day: 'Sáb', score: 48 },
     { day: 'Dom', score: 52 }
+  ];
+
+  // Datos de balance diario para los últimos 7 días (en pesos chilenos)
+  const balanceData = [
+    // Lunes - Verde (dentro del rango seguro)
+    { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Martes - Verde (dentro del rango seguro)
+    { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Miércoles - Amarillo (por debajo del rango inferior)
+    { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Jueves - Verde (dentro del rango seguro)
+    { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Viernes - Rojo (por encima del rango superior)
+    { date: '2024-01-19', amount: 1520000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Sábado - Sin datos
+    { date: '2024-01-20', amount: undefined, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Domingo - Verde (dentro del rango seguro)
+    { date: '2024-01-21', amount: 1270000, upper_amount: 1500000, lower_amount: 1000000 },
   ];
 
   // Categorías de gastos
@@ -419,35 +444,9 @@ const SofinanceAppContent = () => {
           </p>
         </div>
           
-        {/* Gráfica de Zona Saludable Mejorada */}
-        <div className="h-64 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-4 relative overflow-hidden mb-8">
-          {/* Zona Saludable con mejor diseño */}
-          <div className="absolute inset-x-6 top-12 bottom-20 bg-gradient-to-r from-green-200/40 to-emerald-200/40 rounded-xl border-2 border-dashed border-green-300/60">
-            <div className="absolute top-3 left-3 text-xs font-semibold text-green-700 bg-white/80 px-2 py-1 rounded-full">
-              Zona Saludable (40-80 pts)
-            </div>
-          </div>
-          
-          {/* Línea de Progreso Mejorada */}
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={dailyScoreData}>
-              <XAxis 
-                dataKey="day" 
-                axisLine={false} 
-                tickLine={false}
-                tick={{ fontSize: 12, fill: '#6B7280' }}
-              />
-              <YAxis domain={[30, 70]} hide />
-              <Line 
-                type="monotone" 
-                dataKey="score" 
-                stroke="#858BF2" 
-                strokeWidth={4}
-                dot={{ fill: '#858BF2', r: 8, strokeWidth: 2, stroke: '#fff' }}
-                activeDot={{ r: 10, fill: '#6366F1', stroke: '#fff', strokeWidth: 3 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        {/* Gráfico de Balance Diario con Rangos de Seguridad */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl p-2 border border-white/20 mb-2">
+          <BalanceChart data={balanceData} height={300} />
         </div>
 
         {/* Grid de Métricas - Solo Porcentajes */}
@@ -458,17 +457,17 @@ const SofinanceAppContent = () => {
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-red-600 mb-1">{userData.financialData.necesidades.percentage}%</div>
+            <div className="text-3xl font-bold text-blue-600 mb-1">{userData.financialData.necesidades.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Necesidades</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-green-600 mb-1">{userData.financialData.ahorro.percentage}%</div>
+            <div className="text-3xl font-bold text-purple-600 mb-1">{userData.financialData.ahorro.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Ahorro</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-purple-600 mb-1">{userData.financialData.invertido.percentage}%</div>
+            <div className="text-3xl font-bold text-green-600 mb-1">{userData.financialData.invertido.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Invertido</p>
           </div>
         </div>

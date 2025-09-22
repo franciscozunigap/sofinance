@@ -10,53 +10,48 @@ import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../pla
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
-import { validateEmail } from '../utils';
+import { validatePassword } from '../utils';
 import { OnboardingData } from '../types';
 
 const { width, height } = Dimensions.get('window');
 
-interface OnboardingStep1Props {
+interface OnboardingStep4Props {
   data: Partial<OnboardingData>;
-  onNext: (stepData: Partial<OnboardingData>) => void;
+  onComplete: (stepData: Partial<OnboardingData>) => void;
   onBack?: () => void;
 }
 
-const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack }) => {
-  const [firstName, setFirstName] = useState(data.firstName || '');
-  const [lastName, setLastName] = useState(data.lastName || '');
-  const [email, setEmail] = useState(data.email || '');
-  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; email?: string }>({});
+const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ data, onComplete, onBack }) => {
+  const [password, setPassword] = useState(data.password || '');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
 
   const validateForm = (): boolean => {
-    const newErrors: { firstName?: string; lastName?: string; email?: string } = {};
+    const newErrors: { password?: string; confirmPassword?: string } = {};
 
-    if (!firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
+    if (!password.trim()) {
+      newErrors.password = 'La contraseña es requerida';
+    } else if (!validatePassword(password)) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
 
-    if (!lastName.trim()) {
-      newErrors.lastName = 'El apellido es requerido';
-    }
-
-    if (!email.trim()) {
-      newErrors.email = 'El correo electrónico es requerido';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'El correo electrónico no es válido';
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = 'Confirma tu contraseña';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = () => {
+  const handleComplete = () => {
     if (!validateForm()) return;
 
-    onNext({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim().toLowerCase(),
+    onComplete({
+      password: password.trim(),
     });
   };
 
@@ -100,52 +95,65 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
             <View style={styles.header}>
               <View style={styles.stepIndicator}>
                 <View style={styles.stepCircle}>
-                  <Text style={styles.stepNumber}>1</Text>
+                  <Text style={styles.stepNumber}>4</Text>
                 </View>
-                <Text style={styles.stepText}>de 3</Text>
+                <Text style={styles.stepText}>de 4</Text>
               </View>
-              <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
+              <Text style={styles.title}>Crea tu contraseña</Text>
               <Text style={styles.subtitle}>
-                Comencemos con algunos datos básicos para personalizar tu experiencia
+                Protege tu cuenta con una contraseña segura
               </Text>
             </View>
             
-            {/* Formulario con mejor diseño */}
+            {/* Formulario principal */}
             <View style={styles.formContainer}>
               <View style={styles.form}>
                 <Input
-                  label="Nombre"
-                  placeholder="Ingresa tu nombre"
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  error={errors.firstName}
+                  label="Contraseña"
+                  placeholder="Mínimo 6 caracteres"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  error={errors.password}
                 />
                 
                 <Input
-                  label="Apellido"
-                  placeholder="Ingresa tu apellido"
-                  value={lastName}
-                  onChangeText={setLastName}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  error={errors.lastName}
-                />
-                
-                <Input
-                  label="Correo electrónico"
-                  placeholder="Ingresa tu email"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  error={errors.email}
+                  label="Confirmar contraseña"
+                  placeholder="Repite tu contraseña"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry
+                  error={errors.confirmPassword}
                 />
               </View>
+
+              {/* Consejos de contraseña con mejor diseño */}
+              <View style={styles.passwordTips}>
+                <View style={styles.tipsHeader}>
+                  <Text style={styles.tipsIcon}>🔒</Text>
+                  <Text style={styles.tipsTitle}>Consejos para una contraseña segura</Text>
+                </View>
+                <View style={styles.tipsList}>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>Usa al menos 6 caracteres</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>Combina letras y números</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>Evita información personal</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>•</Text>
+                    <Text style={styles.tipText}>No la compartas con nadie</Text>
+                  </View>
+                </View>
+              </View>
               
-              {/* Botones con mejor diseño */}
+              {/* Botones */}
               <View style={styles.buttonContainer}>
                 {onBack && (
                   <Button
@@ -156,9 +164,9 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
                   />
                 )}
                 <Button
-                  title="Continuar"
-                  onPress={handleNext}
-                  style={[styles.button, styles.nextButton]}
+                  title="Crear cuenta"
+                  onPress={handleComplete}
+                  style={[styles.button, styles.completeButton]}
                 />
               </View>
             </View>
@@ -248,6 +256,51 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: SIZES.xl,
   },
+  passwordTips: {
+    backgroundColor: COLORS.blue[50], // Azul muy claro
+    padding: SIZES.lg,
+    borderRadius: 12,
+    marginBottom: SIZES.xl,
+    borderWidth: 1,
+    borderColor: COLORS.blue[200], // Azul medio
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary, // Azul Suave
+  },
+  tipsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.md,
+  },
+  tipsIcon: {
+    fontSize: 20,
+    marginRight: SIZES.sm,
+  },
+  tipsTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.dark, // Negro Suave
+  },
+  tipsList: {
+    gap: SIZES.sm,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  tipBullet: {
+    fontSize: 16,
+    fontFamily: FONTS.regular,
+    color: COLORS.primary, // Azul Suave
+    marginRight: SIZES.sm,
+    marginTop: 2,
+  },
+  tipText: {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.gray,
+    flex: 1,
+    lineHeight: 20,
+  },
   buttonContainer: {
     flexDirection: 'row',
     gap: SIZES.md,
@@ -260,9 +313,9 @@ const styles = StyleSheet.create({
   backButton: {
     backgroundColor: COLORS.grayScale[200],
   },
-  nextButton: {
+  completeButton: {
     backgroundColor: '#3b82f6', // primary-500
   },
 });
 
-export default OnboardingStep1;
+export default OnboardingStep4;

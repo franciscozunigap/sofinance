@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { OnboardingData } from '../../types';
+import { OnboardingData, FinancialProfileTag } from '../../types';
 import { validatePassword } from '../../utils';
+import { FINANCIAL_PROFILE_TAGS, getTagsByCategory } from '../../constants';
 
 interface WebOnboardingStep3Props {
   data: Partial<OnboardingData>;
@@ -10,23 +11,14 @@ interface WebOnboardingStep3Props {
 }
 
 const WebOnboardingStep3: React.FC<WebOnboardingStep3Props> = ({ data, onComplete, onBack, loading = false }) => {
-  const [password, setPassword] = useState(data.password || '');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+  const [selectedTags, setSelectedTags] = useState<string[]>(data.financialProfile || []);
+  const [errors, setErrors] = useState<{ financialProfile?: string }>({});
 
   const validateForm = (): boolean => {
-    const newErrors: { password?: string; confirmPassword?: string } = {};
+    const newErrors: { financialProfile?: string } = {};
 
-    if (!password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
-    } else if (!validatePassword(password)) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
-    }
-
-    if (!confirmPassword.trim()) {
-      newErrors.confirmPassword = 'Confirma tu contraseña';
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (selectedTags.length === 0) {
+      newErrors.financialProfile = 'Selecciona al menos una característica de tu perfil financiero';
     }
 
     setErrors(newErrors);
@@ -37,76 +29,82 @@ const WebOnboardingStep3: React.FC<WebOnboardingStep3Props> = ({ data, onComplet
     if (!validateForm()) return;
 
     onComplete({
-      password: password.trim(),
+      financialProfile: selectedTags,
     });
   };
 
+  const toggleTag = (tagId: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  const isTagSelected = (tagId: string) => selectedTags.includes(tagId);
+
   return (
-    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-white py-8 px-6 shadow-xl rounded-xl">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl w-full space-y-8">
+        <div className="bg-white/80 backdrop-blur-sm py-8 px-6 shadow-xl rounded-2xl border border-white/20">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <span className="text-2xl font-bold text-primary-400">3</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl mb-4 border-2 border-blue-500">
+              <span className="text-2xl font-bold text-blue-500">3</span>
             </div>
-            <h2 className="text-3xl font-bold text-dark mb-2">Crea tu contraseña</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Perfil Financiero</h2>
             <p className="text-gray-600">
-              Protege tu cuenta con una contraseña segura
+              Cuéntanos sobre tus hábitos financieros para personalizar tu experiencia
             </p>
           </div>
 
           {/* Form */}
           <div className="space-y-6">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Mínimo 6 caracteres"
-                autoComplete="new-password"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            {/* Sección de perfil financiero */}
+            <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">👤 Perfil Financiero</h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Selecciona las características que mejor te describan
+              </p>
+              
+              {/* Etiquetas por categoría */}
+              {['gastos', 'ingresos', 'activos', 'responsabilidades'].map(category => {
+                const categoryTags = getTagsByCategory(category as FinancialProfileTag['category']);
+                const categoryLabels = {
+                  gastos: 'Gastos',
+                  ingresos: 'Ingresos', 
+                  activos: 'Activos',
+                  responsabilidades: 'Responsabilidades'
+                };
+                
+                return (
+                  <div key={category} className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {categoryLabels[category as keyof typeof categoryLabels]}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {categoryTags.map(tag => (
+                        <button
+                          key={tag.id}
+                          onClick={() => toggleTag(tag.id)}
+                          className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                            isTagSelected(tag.id)
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
+                              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-300'
+                          }`}
+                        >
+                          <span className="mr-2">{tag.icon}</span>
+                          {tag.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {errors.financialProfile && (
+                <p className="mt-2 text-sm text-red-600">{errors.financialProfile}</p>
               )}
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirmar contraseña
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Repite tu contraseña"
-                autoComplete="new-password"
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-              )}
-            </div>
-
-            {/* Consejos de contraseña */}
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded">
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Consejos para una contraseña segura:</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Usa al menos 6 caracteres</li>
-                <li>• Combina letras y números</li>
-                <li>• Evita información personal</li>
-                <li>• No la compartas con nadie</li>
-              </ul>
             </div>
 
             {/* Buttons */}
@@ -123,9 +121,9 @@ const WebOnboardingStep3: React.FC<WebOnboardingStep3Props> = ({ data, onComplet
               <button
                 onClick={handleComplete}
                 disabled={loading}
-                className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+                {loading ? 'Continuando...' : 'Continuar'}
               </button>
             </div>
           </div>

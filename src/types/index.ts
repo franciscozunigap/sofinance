@@ -37,9 +37,17 @@ export interface OnboardingData {
   savingsPercentage: number;
   needsPercentage: number;
   consumptionPercentage: number;
+  investmentPercentage: number;
   currentSavings: number;
   password: string;
-  financialProfile?: string;
+  financialProfile: string[];
+}
+
+export interface FinancialProfileTag {
+  id: string;
+  label: string;
+  category: 'gastos' | 'ingresos' | 'activos' | 'responsabilidades';
+  icon: string;
 }
 
 export interface FinancialData {

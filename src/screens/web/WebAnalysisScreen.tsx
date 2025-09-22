@@ -14,30 +14,66 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
   // Datos mock del usuario
   const userData = {
     name: user?.name || 'Usuario Demo',
-    monthlyIncome: user?.monthlyIncome || 4200,
+    monthlyIncome: user?.monthlyIncome || 420000,
     currentScore: user?.currentScore || 52,
     riskScore: user?.riskScore || 48,
-    monthlyExpenses: user?.monthlyExpenses || 3180,
-    currentSavings: user?.currentSavings || 12500,
-    savingsGoal: user?.savingsGoal || 18000,
+    monthlyExpenses: user?.monthlyExpenses || 318000,
+    currentSavings: user?.currentSavings || 1250000,
+    savingsGoal: user?.savingsGoal || 1800000,
     alerts: user?.alerts || 3,
     // Datos financieros mock
     financialData: {
-      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
-      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
     }
   };
 
-  // Datos para análisis financiero
+  // Datos para análisis financiero - Formato JSON con montos y porcentajes
   const monthlyTrend = [
-    { month: 'Ene', income: 4200, expenses: 3500, savings: 700 },
-    { month: 'Feb', income: 4200, expenses: 3200, savings: 1000 },
-    { month: 'Mar', income: 4200, expenses: 3800, savings: 400 },
-    { month: 'Abr', income: 4200, expenses: 3100, savings: 1100 },
-    { month: 'May', income: 4200, expenses: 3300, savings: 900 },
-    { month: 'Jun', income: 4200, expenses: 3180, savings: 1020 }
+    { 
+      month: 'Ene', 
+      consume: { amount: 120000, percent: 20 },
+      necesidades: { amount: 400000, percent: 40 },
+      ahorro: { amount: 20000, percent: 2 },
+      invest: { amount: 120000, percent: 10 }
+    },
+    { 
+      month: 'Feb', 
+      consume: { amount: 150000, percent: 25 },
+      necesidades: { amount: 350000, percent: 35 },
+      ahorro: { amount: 50000, percent: 5 },
+      invest: { amount: 100000, percent: 8 }
+    },
+    { 
+      month: 'Mar', 
+      consume: { amount: 100000, percent: 15 },
+      necesidades: { amount: 450000, percent: 45 },
+      ahorro: { amount: 30000, percent: 3 },
+      invest: { amount: 150000, percent: 12 }
+    },
+    { 
+      month: 'Abr', 
+      consume: { amount: 180000, percent: 30 },
+      necesidades: { amount: 300000, percent: 30 },
+      ahorro: { amount: 60000, percent: 6 },
+      invest: { amount: 120000, percent: 10 }
+    },
+    { 
+      month: 'May', 
+      consume: { amount: 140000, percent: 22 },
+      necesidades: { amount: 380000, percent: 38 },
+      ahorro: { amount: 40000, percent: 4 },
+      invest: { amount: 140000, percent: 11 }
+    },
+    { 
+      month: 'Jun', 
+      consume: { amount: 160000, percent: 26 },
+      necesidades: { amount: 360000, percent: 36 },
+      ahorro: { amount: 50000, percent: 5 },
+      invest: { amount: 130000, percent: 10 }
+    }
   ];
 
   const categoryAnalysis = [
@@ -58,6 +94,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
     { day: 'Sáb', amount: 450 },
     { day: 'Dom', amount: 180 }
   ];
+
 
   const financialGoals = [
     { name: 'Fondo de Emergencia', target: 10000, current: 8000, deadline: 'Dic 2024', priority: 'high' },
@@ -115,44 +152,75 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pb-32">
-      {/* Header Mejorado */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="slide-in-left">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Análisis Financiero
-              </h1>
-
+      {/* Header Mejorado con Métricas Dinámicas */}
+      <div className="bg-white/90 backdrop-blur-md shadow-xl border-b border-white/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Primera fila: Título y Botón + */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4 slide-in-left">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <BarChart3 className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 via-primary-600 to-gray-700 bg-clip-text text-transparent">
+                  Dashboard Financiero
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Última actualización: {new Date().toLocaleDateString('es-ES', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                  })}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center space-x-4 slide-in-right">
+            
+            {/* Botón + en la esquina superior derecha */}
+            <div className="slide-in-right">
               <button
                 onClick={() => setShowBalanceRegistration(true)}
-                className="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-2xl shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-xl"
+                className="w-12 h-12 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-2xl shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-xl"
                 title="Agregar movimiento"
               >
                 <span className="text-xl font-bold">+</span>
               </button>
-
+            </div>
+          </div>
+          
+          {/* Segunda fila: Métricas Rápidas */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-3 border border-primary-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-primary-700 mb-1">Saldo Actual</p>
+                  <p className="text-lg font-bold text-primary-800">
+                    ${userData.currentSavings.toLocaleString()}
+                  </p>
+                </div>
+                <PiggyBank className="h-5 w-5 text-primary-600" />
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-3 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-purple-700 mb-1">Ahorro Mensual</p>
+                  <p className="text-lg font-bold text-purple-800">
+                    {userData.financialData.ahorro.percentage}%
+                  </p>
+                </div>
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Monto Actual - Sección Superior */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 mb-8 border border-white/20">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Monto Actual</h2>
-            <div className="text-5xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent mb-2">
-              ${userData.currentSavings.toLocaleString()}
-            </div>
-          </div>
-        </div>
 
         {/* Montos y Análisis - Métricas Detalladas */}
         <div className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -176,16 +244,16 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
 
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in" style={{ animationDelay: '0.1s' }}>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                  <HomeIcon className="h-6 w-6 text-red-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <HomeIcon className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-red-600">{userData.financialData.necesidades.percentage}%</p>
+                  <p className="text-2xl font-bold text-blue-600">{userData.financialData.necesidades.percentage}%</p>
                   <p className="text-lg font-semibold text-gray-900">${userData.financialData.necesidades.amount.toLocaleString()}</p>
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-600 mb-2">Necesidades</p>
-              <div className={`flex items-center text-xs ${userData.financialData.necesidades.previousChange >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+              <div className={`flex items-center text-xs ${userData.financialData.necesidades.previousChange >= 0 ? 'text-blue-500' : 'text-green-500'}`}>
                 {userData.financialData.necesidades.previousChange >= 0 ? (
                   <TrendingUp className="h-3 w-3 mr-1" />
                 ) : (
@@ -198,36 +266,15 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in" style={{ animationDelay: '0.2s' }}>
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <PiggyBank className="h-6 w-6 text-green-600" />
+                  <TrendingUpIcon className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">{userData.financialData.ahorro.percentage}%</p>
-                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.ahorro.amount.toLocaleString()}</p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-gray-600 mb-2">Ahorro</p>
-              <div className={`flex items-center text-xs ${userData.financialData.ahorro.previousChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {userData.financialData.ahorro.previousChange >= 0 ? (
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                ) : (
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                )}
-                {userData.financialData.ahorro.previousChange >= 0 ? '+' : ''}{userData.financialData.ahorro.previousChange}% vs mes anterior
-              </div>
-            </div>
-
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in" style={{ animationDelay: '0.3s' }}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <TrendingUpIcon className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-purple-600">{userData.financialData.invertido.percentage}%</p>
+                  <p className="text-2xl font-bold text-green-600">{userData.financialData.invertido.percentage}%</p>
                   <p className="text-lg font-semibold text-gray-900">${userData.financialData.invertido.amount.toLocaleString()}</p>
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-600 mb-2">Invertido</p>
-              <div className={`flex items-center text-xs ${userData.financialData.invertido.previousChange >= 0 ? 'text-purple-500' : 'text-red-500'}`}>
+              <div className={`flex items-center text-xs ${userData.financialData.invertido.previousChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {userData.financialData.invertido.previousChange >= 0 ? (
                   <TrendingUp className="h-3 w-3 mr-1" />
                 ) : (
@@ -239,22 +286,43 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
           </div>
         </div>
 
+
         {/* Tendencias Últimos 6 Meses */}
         <div className="mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Tendencias Últimos 6 Meses</h3>
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
             {/* Tendencias Mensuales */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Evolución de Ingresos y Gastos</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Evolución de Categorías Financieras</h4>
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={monthlyTrend}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="income" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
-                  <Area type="monotone" dataKey="expenses" stackId="2" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
-                  <Area type="monotone" dataKey="savings" stackId="3" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                  <YAxis tickFormatter={(value) => `${value}%`} />
+                  <Tooltip 
+                    formatter={(value, name, props) => {
+                      const categoryName = name === 'consume' ? 'Consumo' :
+                                         name === 'necesidades' ? 'Necesidades' :
+                                         name === 'ahorro' ? 'Ahorro' :
+                                         name === 'invest' ? 'Inversión' : name;
+                      
+                      // Obtener el monto correspondiente
+                      const amount = props.payload[`${name}.amount`];
+                      
+                      // Verificar que amount existe antes de formatear
+                      const amountText = amount ? `$${amount.toLocaleString()}` : 'N/A';
+                      
+                      return [
+                        `${value}% (${amountText})`, 
+                        categoryName
+                      ];
+                    }}
+                    labelFormatter={(label) => `Mes: ${label}`}
+                  />
+                  <Area type="monotone" dataKey="consume.percent" stackId="1" stroke="#f97316" fill="#f97316" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="necesidades.percent" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="ahorro.percent" stackId="3" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="invest.percent" stackId="4" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

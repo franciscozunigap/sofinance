@@ -57,15 +57,15 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
   };
 
   return (
-    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white py-8 px-6 shadow-xl rounded-xl">
+        <div className="bg-white/80 backdrop-blur-sm py-8 px-6 shadow-xl rounded-2xl border border-white/20">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <span className="text-2xl font-bold text-primary-400">1</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl mb-4 border-2 border-blue-500">
+              <span className="text-2xl font-bold text-blue-500">1</span>
             </div>
-            <h2 className="text-3xl font-bold text-dark mb-2">¡Bienvenido a SoFinance!</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido a SoFinance!</h2>
             <p className="text-gray-600">
               Comencemos con algunos datos básicos para personalizar tu experiencia
             </p>
@@ -168,7 +168,7 @@ const WebOnboardingStep1: React.FC<WebOnboardingStep1Props> = ({ data, onNext, o
               )}
               <button
                 onClick={handleNext}
-                className="flex-1 bg-primary-400 text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-500 transition-colors"
+                className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
               >
                 Continuar
               </button>

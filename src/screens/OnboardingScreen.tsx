@@ -9,6 +9,7 @@ import { SafeAreaView, Animated } from '../platform';
 import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
+import OnboardingStep4 from './OnboardingStep4';
 import { OnboardingData } from '../types';
 import { AuthService } from '../services/authService';
 import { Alert } from '../platform';
@@ -35,7 +36,12 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
     setCurrentStep(3);
   };
 
-  const handleStep3Complete = async (stepData: Partial<OnboardingData>) => {
+  const handleStep3Next = (stepData: Partial<OnboardingData>) => {
+    setOnboardingData(prev => ({ ...prev, ...stepData }));
+    setCurrentStep(4);
+  };
+
+  const handleStep4Complete = async (stepData: Partial<OnboardingData>) => {
     const completeData = { ...onboardingData, ...stepData } as OnboardingData;
     
     setLoading(true);
@@ -50,7 +56,9 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
         savingsPercentage: completeData.savingsPercentage,
         needsPercentage: completeData.needsPercentage,
         consumptionPercentage: completeData.consumptionPercentage,
+        investmentPercentage: completeData.investmentPercentage,
         currentSavings: completeData.currentSavings,
+        financialProfile: completeData.financialProfile,
       });
       
       onComplete();

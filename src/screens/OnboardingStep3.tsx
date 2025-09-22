@@ -5,13 +5,14 @@ import {
   StyleSheet,
   Platform,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { COLORS, SIZES, FONTS } from '../constants';
+import { COLORS, SIZES, FONTS, FINANCIAL_PROFILE_TAGS, getTagsByCategory } from '../constants';
 import { validatePassword } from '../utils';
-import { OnboardingData } from '../types';
+import { OnboardingData, FinancialProfileTag } from '../types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,25 +23,16 @@ interface OnboardingStep3Props {
 }
 
 const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onBack }) => {
-  const [password, setPassword] = useState(data.password || '');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+  const [selectedTags, setSelectedTags] = useState<string[]>(data.financialProfile || []);
+  const [errors, setErrors] = useState<{ financialProfile?: string }>({});
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
 
   const validateForm = (): boolean => {
-    const newErrors: { password?: string; confirmPassword?: string } = {};
+    const newErrors: { financialProfile?: string } = {};
 
-    if (!password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
-    } else if (!validatePassword(password)) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
-    }
-
-    if (!confirmPassword.trim()) {
-      newErrors.confirmPassword = 'Confirma tu contraseña';
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (selectedTags.length === 0) {
+      newErrors.financialProfile = 'Selecciona al menos una característica de tu perfil financiero';
     }
 
     setErrors(newErrors);
@@ -51,9 +43,19 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
     if (!validateForm()) return;
 
     onComplete({
-      password: password.trim(),
+      financialProfile: selectedTags,
     });
   };
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  const isTagSelected = (tagId: string) => selectedTags.includes(tagId);
 
   React.useEffect(() => {
     Animated.parallel([
@@ -99,59 +101,63 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
                 </View>
                 <Text style={styles.stepText}>de 3</Text>
               </View>
-              <Text style={styles.title}>Crea tu contraseña</Text>
+              <Text style={styles.title}>Perfil Financiero</Text>
               <Text style={styles.subtitle}>
-                Protege tu cuenta con una contraseña segura
+                Cuéntanos sobre tus hábitos financieros para personalizar tu experiencia
               </Text>
             </View>
             
             {/* Formulario principal */}
             <View style={styles.formContainer}>
-              <View style={styles.form}>
-                <Input
-                  label="Contraseña"
-                  placeholder="Mínimo 6 caracteres"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  error={errors.password}
-                />
+              {/* Sección de perfil financiero */}
+              <View style={styles.profileSection}>
+                <Text style={styles.sectionTitle}>👤 Perfil Financiero</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Selecciona las características que mejor te describan
+                </Text>
                 
-                <Input
-                  label="Confirmar contraseña"
-                  placeholder="Repite tu contraseña"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
-                  error={errors.confirmPassword}
-                />
+                {/* Etiquetas por categoría */}
+                {['gastos', 'ingresos', 'activos', 'responsabilidades'].map(category => {
+                  const categoryTags = getTagsByCategory(category as FinancialProfileTag['category']);
+                  const categoryLabels = {
+                    gastos: 'Gastos',
+                    ingresos: 'Ingresos', 
+                    activos: 'Activos',
+                    responsabilidades: 'Responsabilidades'
+                  };
+                  
+                  return (
+                    <View key={category} style={styles.categorySection}>
+                      <Text style={styles.categoryTitle}>{categoryLabels[category as keyof typeof categoryLabels]}</Text>
+                      <View style={styles.tagsContainer}>
+                        {categoryTags.map(tag => (
+                          <TouchableOpacity
+                            key={tag.id}
+                            style={[
+                              styles.tag,
+                              isTagSelected(tag.id) && styles.tagSelected
+                            ]}
+                            onPress={() => toggleTag(tag.id)}
+                          >
+                            <Text style={styles.tagIcon}>{tag.icon}</Text>
+                            <Text style={[
+                              styles.tagText,
+                              isTagSelected(tag.id) && styles.tagTextSelected
+                            ]}>
+                              {tag.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  );
+                })}
+                
+                {errors.financialProfile && (
+                  <Text style={styles.errorText}>{errors.financialProfile}</Text>
+                )}
               </View>
-
-              {/* Consejos de contraseña con mejor diseño */}
-              <View style={styles.passwordTips}>
-                <View style={styles.tipsHeader}>
-                  <Text style={styles.tipsIcon}>🔒</Text>
-                  <Text style={styles.tipsTitle}>Consejos para una contraseña segura</Text>
-                </View>
-                <View style={styles.tipsList}>
-                  <View style={styles.tipItem}>
-                    <Text style={styles.tipBullet}>•</Text>
-                    <Text style={styles.tipText}>Usa al menos 6 caracteres</Text>
-                  </View>
-                  <View style={styles.tipItem}>
-                    <Text style={styles.tipBullet}>•</Text>
-                    <Text style={styles.tipText}>Combina letras y números</Text>
-                  </View>
-                  <View style={styles.tipItem}>
-                    <Text style={styles.tipBullet}>•</Text>
-                    <Text style={styles.tipText}>Evita información personal</Text>
-                  </View>
-                  <View style={styles.tipItem}>
-                    <Text style={styles.tipBullet}>•</Text>
-                    <Text style={styles.tipText}>No la compartas con nadie</Text>
-                  </View>
-                </View>
-              </View>
+            </View>
               
               {/* Botones */}
               <View style={styles.buttonContainer}>
@@ -164,7 +170,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
                   />
                 )}
                 <Button
-                  title="Crear cuenta"
+                  title="Continuar"
                   onPress={handleComplete}
                   style={[styles.button, styles.completeButton]}
                 />
@@ -207,7 +213,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.blue[100], // Azul claro
+    backgroundColor: '#eff6ff', // primary-50
+    borderWidth: 2,
+    borderColor: '#3b82f6', // primary-500
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.sm,
@@ -215,12 +223,12 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.primary, // Azul Suave
+    color: '#3b82f6', // primary-500
   },
   stepText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary, // Azul Suave
+    color: '#3b82f6', // primary-500
   },
   title: {
     fontSize: 32,
@@ -254,50 +262,69 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: SIZES.xl,
   },
-  passwordTips: {
-    backgroundColor: COLORS.blue[50], // Azul muy claro
-    padding: SIZES.lg,
-    borderRadius: 12,
+  profileSection: {
     marginBottom: SIZES.xl,
-    borderWidth: 1,
-    borderColor: COLORS.blue[200], // Azul medio
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary, // Azul Suave
   },
-  tipsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.dark,
     marginBottom: SIZES.md,
   },
-  tipsIcon: {
-    fontSize: 20,
-    marginRight: SIZES.sm,
-  },
-  tipsTitle: {
-    fontSize: 16,
-    fontFamily: FONTS.semiBold,
-    color: COLORS.dark, // Negro Suave
-  },
-  tipsList: {
-    gap: SIZES.sm,
-  },
-  tipItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  tipBullet: {
-    fontSize: 16,
-    fontFamily: FONTS.regular,
-    color: COLORS.primary, // Azul Suave
-    marginRight: SIZES.sm,
-    marginTop: 2,
-  },
-  tipText: {
+  sectionSubtitle: {
     fontSize: 14,
     fontFamily: FONTS.regular,
     color: COLORS.gray,
-    flex: 1,
+    marginBottom: SIZES.lg,
     lineHeight: 20,
+  },
+  categorySection: {
+    marginBottom: SIZES.lg,
+  },
+  categoryTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.medium,
+    color: COLORS.dark,
+    marginBottom: SIZES.sm,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SIZES.sm,
+  },
+  tag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.md,
+    paddingVertical: SIZES.sm,
+    backgroundColor: COLORS.grayScale[100],
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.grayScale[300],
+    marginBottom: SIZES.xs,
+  },
+  tagSelected: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  tagIcon: {
+    fontSize: 16,
+    marginRight: SIZES.xs,
+  },
+  tagText: {
+    fontSize: 14,
+    fontFamily: FONTS.medium,
+    color: COLORS.dark,
+  },
+  tagTextSelected: {
+    color: COLORS.white,
+  },
+  errorText: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: COLORS.danger,
+    textAlign: 'center',
+    marginTop: SIZES.sm,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -312,7 +339,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grayScale[200],
   },
   completeButton: {
-    backgroundColor: COLORS.primary, // Azul Suave
+    backgroundColor: '#3b82f6', // primary-500
   },
 });
 

@@ -23,9 +23,10 @@ interface OnboardingStep2Props {
 
 const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack }) => {
   const [monthlyIncome, setMonthlyIncome] = useState(data.monthlyIncome?.toString() || '');
-  const [savingsPercentage, setSavingsPercentage] = useState(data.savingsPercentage?.toString() || '20');
+  const [savingsPercentage, setSavingsPercentage] = useState(data.savingsPercentage?.toString() || '10');
   const [needsPercentage, setNeedsPercentage] = useState(data.needsPercentage?.toString() || '50');
   const [consumptionPercentage, setConsumptionPercentage] = useState(data.consumptionPercentage?.toString() || '30');
+  const [investmentPercentage, setInvestmentPercentage] = useState(data.investmentPercentage?.toString() || '10');
   const [currentSavings, setCurrentSavings] = useState(data.currentSavings?.toString() || '');
   
   const [errors, setErrors] = useState<{ 
@@ -33,6 +34,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
     savingsPercentage?: string; 
     needsPercentage?: string; 
     consumptionPercentage?: string; 
+    investmentPercentage?: string;
     currentSavings?: string;
     percentages?: string;
   }>({});
@@ -46,6 +48,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
       savingsPercentage?: string; 
       needsPercentage?: string; 
       consumptionPercentage?: string; 
+      investmentPercentage?: string;
       currentSavings?: string;
       percentages?: string;
     } = {};
@@ -64,6 +67,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
     const savings = parseFloat(savingsPercentage);
     const needs = parseFloat(needsPercentage);
     const consumption = parseFloat(consumptionPercentage);
+    const investment = parseFloat(investmentPercentage);
     
     if (isNaN(savings) || savings < 0 || savings > 100) {
       newErrors.savingsPercentage = 'Porcentaje inválido (0-100)';
@@ -74,16 +78,19 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
     if (isNaN(consumption) || consumption < 0 || consumption > 100) {
       newErrors.consumptionPercentage = 'Porcentaje inválido (0-100)';
     }
+    if (isNaN(investment) || investment < 0 || investment > 100) {
+      newErrors.investmentPercentage = 'Porcentaje inválido (0-100)';
+    }
 
     // Validar que los porcentajes sumen 100%
-    const totalPercentage = savings + needs + consumption;
+    const totalPercentage = savings + needs + consumption + investment;
     if (Math.abs(totalPercentage - 100) > 0.1) {
       newErrors.percentages = 'Los porcentajes deben sumar exactamente 100%';
     }
 
-    // Validar ahorro actual
+    // Validar monto actual
     if (!currentSavings.trim()) {
-      newErrors.currentSavings = 'El monto de ahorro actual es requerido';
+      newErrors.currentSavings = 'El monto actual es requerido';
     } else {
       const savings = parseFloat(currentSavings);
       if (isNaN(savings) || savings < 0) {
@@ -103,14 +110,16 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
       savingsPercentage: parseFloat(savingsPercentage),
       needsPercentage: parseFloat(needsPercentage),
       consumptionPercentage: parseFloat(consumptionPercentage),
+      investmentPercentage: parseFloat(investmentPercentage),
       currentSavings: parseFloat(currentSavings),
     });
   };
 
   const applyRecommendedPercentages = () => {
-    setSavingsPercentage('20');
+    setSavingsPercentage('10');
     setNeedsPercentage('50');
     setConsumptionPercentage('30');
+    setInvestmentPercentage('10');
   };
 
   React.useEffect(() => {
@@ -173,16 +182,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                 </View>
                 
                 <Input
-                  label="Ingreso mensual (CLP)"
-                  placeholder="Ej: 800000"
-                  value={monthlyIncome}
-                  onChangeText={setMonthlyIncome}
-                  keyboardType="numeric"
-                  error={errors.monthlyIncome}
-                />
-                
-                <Input
-                  label="Ahorro actual (CLP)"
+                  label="Monto actual (CLP)"
                   placeholder="Ej: 500000"
                   value={currentSavings}
                   onChangeText={setCurrentSavings}
@@ -198,8 +198,18 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   <Text style={styles.sectionTitle}>Distribución de Gastos</Text>
                 </View>
                 <Text style={styles.sectionSubtitle}>
-                  Ajusta los porcentajes según tus prioridades financieras
+                  Ingresa tu total de ingreso y ajusta los porcentajes según tus prioridades financieras
                 </Text>
+                
+                <Input
+                  label="Total de ingreso mensual (CLP)"
+                  placeholder="Ej: 800000"
+                  value={monthlyIncome}
+                  onChangeText={setMonthlyIncome}
+                  keyboardType="numeric"
+                  error={errors.monthlyIncome}
+                  style={styles.incomeInput}
+                />
                 
 
 
@@ -209,9 +219,14 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   <View style={styles.sliderItem}>
                     <View style={styles.sliderHeader}>
                       <Text style={styles.sliderLabel}>💚 Ahorro</Text>
-                      <Text style={[styles.sliderValue, { color: '#10b981' }]}>
-                        {savingsPercentage}%
-                      </Text>
+                      <View style={styles.sliderValueContainer}>
+                        <Text style={[styles.sliderValue, { color: '#10b981' }]}>
+                          {savingsPercentage}%
+                        </Text>
+                        <Text style={styles.sliderAmount}>
+                          ${Math.round((parseFloat(monthlyIncome) || 0) * parseFloat(savingsPercentage) / 100).toLocaleString()}
+                        </Text>
+                      </View>
                     </View>
                     <CustomSlider
                       style={styles.slider}
@@ -233,9 +248,14 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   <View style={styles.sliderItem}>
                     <View style={styles.sliderHeader}>
                       <Text style={styles.sliderLabel}>🏠 Necesidades</Text>
-                      <Text style={[styles.sliderValue, { color: '#ea580c' }]}>
-                        {needsPercentage}%
-                      </Text>
+                      <View style={styles.sliderValueContainer}>
+                        <Text style={[styles.sliderValue, { color: '#ea580c' }]}>
+                          {needsPercentage}%
+                        </Text>
+                        <Text style={styles.sliderAmount}>
+                          ${Math.round((parseFloat(monthlyIncome) || 0) * parseFloat(needsPercentage) / 100).toLocaleString()}
+                        </Text>
+                      </View>
                     </View>
                     <CustomSlider
                       style={styles.slider}
@@ -257,9 +277,14 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   <View style={styles.sliderItem}>
                     <View style={styles.sliderHeader}>
                       <Text style={styles.sliderLabel}>🛍️ Consumo</Text>
-                      <Text style={[styles.sliderValue, { color: '#3b82f6' }]}>
-                        {consumptionPercentage}%
-                      </Text>
+                      <View style={styles.sliderValueContainer}>
+                        <Text style={[styles.sliderValue, { color: '#3b82f6' }]}>
+                          {consumptionPercentage}%
+                        </Text>
+                        <Text style={styles.sliderAmount}>
+                          ${Math.round((parseFloat(monthlyIncome) || 0) * parseFloat(consumptionPercentage) / 100).toLocaleString()}
+                        </Text>
+                      </View>
                     </View>
                     <CustomSlider
                       style={styles.slider}
@@ -276,6 +301,35 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                       <Text style={styles.rangeText}>100%</Text>
                     </View>
                   </View>
+
+                  {/* Inversión */}
+                  <View style={styles.sliderItem}>
+                    <View style={styles.sliderHeader}>
+                      <Text style={styles.sliderLabel}>📈 Inversión</Text>
+                      <View style={styles.sliderValueContainer}>
+                        <Text style={[styles.sliderValue, { color: '#8b5cf6' }]}>
+                          {investmentPercentage}%
+                        </Text>
+                        <Text style={styles.sliderAmount}>
+                          ${Math.round((parseFloat(monthlyIncome) || 0) * parseFloat(investmentPercentage) / 100).toLocaleString()}
+                        </Text>
+                      </View>
+                    </View>
+                    <CustomSlider
+                      style={styles.slider}
+                      minimumValue={0}
+                      maximumValue={100}
+                      value={parseFloat(investmentPercentage)}
+                      onValueChange={(value) => setInvestmentPercentage(value.toString())}
+                      minimumTrackTintColor="#8b5cf6"
+                      maximumTrackTintColor="#e5e7eb"
+                      thumbTintColor="#8b5cf6"
+                    />
+                    <View style={styles.sliderRange}>
+                      <Text style={styles.rangeText}>0%</Text>
+                      <Text style={styles.rangeText}>100%</Text>
+                    </View>
+                  </View>
                 </View>
 
                 {/* Indicador del total */}
@@ -285,12 +339,12 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                     <Text style={[
                       styles.totalValue,
                       {
-                        color: Math.abs(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) - 100) < 0.1 
+                        color: Math.abs(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) + parseFloat(investmentPercentage) - 100) < 0.1 
                           ? '#10b981' 
                           : '#ef4444'
                       }
                     ]}>
-                      {Math.round(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage))}%
+                      {Math.round(parseFloat(savingsPercentage) + parseFloat(needsPercentage) + parseFloat(consumptionPercentage) + parseFloat(investmentPercentage))}%
                     </Text>
                   </View>
                 </View>
@@ -361,7 +415,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.blue[100],
+    backgroundColor: '#eff6ff', // primary-50
+    borderWidth: 2,
+    borderColor: '#3b82f6', // primary-500
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.sm,
@@ -369,12 +425,12 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.primary,
+    color: '#3b82f6', // primary-500
   },
   stepText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: '#3b82f6', // primary-500
   },
   title: {
     fontSize: 32,
@@ -529,7 +585,19 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grayScale[200],
   },
   nextButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#3b82f6', // primary-500
+  },
+  incomeInput: {
+    marginBottom: SIZES.lg,
+  },
+  sliderValueContainer: {
+    alignItems: 'flex-end',
+  },
+  sliderAmount: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: COLORS.gray,
+    marginTop: 2,
   },
 });
 
