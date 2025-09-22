@@ -245,8 +245,8 @@ const WebDashboardScreen = () => {
         minHeight: '256px', 
         maxHeight: '320px'
       }}>
-        {/* Gradiente de fondo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
+        {/* Gradiente de fondo alineado con el tema */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primaryIntense"></div>
         
         {/* Patrón decorativo */}
         <div className="absolute inset-0 opacity-10">
@@ -328,7 +328,7 @@ const WebDashboardScreen = () => {
               }}
             />
             {/* Overlay para integrar mejor con el fondo */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 via-transparent to-primary-600/20"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 via-transparent to-primaryIntense/20"></div>
           </div>
         </div>
 
@@ -388,43 +388,43 @@ const WebDashboardScreen = () => {
         {/* Grid de Métricas - Solo Porcentajes con Iconos */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <ShoppingCart className="h-6 w-6 text-orange-600" />
+            <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <ShoppingCart className="h-6 w-6 text-warning" />
             </div>
-            <div className="text-3xl font-bold text-orange-600 mb-1">{financialData.consumo.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Consumo</p>
+            <div className="text-3xl font-bold text-warning mb-1">{financialData.consumo.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Consumo</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <HomeIcon className="h-6 w-6 text-red-600" />
+            <div className="w-12 h-12 bg-primaryIntense/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <HomeIcon className="h-6 w-6 text-primaryIntense" />
             </div>
-            <div className="text-3xl font-bold text-red-600 mb-1">{financialData.necesidades.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Necesidades</p>
+            <div className="text-3xl font-bold text-primaryIntense mb-1">{financialData.necesidades.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Necesidades</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <PiggyBank className="h-6 w-6 text-green-600" />
+            <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <PiggyBank className="h-6 w-6 text-success" />
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-1">{financialData.disponible.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Ahorro</p>
+            <div className="text-3xl font-bold text-success mb-1">{financialData.disponible.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Ahorro</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <TrendingUpIcon className="h-6 w-6 text-purple-600" />
+            <div className="w-12 h-12 bg-primary-400/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <TrendingUpIcon className="h-6 w-6 text-primary-400" />
             </div>
-            <div className="text-3xl font-bold text-purple-600 mb-1">{financialData.invertido.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Invertido</p>
+            <div className="text-3xl font-bold text-primary-400 mb-1">{financialData.invertido.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Invertido</p>
           </div>
         </div>
 
         {/* Lista de Registros Mejorada */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Registros Recientes</h3>
-            <button className="text-primary-400 hover:text-primary-500 text-sm font-medium flex items-center">
+            <h3 className="text-lg font-semibold text-dark">Registros Recientes</h3>
+            <button className="text-primary-400 hover:text-primaryIntense text-sm font-medium flex items-center">
               Ver todos
               <ChevronRight className="h-4 w-4 ml-1" />
             </button>
@@ -441,17 +441,17 @@ const WebDashboardScreen = () => {
                     transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
                   } group-hover:scale-110 transition-transform duration-200`}>
                     <DollarSign className={`h-6 w-6 ${
-                      transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                      transaction.amount > 0 ? 'text-success' : 'text-danger'
                     }`} />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{transaction.description}</p>
+                    <p className="font-semibold text-dark">{transaction.description}</p>
                     <p className="text-sm text-gray-500">{transaction.category} • {transaction.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className={`text-lg font-bold ${
-                    transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                    transaction.amount > 0 ? 'text-success' : 'text-danger'
                   }`}>
                     {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
                   </p>

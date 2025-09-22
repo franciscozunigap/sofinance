@@ -312,8 +312,8 @@ const SofinanceAppContent = () => {
     >
       {/* Header Mejorado con Gradiente */}
       <div className="relative w-full h-64 lg:h-80 overflow-hidden">
-        {/* Gradiente de fondo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
+        {/* Gradiente de fondo alineado con el tema */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primaryIntense"></div>
         
         {/* Patrón decorativo */}
         <div className="absolute inset-0 opacity-10">
@@ -372,12 +372,12 @@ const SofinanceAppContent = () => {
         </div>
 
         {/* Disponible en pesos chilenos */}
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 mb-6 text-center">
+        <div className="bg-gradient-to-r from-primary-400 to-primaryIntense rounded-2xl shadow-xl p-6 mb-6 text-center">
           <h3 className="text-lg font-semibold text-white mb-2">Disponible</h3>
           <div className="text-4xl font-bold text-white">
             {formatChileanPeso(financialData.disponible.amount)}
           </div>
-          <p className="text-purple-100 text-sm mt-1">
+          <p className="text-primary-100 text-sm mt-1">
             {financialData.disponible.percentage}% de tus ingresos
           </p>
         </div>
@@ -385,20 +385,20 @@ const SofinanceAppContent = () => {
         {/* Grid de Porcentajes - 3 columnas */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-orange-600 mb-1">{financialData.consumo.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Consumo</p>
+            <div className="text-3xl font-bold text-warning mb-1">{financialData.consumo.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Consumo</p>
             <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.consumo.amount)}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-blue-600 mb-1">{financialData.necesidades.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Necesidades</p>
+            <div className="text-3xl font-bold text-primaryIntense mb-1">{financialData.necesidades.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Necesidades</p>
             <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.necesidades.amount)}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-green-600 mb-1">{financialData.invertido.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Invertido</p>
+            <div className="text-3xl font-bold text-success mb-1">{financialData.invertido.percentage}%</div>
+            <p className="text-sm font-medium text-dark">Invertido</p>
             <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.invertido.amount)}</p>
           </div>
         </div>
@@ -406,10 +406,10 @@ const SofinanceAppContent = () => {
         {/* Lista de Registros Mejorada */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Registros Recientes</h3>
+            <h3 className="text-lg font-semibold text-dark">Registros Recientes</h3>
             <button 
               onClick={() => setIsAllTransactionsModalOpen(true)}
-              className="text-primary-400 hover:text-primary-500 text-sm font-medium flex items-center transition-colors"
+              className="text-primary-400 hover:text-primaryIntense text-sm font-medium flex items-center transition-colors"
             >
               Ver todos
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -427,17 +427,17 @@ const SofinanceAppContent = () => {
                     transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
                   } group-hover:scale-110 transition-transform duration-200`}>
                     <DollarSign className={`h-6 w-6 ${
-                      transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                      transaction.amount > 0 ? 'text-success' : 'text-danger'
                     }`} />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{transaction.description}</p>
+                    <p className="font-semibold text-dark">{transaction.description}</p>
                     <p className="text-sm text-gray-500">{transaction.category} • {transaction.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className={`text-lg font-bold ${
-                    transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                    transaction.amount > 0 ? 'text-success' : 'text-danger'
                   }`}>
                     {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
                   </p>

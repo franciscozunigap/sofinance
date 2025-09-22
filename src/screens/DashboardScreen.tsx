@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   // Avatar Header styles - mejorado para coincidir con web
   avatarHeader: {
     height: 256, // Aumentado para coincidir con web (h-64 = 256px)
-    backgroundColor: '#6B73FF',
+    backgroundColor: COLORS.primary, // Usar color primario del tema
     position: 'relative',
     overflow: 'hidden',
   },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#6B73FF', // Color base
+    backgroundColor: COLORS.primary, // Usar color primario del tema
     // En React Native no podemos usar gradientes CSS directamente, 
     // pero podemos simular el efecto con múltiples capas
   },
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(107, 115, 255, 0.05)', // Reducido aún más para mayor solidez
+    backgroundColor: COLORS.primary + '0D', // Usar color primario con transparencia
     borderRadius: 0,
   },
   // Main content overlay - igual que web
