@@ -103,7 +103,7 @@ const FloatingNavBar: React.FC<FloatingNavBarProps> = ({ currentView, onViewChan
               color={currentView === 'analysis' ? COLORS.white : COLORS.gray}
             />
             <Text style={[styles.floatingNavLabel, currentView === 'analysis' && styles.floatingNavLabelActive]}>
-              Análisis
+              Dashboard
             </Text>
           </TouchableOpacity>
         </Animated.View>

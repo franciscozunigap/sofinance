@@ -19,9 +19,9 @@ const FloatingNavigationPanel: React.FC<FloatingNavigationPanelProps> = ({
     },
     {
       id: 'analysis',
-      label: 'Análisis',
+      label: 'Dashboard',
       icon: BarChart3,
-      description: 'Análisis detallado'
+      description: 'Dashboard detallado'
     },
     {
       id: 'sofia',

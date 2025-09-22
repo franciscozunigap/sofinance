@@ -191,7 +191,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                   <BarChart3 size={24} color={COLORS.white} />
                 </View>
                 <View style={styles.headerTextContainer}>
-                  <Text style={styles.enhancedHeaderTitle}>Dashboard Financiero</Text>
+                  <Text style={styles.enhancedHeaderTitle}>Dashboard</Text>
                   <Text style={styles.enhancedHeaderSubtitle}>
                     Última actualización: {new Date().toLocaleDateString('es-ES', { 
                       day: 'numeric', 
@@ -233,7 +233,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
           </View>
         </View>
 
-        {/* Montos y Análisis - Ahorro, Consumo, Necesidades, Invertido */}
+        {/* Montos y Dashboard - Ahorro, Consumo, Necesidades, Invertido */}
         <View style={styles.verticalMetricsContainer}>
           <View style={styles.verticalMetricCard}>
             <View style={styles.verticalMetricHeader}>

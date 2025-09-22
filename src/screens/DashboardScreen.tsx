@@ -227,7 +227,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           <View style={styles.titleSection}>
             <Text style={styles.mainTitle}>¡Qué bien lo estás haciendo!</Text>
             <Text style={styles.mainDescription}>
-            Hoy mantuviste tus gastos bajo control. Cada vez que tus ingresos superan tus gastos, estás construyendo una base más fuerte para tu libertad financiera. ¡Un gran paso!
+               Vas super bien, tus gastos no han excedido tus ingresos, lo que significa que estas ahorrando dinero. No hay problemas.
             </Text>
           </View>
 
@@ -432,10 +432,10 @@ const styles = StyleSheet.create({
     marginVertical: SIZES.lg,
   },
   welcomeTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.dark, // Negro Suave
-    marginBottom: SIZES.xs,
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.gray,
+    marginBottom: -10,
   },
   welcomeSubtitle: {
     fontSize: 16,
