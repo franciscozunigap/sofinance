@@ -1,6 +1,6 @@
 import React from 'react';
-import { Slider } from '@react-native-community/slider';
 import { View, StyleSheet, ViewStyle } from 'react-native';
+import Slider from '@react-native-community/slider';
 
 interface CustomSliderProps {
   style?: ViewStyle;

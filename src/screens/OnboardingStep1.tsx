@@ -6,7 +6,8 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import { KeyboardAvoidingView, ScrollView, Animated } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
@@ -25,12 +26,13 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
   const [firstName, setFirstName] = useState(data.firstName || '');
   const [lastName, setLastName] = useState(data.lastName || '');
   const [email, setEmail] = useState(data.email || '');
-  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; email?: string }>({});
+  const [age, setAge] = useState(data.age?.toString() || '');
+  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; email?: string; age?: string }>({});
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
 
   const validateForm = (): boolean => {
-    const newErrors: { firstName?: string; lastName?: string; email?: string } = {};
+    const newErrors: { firstName?: string; lastName?: string; email?: string; age?: string } = {};
 
     if (!firstName.trim()) {
       newErrors.firstName = 'El nombre es requerido';
@@ -46,6 +48,15 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
       newErrors.email = 'El correo electrónico no es válido';
     }
 
+    if (!age.trim()) {
+      newErrors.age = 'La edad es requerida';
+    } else {
+      const ageNum = parseInt(age);
+      if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+        newErrors.age = 'La edad debe ser entre 18 y 100 años';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -57,6 +68,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: email.trim().toLowerCase(),
+      age: parseInt(age),
     });
   };
 
@@ -142,6 +154,16 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
                   autoCapitalize="none"
                   autoCorrect={false}
                   error={errors.email}
+                />
+                
+                <Input
+                  label="Edad"
+                  placeholder="Ingresa tu edad"
+                  value={age}
+                  onChangeText={setAge}
+                  keyboardType="numeric"
+                  autoCorrect={false}
+                  error={errors.age}
                 />
               </View>
               

@@ -6,8 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from '../platform';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
@@ -135,7 +136,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Main Content con superposición */}
       <View style={styles.mainContentOverlay}>
         {/* Header */}
@@ -419,9 +420,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: -5, // Aumentado para cubrir completamente el área
     zIndex: 10,
-    marginBottom: -120,
+    marginBottom: Platform.OS === 'ios' ? -100 : -120,
     width: '100%',
-    paddingBottom: 100, // Aumentado para evitar que el navegador flotante tape el contenido
+    paddingBottom: Platform.OS === 'ios' ? 120 : 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
   header: {
     backgroundColor: COLORS.white, // Fondo blanco sólido sobre el gris

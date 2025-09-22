@@ -8,8 +8,9 @@ import {
   Dimensions,
   Image,
   Animated,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from '../platform';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
 import { COLORS, SIZES, BORDER_RADIUS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,7 +31,7 @@ import {
 import { useViewNavigation } from '../hooks/useViewNavigation';
 import { useChat } from '../hooks/useChat';
 import { getScoreStatus } from '../utils/financialUtils';
-import { DollarSign } from 'lucide-react-native';
+import { isIOS, floatingNavConfig, safeAreaInsets } from '../platform/ios';
 
 const { width } = Dimensions.get('window');
 
@@ -127,7 +128,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header con Avatar */}
       <View style={styles.avatarHeader}>
         <View style={styles.avatarHeaderContent}>
@@ -355,9 +356,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: -5, // Aumentado para cubrir completamente el área del avatar
     zIndex: 10,
-    marginBottom: -120,
+    marginBottom: isIOS ? -100 : -120,
     width: '100%',
-    paddingBottom: 100, // Aumentado para evitar que el navegador flotante tape el contenido
+    paddingBottom: isIOS ? 120 : 100, // Aumentado para evitar que el navegador flotante tape el contenido
   },
   // Main content styles
   mainContent: {

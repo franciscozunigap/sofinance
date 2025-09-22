@@ -6,7 +6,8 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import { KeyboardAvoidingView, ScrollView, Animated } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomSlider from '../components/CustomSlider';
 import Input from '../components/Input';
 import Button from '../components/Button';

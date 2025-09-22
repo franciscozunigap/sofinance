@@ -5,12 +5,12 @@ import {
   StatusBar, 
   Alert, 
   ActivityIndicator, 
-  SafeAreaView,
   KeyboardAvoidingView,
   ScrollView,
   Animated,
   RefreshControl
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export { 
   Platform, 
@@ -24,3 +24,6 @@ export {
   Animated,
   RefreshControl
 };
+
+// Exportar configuración específica de iOS
+export * from './ios';

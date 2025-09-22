@@ -4,14 +4,15 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import { StatusBar, ActivityIndicator } from './src/platform';
+import { View, Text, StyleSheet, Platform, StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import WebAppNavigator from './src/navigation/WebAppNavigator';
 import { AuthService } from './src/services/authService';
 import { COLORS } from './src/constants';
 import { UserProvider } from './src/contexts/UserContext';
 import { testFirebaseConfig } from './src/firebase/testConnection';
+import IOSStatusBar from './src/components/IOSStatusBar';
 
 // Componente de carga
 const LoadingScreen = ({ firebaseReady }: { firebaseReady: boolean }) => (
@@ -29,11 +30,9 @@ const LoadingScreen = ({ firebaseReady }: { firebaseReady: boolean }) => (
           ⚠️ Verificando configuración de Firebase
         </Text>
       )}
-      <ActivityIndicator 
-        size="large" 
-        color={COLORS.primary} 
-        style={styles.loadingSpinner}
-      />
+      <View style={styles.loadingSpinner}>
+        <View style={styles.spinner} />
+      </View>
     </View>
   </View>
 );
@@ -93,11 +92,7 @@ const AppContent = () => {
 
   return (
     <>
-      <StatusBar 
-        barStyle="dark-content" 
-        backgroundColor={COLORS.light} 
-        translucent={false}
-      />
+      <IOSStatusBar />
       {Platform.OS === 'web' ? (
         <WebAppNavigator
           isLoggedIn={isLoggedIn}
@@ -119,9 +114,11 @@ const AppContent = () => {
 
 function App(): JSX.Element {
   return (
-    <UserProvider>
-      <AppContent />
-    </UserProvider>
+    <SafeAreaProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </SafeAreaProvider>
   );
 }
 
@@ -170,6 +167,16 @@ const styles = StyleSheet.create({
   },
   loadingSpinner: {
     marginTop: 16,
+  },
+  spinner: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: COLORS.lightGray,
+    borderTopColor: COLORS.primary,
+    // Animación de rotación
+    transform: [{ rotate: '0deg' }],
   },
   warningText: {
     fontSize: 14,

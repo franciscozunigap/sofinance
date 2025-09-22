@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants';
+import { isIOS, floatingNavConfig } from '../platform/ios';
 
 interface FloatingNavBarProps {
   currentView: 'dashboard' | 'analysis' | 'chat';
@@ -147,7 +148,7 @@ const FloatingNavBar: React.FC<FloatingNavBarProps> = ({ currentView, onViewChan
 const styles = StyleSheet.create({
   floatingNavContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: floatingNavConfig.bottomOffset, // Ajuste para el home indicator de iOS
     left: 16,
     right: 16,
     alignItems: 'center',

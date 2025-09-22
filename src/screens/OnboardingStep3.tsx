@@ -7,7 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView, KeyboardAvoidingView, ScrollView, Animated } from '../platform';
+import { KeyboardAvoidingView, ScrollView, Animated } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS, FINANCIAL_PROFILE_TAGS, getTagsByCategory } from '../constants';
@@ -157,7 +158,6 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
                   <Text style={styles.errorText}>{errors.financialProfile}</Text>
                 )}
               </View>
-            </View>
               
               {/* Botones */}
               <View style={styles.buttonContainer}>

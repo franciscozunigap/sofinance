@@ -5,7 +5,8 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView, Animated } from '../platform';
+import { Animated } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
@@ -110,8 +111,17 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
         return (
           <OnboardingStep3
             data={onboardingData}
-            onComplete={handleStep3Complete}
+            onComplete={handleStep3Next}
             onBack={handleBack}
+          />
+        );
+      case 4:
+        return (
+          <OnboardingStep4
+            data={onboardingData}
+            onComplete={handleStep4Complete}
+            onBack={handleBack}
+            loading={loading}
           />
         );
       default:
