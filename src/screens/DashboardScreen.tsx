@@ -30,7 +30,9 @@ import {
 } from '../data/mockData';
 import { useViewNavigation } from '../hooks/useViewNavigation';
 import { useChat } from '../hooks/useChat';
+import { useBalance } from '../hooks/useBalance';
 import { getScoreStatus } from '../utils/financialUtils';
+import { formatChileanPeso } from '../utils/currencyUtils';
 import { isIOS, floatingNavConfig, safeAreaInsets } from '../platform/ios';
 
 const { width } = Dimensions.get('window');
@@ -43,36 +45,83 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { user } = useUser();
   const { currentView, navigateTo, goBack } = useViewNavigation();
   const { messages: chatMessages, input: chatInput, setInput: setChatInput, sendMessage: handleSendMessage } = useChat();
+  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading } = useBalance(user?.id || 'user-id');
   const [scrollY] = useState(new Animated.Value(0));
   const [isUserDataLoading, setIsUserDataLoading] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(1));
 
   // Datos del usuario desde el contexto
-  const userData = user || {
-    ...MOCK_USER_DATA,
-    // Datos financieros mejorados como en la versión web (en pesos chilenos)
+  const userData = user ? {
+    name: user.name || user.firstName || 'Usuario',
+    firstName: user.firstName || '',
+    monthlyIncome: user.monthlyIncome || user.wallet?.monthly_income || 0,
+    currentScore: user.currentScore || 0,
+    riskScore: user.riskScore || 0,
+    monthlyExpenses: monthlyStats?.totalExpenses || user.monthlyExpenses || 0,
+    currentSavings: currentBalance || user.currentSavings || user.wallet?.amount || 0,
+    savingsGoal: user.savingsGoal || 0,
+    alerts: user.alerts || 0,
+    financialData: monthlyStats ? {
+      consumo: { 
+        percentage: monthlyStats.percentages.wants, 
+        amount: monthlyStats.totalExpenses * 0.4, 
+        previousChange: 0 
+      },
+      necesidades: { 
+        percentage: monthlyStats.percentages.needs, 
+        amount: monthlyStats.totalExpenses * 0.6, 
+        previousChange: 0 
+      },
+      disponible: { 
+        percentage: monthlyStats.percentages.savings, 
+        amount: monthlyStats.balance * (monthlyStats.percentages.savings / 100), 
+        previousChange: 0 
+      },
+      invertido: { 
+        percentage: monthlyStats.percentages.investment, 
+        amount: monthlyStats.balance * (monthlyStats.percentages.investment / 100), 
+        previousChange: 0 
+      }
+    } : {
+      consumo: { percentage: 0, amount: 0, previousChange: 0 },
+      necesidades: { percentage: 0, amount: 0, previousChange: 0 },
+      disponible: { percentage: 0, amount: 0, previousChange: 0 },
+      invertido: { percentage: 0, amount: 0, previousChange: 0 }
+    }
+  } : {
+    name: 'Usuario',
+    firstName: '',
+    monthlyIncome: 0,
+    currentScore: 0,
+    riskScore: 0,
+    monthlyExpenses: 0,
+    currentSavings: 0,
+    savingsGoal: 0,
+    alerts: 0,
     financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
+      consumo: { percentage: 0, amount: 0, previousChange: 0 },
+      necesidades: { percentage: 0, amount: 0, previousChange: 0 },
+      disponible: { percentage: 0, amount: 0, previousChange: 0 },
+      invertido: { percentage: 0, amount: 0, previousChange: 0 }
     }
   };
 
-  // Datos de balance diario para los últimos 4 días (en pesos chilenos) - igual que en web
-  const balanceData = [
-    // Lunes - Verde (dentro del rango seguro)
-    { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Martes - Verde (dentro del rango seguro)
-    { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Miércoles - Amarillo (por debajo del rango inferior)
-    { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Jueves - Verde (dentro del rango seguro)
-    { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
-  ];
+  // Datos de balance diario - usar datos reales si están disponibles
+  const balanceData = balanceHistory.length > 0 ? 
+    balanceHistory.slice(0, 7).map((registration, index) => ({
+      date: registration.date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' }),
+      amount: registration.balanceAfter,
+      upper_amount: registration.balanceAfter * 1.2,
+      lower_amount: registration.balanceAfter * 0.8,
+    })) : monthlyStats ? [
+      { date: 'Hoy', amount: currentBalance, upper_amount: currentBalance * 1.2, lower_amount: currentBalance * 0.8 },
+    ] : [
+      // Datos de ejemplo si no hay datos reales
+      { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
+      { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
+      { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
+      { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+    ];
 
   // Simular carga de datos del usuario
   useEffect(() => {
@@ -224,21 +273,18 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           )}
           scrollEventThrottle={16}
         >
-          {/* Bienvenida */}
-          <View style={styles.welcomeSection}>
-            {isUserDataLoading ? (
-              <SkeletonLoader width={200} height={24} borderRadius={12} />
+          {/* Saldo actual */}
+          <View style={styles.balanceSection}>
+            {isUserDataLoading || balanceLoading ? (
+              <SkeletonLoader width={200} height={60} borderRadius={12} />
             ) : (
-              <Text style={styles.welcomeTitle}>¡Hola {userData.name}! 👋</Text>
+              <>
+                <Text style={styles.balanceLabel}>Saldo Actual</Text>
+                <Text style={styles.balanceAmount}>
+                  {formatChileanPeso(currentBalance)}
+                </Text>
+              </>
             )}
-          </View>
-
-          {/* Título y descripción principal */}
-          <View style={styles.titleSection}>
-            <Text style={styles.mainTitle}>¡Qué bien lo estás haciendo!</Text>
-            <Text style={styles.mainDescription}>
-               Vas super bien, tus gastos no han excedido tus ingresos, lo que significa que estas ahorrando dinero. No hay problemas.
-            </Text>
           </View>
 
         {/* Gráfico de Balance Diario con Rangos de Seguridad */}
@@ -250,28 +296,28 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         <View style={styles.percentageGrid}>
           <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
             <Text style={[styles.percentageValue, { color: '#ea580c' }]}>
-              {userData.financialData?.consumo?.percentage || 42}%
+              {monthlyStats?.percentages.wants || userData.financialData?.consumo?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Consumo</Text>
           </View>
 
           <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
             <Text style={[styles.percentageValue, { color: '#3b82f6' }]}>
-              {userData.financialData?.necesidades?.percentage || 57}%
+              {monthlyStats?.percentages.needs || userData.financialData?.necesidades?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Necesidades</Text>
           </View>
 
           <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
             <Text style={[styles.percentageValue, { color: '#8b5cf6' }]}>
-              {userData.financialData?.ahorro?.percentage || 19}%
+              {monthlyStats?.percentages.savings || userData.financialData?.disponible?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Ahorro</Text>
           </View>
 
           <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
             <Text style={[styles.percentageValue, { color: '#10b981' }]}>
-              {userData.financialData?.invertido?.percentage || 8}%
+              {monthlyStats?.percentages.investment || userData.financialData?.invertido?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Invertido</Text>
           </View>
@@ -287,46 +333,54 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.registrosList}>
-            {RECENT_TRANSACTIONS.slice(0, 5).map((transaction, index) => (
-              <View 
-                key={transaction.id} 
-                style={[
-                  styles.registroItem,
-                  { 
-                    backgroundColor: 'rgba(243, 244, 246, 0.5)'
-                  }
-                ]}
-              >
-                <View style={styles.registroLeft}>
-                  <View style={[
-                    styles.registroIcon,
+            {balanceHistory.length > 0 ? (
+              balanceHistory.slice(0, 5).map((registration, index) => (
+                <View 
+                  key={registration.id} 
+                  style={[
+                    styles.registroItem,
                     { 
-                      backgroundColor: transaction.amount > 0 ? '#dcfce7' : '#fef2f2'
+                      backgroundColor: 'rgba(243, 244, 246, 0.5)'
                     }
-                  ]}>
-                    <Ionicons 
-                      name="cash-outline" 
-                      size={16} 
-                      color={transaction.amount > 0 ? '#16a34a' : '#dc2626'} 
-                    />
+                  ]}
+                >
+                  <View style={styles.registroLeft}>
+                    <View style={[
+                      styles.registroIcon,
+                      { 
+                        backgroundColor: registration.type === 'income' ? '#dcfce7' : '#fef2f2'
+                      }
+                    ]}>
+                      <Ionicons 
+                        name={registration.type === 'income' ? 'add-circle-outline' : 'remove-circle-outline'} 
+                        size={16} 
+                        color={registration.type === 'income' ? '#16a34a' : '#dc2626'} 
+                      />
+                    </View>
+                    <View>
+                      <Text style={styles.registroDescription}>{registration.description}</Text>
+                      <Text style={styles.registroCategory}>
+                        {registration.category} • {registration.date.toLocaleDateString()}
+                      </Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.registroDescription}>{transaction.description}</Text>
-                    <Text style={styles.registroCategory}>
-                      {transaction.category} • {transaction.date}
+                  <View style={styles.registroRight}>
+                    <Text style={[
+                      styles.registroAmount,
+                      { color: registration.type === 'income' ? '#16a34a' : '#dc2626' }
+                    ]}>
+                      {registration.type === 'income' ? '+' : '-'}{formatChileanPeso(registration.amount)}
                     </Text>
                   </View>
                 </View>
-                <View style={styles.registroRight}>
-                  <Text style={[
-                    styles.registroAmount,
-                    { color: transaction.amount > 0 ? '#16a34a' : '#dc2626' }
-                  ]}>
-                    {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
-                  </Text>
-                </View>
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Ionicons name="document-outline" size={48} color={COLORS.gray} />
+                <Text style={styles.emptyStateText}>No hay registros aún</Text>
+                <Text style={styles.emptyStateSubtext}>Comienza registrando tu balance</Text>
               </View>
-            ))}
+            )}
           </View>
         </View>
 
@@ -497,6 +551,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.lg,
     paddingBottom: 80, // Aumentado padding inferior para evitar que el navegador tape el contenido
   },
+  // Balance section
+  balanceSection: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SIZES.lg,
+    marginVertical: SIZES.lg,
+    alignItems: 'center',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  balanceLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.gray,
+    marginBottom: SIZES.sm,
+  },
+  balanceAmount: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
   welcomeSection: {
     marginVertical: SIZES.lg,
   },
@@ -654,6 +732,22 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.primary,
     marginRight: 4,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.gray,
+    marginTop: 12,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginTop: 4,
   },
   registrosList: {
     gap: SIZES.md,

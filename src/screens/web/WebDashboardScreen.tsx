@@ -2,12 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
-import { RECENT_TRANSACTIONS } from '../../data/mockData';
+import { useFinancialData } from '../../contexts/FinancialDataContext';
+import { formatChileanPeso } from '../../utils/currencyUtils';
+import AppSkeleton from '../../components/AppSkeleton';
 import avatar from '../../../assets/avatar.png';
 
 const WebDashboardScreen = () => {
   const { user } = useUser();
+  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading, financialData, userData, refreshData } = useFinancialData();
   const [currentView, setCurrentView] = useState('dashboard');
+
+  // Mostrar skeleton mientras se cargan los datos
+  if (balanceLoading) {
+    return <AppSkeleton />;
+  }
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [showRegistration, setShowRegistration] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -27,74 +35,61 @@ const WebDashboardScreen = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Datos del usuario (se actualizarán desde el contexto)
-  const userData = user ? {
-    name: user.name || 'Usuario',
-    monthlyIncome: user.monthlyIncome || 4200000, // 4.200.000 pesos
-    currentScore: user.currentScore || 52,
-    riskScore: user.riskScore || 48,
-    monthlyExpenses: user.monthlyExpenses || 3180000, // 3.180.000 pesos
-    currentSavings: user.currentSavings || 12500000, // 12.500.000 pesos
-    savingsGoal: user.savingsGoal || 18000000, // 18.000.000 pesos
-    alerts: user.alerts || 3,
-    // Nuevos datos financieros (en pesos chilenos)
-    financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
-    }
-  } : {
-    name: 'Usuario',
-    monthlyIncome: 4200000, // 4.200.000 pesos
-    currentScore: 52,
-    riskScore: 48,
-    monthlyExpenses: 3180000, // 3.180.000 pesos
-    currentSavings: 12500000, // 12.500.000 pesos
-    savingsGoal: 18000000, // 18.000.000 pesos
-    alerts: 3,
-    // Nuevos datos financieros (en pesos chilenos)
-    financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
-    }
-  };
+  // Los datos del usuario y financieros ahora vienen del contexto centralizado
 
   // Gráfico de salud financiera - 7 días
-  const currentMonth = "Septiembre";
-  const dailyScoreData = [
-    { day: 'Lun', score: 45 },
-    { day: 'Mar', score: 48 },
-    { day: 'Mié', score: 44 },
-    { day: 'Jue', score: 46 },
-    { day: 'Vie', score: 50 },
-    { day: 'Sáb', score: 48 },
-    { day: 'Dom', score: 52 }
-  ];
+  const currentMonth = new Date().toLocaleDateString('es-CL', { month: 'long' });
+  const dailyScoreData = balanceHistory.length > 0 ? 
+    balanceHistory.slice(0, 7).map((registration, index) => ({
+      day: registration.date.toLocaleDateString('es-CL', { weekday: 'short' }),
+      score: Math.min(100, Math.max(0, 50 + (registration.balanceAfter / 100000) * 10)) // Score basado en balance
+    })) : [
+      { day: 'Lun', score: 45 },
+      { day: 'Mar', score: 48 },
+      { day: 'Mié', score: 44 },
+      { day: 'Jue', score: 46 },
+      { day: 'Vie', score: 50 },
+      { day: 'Sáb', score: 48 },
+      { day: 'Dom', score: 52 }
+    ];
 
   // Categorías de gastos (en pesos chilenos)
-  const expenseCategories = [
+  const expenseCategories = monthlyStats ? [
+    { name: 'Necesidades', value: monthlyStats.totalExpenses * 0.6, color: '#ea580c' },
+    { name: 'Consumo', value: monthlyStats.totalExpenses * 0.4, color: '#fb923c' },
+    { name: 'Ahorro', value: monthlyStats.balance * 0.7, color: '#fed7aa' }
+  ] : [
     { name: 'Necesidades', value: 1800000, color: '#ea580c' }, // 1.800.000 pesos
     { name: 'Consumo', value: 780000, color: '#fb923c' }, // 780.000 pesos
     { name: 'Ahorro', value: 600000, color: '#fed7aa' } // 600.000 pesos
   ];
 
-  const weeklyTrend = [
-    { week: 'S1', gastos: 720000 }, // 720.000 pesos
-    { week: 'S2', gastos: 890000 }, // 890.000 pesos
-    { week: 'S3', gastos: 650000 }, // 650.000 pesos
-    { week: 'S4', gastos: 920000 } // 920.000 pesos
-  ];
+  const weeklyTrend = balanceHistory.length > 0 ? 
+    balanceHistory.slice(0, 4).map((registration, index) => ({
+      week: `S${index + 1}`,
+      gastos: Math.abs(registration.amount)
+    })) : [
+      { week: 'S1', gastos: 720000 }, // 720.000 pesos
+      { week: 'S2', gastos: 890000 }, // 890.000 pesos
+      { week: 'S3', gastos: 650000 }, // 650.000 pesos
+      { week: 'S4', gastos: 920000 } // 920.000 pesos
+    ];
 
-  // Importar las transacciones desde mockData
-  const recentTransactions = RECENT_TRANSACTIONS;
+  // Convertir el historial de balance a formato de transacciones recientes
+  const recentTransactions = balanceHistory.length > 0 ? 
+    balanceHistory.slice(0, 5).map(registration => ({
+      id: registration.id,
+      description: registration.description,
+      amount: registration.type === 'income' ? registration.amount : -registration.amount,
+      type: registration.type,
+      category: registration.category,
+      date: registration.date,
+    })) : [];
 
   const achievements = [
     { id: 1, title: 'Consistencia Semanal', description: 'Registraste tus gastos 7 días seguidos', icon: '🎯', unlocked: true },
     { id: 2, title: 'Consumo Consciente', description: 'Redujiste gastos de consumo esta semana', icon: '🏆', unlocked: true },
-    { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de ahorro mensual', icon: '💎', unlocked: false }
+    { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de disponible mensual', icon: '💎', unlocked: false }
   ];
 
   const handleLogout = () => {
@@ -337,13 +332,13 @@ const WebDashboardScreen = () => {
           </div>
         </div>
 
-        {/* Información del usuario en el header */}
+        {/* Saldo actual en el header */}
         <div className="absolute bottom-6 left-6 right-6 z-10">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-            <p className="text-white/90 text-sm">¡Hola {userData.name}! 👋</p>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">¡Qué bien lo estás haciendo!</h1>
-            <p className="text-white/80 text-sm">
-            Hoy mantuviste tus gastos bajo control. Cada vez que tus ingresos superan tus gastos, estás construyendo una base más fuerte para tu libertad financiera. ¡Un gran paso!            </p>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 text-center">
+            <p className="text-white/90 text-sm mb-2">Saldo Actual</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-white">
+              {formatChileanPeso(currentBalance)}
+            </h1>
           </div>
         </div>
       </div>
@@ -396,7 +391,7 @@ const WebDashboardScreen = () => {
             <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
               <ShoppingCart className="h-6 w-6 text-orange-600" />
             </div>
-            <div className="text-3xl font-bold text-orange-600 mb-1">{userData.financialData.consumo.percentage}%</div>
+            <div className="text-3xl font-bold text-orange-600 mb-1">{financialData.consumo.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Consumo</p>
           </div>
 
@@ -404,7 +399,7 @@ const WebDashboardScreen = () => {
             <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
               <HomeIcon className="h-6 w-6 text-red-600" />
             </div>
-            <div className="text-3xl font-bold text-red-600 mb-1">{userData.financialData.necesidades.percentage}%</div>
+            <div className="text-3xl font-bold text-red-600 mb-1">{financialData.necesidades.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Necesidades</p>
           </div>
 
@@ -412,7 +407,7 @@ const WebDashboardScreen = () => {
             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
               <PiggyBank className="h-6 w-6 text-green-600" />
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-1">{userData.financialData.ahorro.percentage}%</div>
+            <div className="text-3xl font-bold text-green-600 mb-1">{financialData.disponible.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Ahorro</p>
           </div>
 
@@ -420,7 +415,7 @@ const WebDashboardScreen = () => {
             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
               <TrendingUpIcon className="h-6 w-6 text-purple-600" />
             </div>
-            <div className="text-3xl font-bold text-purple-600 mb-1">{userData.financialData.invertido.percentage}%</div>
+            <div className="text-3xl font-bold text-purple-600 mb-1">{financialData.invertido.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Invertido</p>
           </div>
         </div>
@@ -451,7 +446,7 @@ const WebDashboardScreen = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{transaction.description}</p>
-                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date}</p>
+                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}</p>
                   </div>
                 </div>
                 <div className="text-right">

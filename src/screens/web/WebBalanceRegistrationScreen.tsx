@@ -3,6 +3,8 @@ import { X, DollarSign, Plus, Minus, Check, AlertCircle } from 'lucide-react';
 import { BalanceRecord, BalanceCategory, BalanceRegistrationData } from '../../types';
 import { BalanceService } from '../../services/balanceService';
 import { formatChileanPeso } from '../../utils/currencyUtils';
+import { useUser } from '../../contexts/UserContext';
+import { useFinancialData } from '../../contexts/FinancialDataContext';
 
 interface WebBalanceRegistrationScreenProps {
   isOpen: boolean;
@@ -23,6 +25,9 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
   const [amountError, setAmountError] = useState<string | undefined>();
   const [recordsError, setRecordsError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
+  const [recordTitle, setRecordTitle] = useState('');
+  const { user } = useUser();
+  const { registerBalance } = useFinancialData();
 
   // Calcular la diferencia
   const currentAmountNum = parseFloat(currentAmount) || 0;
@@ -58,17 +63,11 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
   };
 
   const validateRecords = (): boolean => {
-    if (records.length === 0) {
-      setRecordsError('Agrega al menos un registro');
+    const validation = BalanceService.validateRecords(records, difference);
+    if (!validation.isValid) {
+      setRecordsError(validation.error);
       return false;
     }
-    
-    const totalRecords = records.reduce((sum, record) => sum + record.amount, 0);
-    if (Math.abs(totalRecords - difference) > 0.01) {
-      setRecordsError(`Los registros deben sumar ${formatChileanPeso(difference)}`);
-      return false;
-    }
-    
     setRecordsError(undefined);
     return true;
   };
@@ -88,12 +87,20 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
   const handleComplete = async () => {
     setLoading(true);
     try {
-      const registrationData: BalanceRegistrationData = {
-        currentAmount: currentAmountNum,
-        records: records,
-      };
-
-      await BalanceService.saveBalanceRegistration('user-id', registrationData);
+      // Registrar cada transacción individualmente usando el hook
+      for (const record of records) {
+        const type = record.category === 'Ingreso' ? 'income' : 'expense';
+        const success = await registerBalance(
+          type,
+          `Registro de ${record.category}`,
+          typeof record.amount === 'string' ? parseFloat(record.amount) || 0 : record.amount,
+          record.category
+        );
+        
+        if (!success) {
+          throw new Error('Error al registrar el balance');
+        }
+      }
       
       if (onComplete) {
         onComplete();
@@ -110,6 +117,8 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
   const addRecord = () => {
     const newRecord: BalanceRecord = {
       id: Date.now().toString(),
+      type: 'expense',
+      description: '',
       amount: 0,
       category: categories[0].value,
     };
@@ -289,7 +298,7 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total registros:</span>
                     <span className="font-semibold">
-                      {formatChileanPeso(records.reduce((sum, record) => sum + record.amount, 0))}
+                      {formatChileanPeso(BalanceService.calculateTotal(records))}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">

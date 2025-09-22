@@ -2,111 +2,202 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, AreaChart, Area } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon, X, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
+import { useFinancialData } from '../../contexts/FinancialDataContext';
+import { formatChileanPeso } from '../../utils/currencyUtils';
+import AnalysisSkeleton from '../../components/AnalysisSkeleton';
 import WebBalanceRegistrationScreen from './WebBalanceRegistrationScreen';
 
 interface WebAnalysisScreenProps {}
 
 const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
   const { user } = useUser();
+  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading, financialData, userData, refreshData } = useFinancialData();
   const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
   const [showBalanceRegistration, setShowBalanceRegistration] = useState(false);
 
-  // Datos mock del usuario
-  const userData = {
-    name: user?.name || 'Usuario Demo',
-    monthlyIncome: user?.monthlyIncome || 420000,
-    currentScore: user?.currentScore || 52,
-    riskScore: user?.riskScore || 48,
-    monthlyExpenses: user?.monthlyExpenses || 318000,
-    currentSavings: user?.currentSavings || 1250000,
-    savingsGoal: user?.savingsGoal || 1800000,
-    alerts: user?.alerts || 3,
-    // Datos financieros mock
-    financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
-    }
-  };
+  // Mostrar skeleton mientras se cargan los datos
+  if (balanceLoading) {
+    return <AnalysisSkeleton />;
+  }
 
-  // Datos para análisis financiero - Formato JSON con montos y porcentajes
-  const monthlyTrend = [
+  // Los datos del usuario y financieros ahora vienen del contexto centralizado
+
+  // Datos para análisis financiero - Formato JSON con montos y porcentajes (usar datos reales si están disponibles)
+  const monthlyTrend = monthlyStats ? [
     { 
       month: 'Ene', 
-      consume: { amount: 120000, percent: 20 },
-      necesidades: { amount: 400000, percent: 40 },
-      ahorro: { amount: 20000, percent: 2 },
-      invest: { amount: 120000, percent: 10 }
+      consume: { amount: monthlyStats.totalExpenses * 0.4, percent: monthlyStats.percentages.wants },
+      necesidades: { amount: monthlyStats.totalExpenses * 0.6, percent: monthlyStats.percentages.needs },
+      disponible: { amount: monthlyStats.balance * 0.7, percent: monthlyStats.percentages.savings },
+      invest: { amount: monthlyStats.balance * 0.3, percent: monthlyStats.percentages.investment }
     },
     { 
       month: 'Feb', 
-      consume: { amount: 150000, percent: 25 },
-      necesidades: { amount: 350000, percent: 35 },
-      ahorro: { amount: 50000, percent: 5 },
-      invest: { amount: 100000, percent: 8 }
+      consume: { amount: monthlyStats.totalExpenses * 0.4, percent: monthlyStats.percentages.wants },
+      necesidades: { amount: monthlyStats.totalExpenses * 0.6, percent: monthlyStats.percentages.needs },
+      disponible: { amount: monthlyStats.balance * 0.7, percent: monthlyStats.percentages.savings },
+      invest: { amount: monthlyStats.balance * 0.3, percent: monthlyStats.percentages.investment }
     },
     { 
       month: 'Mar', 
-      consume: { amount: 100000, percent: 15 },
-      necesidades: { amount: 450000, percent: 45 },
-      ahorro: { amount: 30000, percent: 3 },
-      invest: { amount: 150000, percent: 12 }
+      consume: { amount: monthlyStats.totalExpenses * 0.4, percent: monthlyStats.percentages.wants },
+      necesidades: { amount: monthlyStats.totalExpenses * 0.6, percent: monthlyStats.percentages.needs },
+      disponible: { amount: monthlyStats.balance * 0.7, percent: monthlyStats.percentages.savings },
+      invest: { amount: monthlyStats.balance * 0.3, percent: monthlyStats.percentages.investment }
     },
     { 
       month: 'Abr', 
-      consume: { amount: 180000, percent: 30 },
-      necesidades: { amount: 300000, percent: 30 },
-      ahorro: { amount: 60000, percent: 6 },
-      invest: { amount: 120000, percent: 10 }
+      consume: { amount: monthlyStats.totalExpenses * 0.4, percent: monthlyStats.percentages.wants },
+      necesidades: { amount: monthlyStats.totalExpenses * 0.6, percent: monthlyStats.percentages.needs },
+      disponible: { amount: monthlyStats.balance * 0.7, percent: monthlyStats.percentages.savings },
+      invest: { amount: monthlyStats.balance * 0.3, percent: monthlyStats.percentages.investment }
     },
     { 
       month: 'May', 
-      consume: { amount: 140000, percent: 22 },
-      necesidades: { amount: 380000, percent: 38 },
-      ahorro: { amount: 40000, percent: 4 },
-      invest: { amount: 140000, percent: 11 }
+      consume: { amount: monthlyStats.totalExpenses * 0.4, percent: monthlyStats.percentages.wants },
+      necesidades: { amount: monthlyStats.totalExpenses * 0.6, percent: monthlyStats.percentages.needs },
+      disponible: { amount: monthlyStats.balance * 0.7, percent: monthlyStats.percentages.savings },
+      invest: { amount: monthlyStats.balance * 0.3, percent: monthlyStats.percentages.investment }
     },
     { 
       month: 'Jun', 
-      consume: { amount: 160000, percent: 26 },
-      necesidades: { amount: 360000, percent: 36 },
-      ahorro: { amount: 50000, percent: 5 },
-      invest: { amount: 130000, percent: 10 }
+      consume: { amount: monthlyStats.totalExpenses * 0.4, percent: monthlyStats.percentages.wants },
+      necesidades: { amount: monthlyStats.totalExpenses * 0.6, percent: monthlyStats.percentages.needs },
+      disponible: { amount: monthlyStats.balance * 0.7, percent: monthlyStats.percentages.savings },
+      invest: { amount: monthlyStats.balance * 0.3, percent: monthlyStats.percentages.investment }
+    }
+  ] : [
+    { 
+      month: 'Ene', 
+      consume: { amount: 0, percent: 0 },
+      necesidades: { amount: 0, percent: 0 },
+      disponible: { amount: 0, percent: 0 },
+      invest: { amount: 0, percent: 0 }
+    },
+    { 
+      month: 'Feb', 
+      consume: { amount: 0, percent: 0 },
+      necesidades: { amount: 0, percent: 0 },
+      disponible: { amount: 0, percent: 0 },
+      invest: { amount: 0, percent: 0 }
+    },
+    { 
+      month: 'Mar', 
+      consume: { amount: 0, percent: 0 },
+      necesidades: { amount: 0, percent: 0 },
+      disponible: { amount: 0, percent: 0 },
+      invest: { amount: 0, percent: 0 }
+    },
+    { 
+      month: 'Abr', 
+      consume: { amount: 0, percent: 0 },
+      necesidades: { amount: 0, percent: 0 },
+      disponible: { amount: 0, percent: 0 },
+      invest: { amount: 0, percent: 0 }
+    },
+    { 
+      month: 'May', 
+      consume: { amount: 0, percent: 0 },
+      necesidades: { amount: 0, percent: 0 },
+      disponible: { amount: 0, percent: 0 },
+      invest: { amount: 0, percent: 0 }
+    },
+    { 
+      month: 'Jun', 
+      consume: { amount: 0, percent: 0 },
+      necesidades: { amount: 0, percent: 0 },
+      disponible: { amount: 0, percent: 0 },
+      invest: { amount: 0, percent: 0 }
     }
   ];
 
-  const categoryAnalysis = [
-    { name: 'Vivienda', amount: 1200, percentage: 38, trend: 'up', color: '#ef4444' },
-    { name: 'Alimentación', amount: 600, percentage: 19, trend: 'down', color: '#f97316' },
-    { name: 'Transporte', amount: 400, percentage: 13, trend: 'stable', color: '#eab308' },
-    { name: 'Entretenimiento', amount: 300, percentage: 9, trend: 'up', color: '#8b5cf6' },
-    { name: 'Salud', amount: 200, percentage: 6, trend: 'stable', color: '#06b6d4' },
-    { name: 'Otros', amount: 480, percentage: 15, trend: 'down', color: '#10b981' }
+  const categoryAnalysis = monthlyStats ? [
+    { name: 'Necesidades', amount: monthlyStats.totalExpenses * (monthlyStats.percentages.needs / 100), percentage: monthlyStats.percentages.needs, trend: 'stable' as const, color: '#ef4444' },
+    { name: 'Consumo', amount: monthlyStats.totalExpenses * (monthlyStats.percentages.wants / 100), percentage: monthlyStats.percentages.wants, trend: 'stable' as const, color: '#f97316' },
+    { name: 'Ahorro', amount: monthlyStats.balance * (monthlyStats.percentages.savings / 100), percentage: monthlyStats.percentages.savings, trend: 'up' as const, color: '#eab308' },
+    { name: 'Inversión', amount: monthlyStats.balance * (monthlyStats.percentages.investment / 100), percentage: monthlyStats.percentages.investment, trend: 'up' as const, color: '#8b5cf6' }
+  ] : [
+    { name: 'Necesidades', amount: 0, percentage: 0, trend: 'stable' as const, color: '#ef4444' },
+    { name: 'Consumo', amount: 0, percentage: 0, trend: 'stable' as const, color: '#f97316' },
+    { name: 'Ahorro', amount: 0, percentage: 0, trend: 'stable' as const, color: '#eab308' },
+    { name: 'Inversión', amount: 0, percentage: 0, trend: 'stable' as const, color: '#8b5cf6' }
   ];
 
-  const weeklySpending = [
-    { day: 'Lun', amount: 120 },
-    { day: 'Mar', amount: 85 },
-    { day: 'Mié', amount: 200 },
-    { day: 'Jue', amount: 150 },
-    { day: 'Vie', amount: 300 },
-    { day: 'Sáb', amount: 450 },
-    { day: 'Dom', amount: 180 }
-  ];
+  // Calcular gastos semanales basados en el historial real
+  const calculateWeeklySpending = () => {
+    if (!balanceHistory || balanceHistory.length === 0) {
+      return [
+        { day: 'Lun', amount: 0 },
+        { day: 'Mar', amount: 0 },
+        { day: 'Mié', amount: 0 },
+        { day: 'Jue', amount: 0 },
+        { day: 'Vie', amount: 0 },
+        { day: 'Sáb', amount: 0 },
+        { day: 'Dom', amount: 0 }
+      ];
+    }
+
+    // Obtener gastos de la última semana
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const weeklyExpenses = balanceHistory
+      .filter(record => 
+        record.type === 'expense' && 
+        record.date >= weekAgo && 
+        record.date <= now
+      )
+      .reduce((acc, record) => {
+        const dayOfWeek = record.date.getDay();
+        const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const dayName = dayNames[dayOfWeek];
+        
+        if (!acc[dayName]) {
+          acc[dayName] = 0;
+        }
+        acc[dayName] += record.amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+    return [
+      { day: 'Lun', amount: weeklyExpenses['Lun'] || 0 },
+      { day: 'Mar', amount: weeklyExpenses['Mar'] || 0 },
+      { day: 'Mié', amount: weeklyExpenses['Mié'] || 0 },
+      { day: 'Jue', amount: weeklyExpenses['Jue'] || 0 },
+      { day: 'Vie', amount: weeklyExpenses['Vie'] || 0 },
+      { day: 'Sáb', amount: weeklyExpenses['Sáb'] || 0 },
+      { day: 'Dom', amount: weeklyExpenses['Dom'] || 0 }
+    ];
+  };
+
+  const weeklySpending = calculateWeeklySpending();
 
 
-  const financialGoals = [
-    { name: 'Fondo de Emergencia', target: 10000, current: 8000, deadline: 'Dic 2024', priority: 'high' },
-    { name: 'Vacaciones', target: 3000, current: 1200, deadline: 'Ago 2024', priority: 'medium' },
-    { name: 'Casa Propia', target: 50000, current: 12500, deadline: '2026', priority: 'high' }
+  const financialGoals = user?.savingsGoal ? [
+    { 
+      name: 'Meta de Ahorro', 
+      target: user.savingsGoal, 
+      current: currentBalance || 0, 
+      deadline: 'Dic 2024', 
+      priority: 'high' as const 
+    },
+    { 
+      name: 'Fondo de Emergencia', 
+      target: (user.monthlyIncome || 0) * 6, // 6 meses de ingresos
+      current: (currentBalance || 0) * 0.3, // 30% del disponible actual
+      deadline: '2025', 
+      priority: 'high' as const 
+    }
+  ] : [
+    { name: 'Fondo de Emergencia', target: 0, current: 0, deadline: 'Dic 2024', priority: 'high' as const },
+    { name: 'Meta de Ahorro', target: 0, current: 0, deadline: '2025', priority: 'medium' as const }
   ];
 
   const recommendations = [
     {
       id: 1,
       title: 'Regla del 50/30/20',
-      description: 'Asigna el 50% de tus ingresos a necesidades básicas, 30% a deseos personales y 20% a ahorros e inversiones. Esta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.',
+      description: 'Asigna el 50% de tus ingresos a necesidades básicas, 30% a deseos personales y 20% a disponibles e inversiones. Esta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.',
       icon: Target,
       type: 'info'
     },
@@ -206,7 +297,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                 <div>
                   <p className="text-xs font-medium text-purple-700 mb-1">Ahorro Mensual</p>
                   <p className="text-lg font-bold text-purple-800">
-                    {userData.financialData.ahorro.percentage}%
+                    {financialData.disponible.percentage}%
                   </p>
                 </div>
                 <TrendingUp className="h-5 w-5 text-purple-600" />
@@ -227,18 +318,18 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                   <ShoppingCart className="h-6 w-6 text-orange-600" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-orange-600">{userData.financialData.consumo.percentage}%</p>
-                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.consumo.amount.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-orange-600">{financialData.consumo.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${financialData.consumo.amount.toLocaleString()}</p>
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-600 mb-2">Consumo</p>
-              <div className={`flex items-center text-xs ${userData.financialData.consumo.previousChange >= 0 ? 'text-orange-500' : 'text-green-500'}`}>
-                {userData.financialData.consumo.previousChange >= 0 ? (
+              <div className={`flex items-center text-xs ${financialData.consumo.previousChange >= 0 ? 'text-orange-500' : 'text-green-500'}`}>
+                {financialData.consumo.previousChange >= 0 ? (
                   <TrendingUp className="h-3 w-3 mr-1" />
                 ) : (
                   <TrendingDown className="h-3 w-3 mr-1" />
                 )}
-                {userData.financialData.consumo.previousChange >= 0 ? '+' : ''}{userData.financialData.consumo.previousChange}% vs mes anterior
+                {financialData.consumo.previousChange >= 0 ? '+' : ''}{financialData.consumo.previousChange}% vs mes anterior
               </div>
             </div>
 
@@ -248,18 +339,18 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                   <HomeIcon className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600">{userData.financialData.necesidades.percentage}%</p>
-                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.necesidades.amount.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-blue-600">{financialData.necesidades.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${financialData.necesidades.amount.toLocaleString()}</p>
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-600 mb-2">Necesidades</p>
-              <div className={`flex items-center text-xs ${userData.financialData.necesidades.previousChange >= 0 ? 'text-blue-500' : 'text-green-500'}`}>
-                {userData.financialData.necesidades.previousChange >= 0 ? (
+              <div className={`flex items-center text-xs ${financialData.necesidades.previousChange >= 0 ? 'text-blue-500' : 'text-green-500'}`}>
+                {financialData.necesidades.previousChange >= 0 ? (
                   <TrendingUp className="h-3 w-3 mr-1" />
                 ) : (
                   <TrendingDown className="h-3 w-3 mr-1" />
                 )}
-                {userData.financialData.necesidades.previousChange >= 0 ? '+' : ''}{userData.financialData.necesidades.previousChange}% vs mes anterior
+                {financialData.necesidades.previousChange >= 0 ? '+' : ''}{financialData.necesidades.previousChange}% vs mes anterior
               </div>
             </div>
 
@@ -269,18 +360,18 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                   <TrendingUpIcon className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">{userData.financialData.invertido.percentage}%</p>
-                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.invertido.amount.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-green-600">{financialData.invertido.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${financialData.invertido.amount.toLocaleString()}</p>
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-600 mb-2">Invertido</p>
-              <div className={`flex items-center text-xs ${userData.financialData.invertido.previousChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {userData.financialData.invertido.previousChange >= 0 ? (
+              <div className={`flex items-center text-xs ${financialData.invertido.previousChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {financialData.invertido.previousChange >= 0 ? (
                   <TrendingUp className="h-3 w-3 mr-1" />
                 ) : (
                   <TrendingDown className="h-3 w-3 mr-1" />
                 )}
-                {userData.financialData.invertido.previousChange >= 0 ? '+' : ''}{userData.financialData.invertido.previousChange}% vs mes anterior
+                {financialData.invertido.previousChange >= 0 ? '+' : ''}{financialData.invertido.previousChange}% vs mes anterior
               </div>
             </div>
           </div>
@@ -303,7 +394,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                     formatter={(value, name, props) => {
                       const categoryName = name === 'consume' ? 'Consumo' :
                                          name === 'necesidades' ? 'Necesidades' :
-                                         name === 'ahorro' ? 'Ahorro' :
+                                         name === 'disponible' ? 'Ahorro' :
                                          name === 'invest' ? 'Inversión' : name;
                       
                       // Obtener el monto correspondiente
@@ -321,7 +412,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                   />
                   <Area type="monotone" dataKey="consume.percent" stackId="1" stroke="#f97316" fill="#f97316" fillOpacity={0.3} />
                   <Area type="monotone" dataKey="necesidades.percent" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-                  <Area type="monotone" dataKey="ahorro.percent" stackId="3" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="disponible.percent" stackId="3" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
                   <Area type="monotone" dataKey="invest.percent" stackId="4" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>

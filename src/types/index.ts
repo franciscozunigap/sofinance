@@ -17,7 +17,7 @@ export interface User {
   financialData?: {
     consumo: { percentage: number; amount: number; previousChange: number };
     necesidades: { percentage: number; amount: number; previousChange: number };
-    ahorro: { percentage: number; amount: number; previousChange: number };
+    disponible: { percentage: number; amount: number; previousChange: number };
     invertido: { percentage: number; amount: number; previousChange: number };
   };
   // Preferences
@@ -29,7 +29,7 @@ export interface User {
   // Wallet
   wallet?: {
     monthly_income: number;
-    savings: number;
+    amount: number;
   };
   // Financial Profile
   financialProfile?: string;
@@ -78,14 +78,72 @@ export interface LoginCredentials {
   password: string;
 }
 
-// Nuevos tipos para el registro de balance
-export interface BalanceRecord {
+// Tipos para la estructura unificada de balance
+export interface BalanceTransaction {
   id: string;
   amount: number;
   category: BalanceCategory;
+  description: string;
+  date: Date;
+  type: 'income' | 'expense' | 'investment';
 }
 
 export type BalanceCategory = 'Ingreso' | 'Deuda' | 'Consumo' | 'Necesidad' | 'Inversión';
+
+// Estructura simplificada para registros de balance
+export interface BalanceRegistration {
+  id: string;
+  userId: string;
+  date: Date;
+  type: 'income' | 'expense' | 'adjustment';
+  description: string;
+  amount: number;
+  category: string;
+  balanceAfter: number; // Balance después de esta transacción
+  month: number;
+  year: number;
+  createdAt: Date;
+}
+
+// Estadísticas mensuales
+export interface MonthlyStats {
+  id: string; // formato: "2024-01_userId"
+  userId: string;
+  month: number;
+  year: number;
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
+  percentages: {
+    needs: number;
+    wants: number;
+    savings: number;
+    investment: number;
+  };
+  variation: {
+    balanceChange: number;
+    percentageChange: number;
+    previousMonthBalance: number;
+  };
+  lastUpdated: Date;
+  createdAt: Date;
+}
+
+// Balance actual simple
+export interface BalanceData {
+  userId: string;
+  currentBalance: number;
+  lastUpdated: Date;
+}
+
+// Mantener compatibilidad con el código existente
+export interface BalanceRecord {
+  id: string;
+  type?: 'income' | 'expense';
+  description?: string;
+  amount: string | number;
+  category: BalanceCategory;
+}
 
 export interface BalanceRegistrationData {
   currentAmount: number;

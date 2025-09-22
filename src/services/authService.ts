@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { fetchUserData, createUserData, checkEmailExists } from './userService';
+import { BalanceService } from './balanceService';
 
 // Simulación de servicio de autenticación
 export class AuthService {
@@ -57,6 +58,32 @@ export class AuthService {
     };
 
     await createUserData(firebaseUser.uid, userDocument);
+
+    // Crear documentos iniciales necesarios
+    try {
+      // Crear balance inicial
+      await BalanceService.createInitialBalance(firebaseUser.uid);
+      console.log('Balance inicial creado exitosamente');
+
+      // Crear estadísticas mensuales iniciales
+      await BalanceService.createInitialMonthlyStats(firebaseUser.uid);
+      console.log('Estadísticas mensuales iniciales creadas exitosamente');
+
+      // Si el usuario tiene disponibles iniciales, registrar el balance
+      if (data.currentSavings > 0) {
+        await BalanceService.registerBalance(
+          firebaseUser.uid,
+          'income',
+          'Balance inicial',
+          data.currentSavings,
+          'Balance Inicial'
+        );
+        console.log('Registro de balance inicial creado exitosamente');
+      }
+    } catch (error) {
+      console.error('Error al crear documentos iniciales:', error);
+      // No lanzar error aquí para no interrumpir el registro del usuario
+    }
 
     return firebaseUser;
   }

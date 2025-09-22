@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
+import { useBalance } from '../hooks/useBalance';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon } from 'lucide-react-native';
+import { formatChileanPeso } from '../utils/currencyUtils';
 import FloatingNavBar from '../components/FloatingNavBar';
 import BalanceRegistrationScreen from './BalanceRegistrationScreen';
 
@@ -27,71 +29,156 @@ interface AnalysisScreenProps {
 
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChange }) => {
   const { user } = useUser();
+  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading } = useBalance(user?.id || 'user-id');
   const [showBalanceRegistration, setShowBalanceRegistration] = useState(false);
   const [selectedRecommendation, setSelectedRecommendation] = useState<typeof insights[0] | null>(null);
 
-  // Datos del usuario
+  // Datos del usuario con información real
   const userData = {
-    name: user?.name || 'Usuario',
-    monthlyIncome: user?.monthlyIncome || 420000,
-    currentScore: user?.currentScore || 52,
-    riskScore: user?.riskScore || 48,
-    monthlyExpenses: user?.monthlyExpenses || 318000,
-    currentSavings: user?.currentSavings || 1500000,
-    savingsGoal: user?.savingsGoal || 1800000,
-    alerts: user?.alerts || 3,
-    // Datos financieros mejorados como en la versión web
-    financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
+    name: user?.name || user?.firstName || 'Usuario',
+    monthlyIncome: user?.monthlyIncome || user?.wallet?.monthly_income || 0,
+    currentScore: user?.currentScore || 0,
+    riskScore: user?.riskScore || 0,
+    monthlyExpenses: monthlyStats?.totalExpenses || user?.monthlyExpenses || 0,
+    currentSavings: currentBalance || user?.currentSavings || user?.wallet?.amount || 0,
+    savingsGoal: user?.savingsGoal || 0,
+    alerts: user?.alerts || 0,
+    // Datos financieros reales o por defecto
+    financialData: monthlyStats ? {
+      consumo: { 
+        percentage: monthlyStats.percentages.wants, 
+        amount: monthlyStats.totalExpenses * 0.4, 
+        previousChange: 0 
+      },
+      necesidades: { 
+        percentage: monthlyStats.percentages.needs, 
+        amount: monthlyStats.totalExpenses * 0.6, 
+        previousChange: 0 
+      },
+      disponible: { 
+        percentage: monthlyStats.percentages.savings, 
+        amount: monthlyStats.balance * (monthlyStats.percentages.savings / 100), 
+        previousChange: 0 
+      },
+      invertido: { 
+        percentage: monthlyStats.percentages.investment, 
+        amount: monthlyStats.balance * (monthlyStats.percentages.investment / 100), 
+        previousChange: 0 
+      }
+    } : {
+      consumo: { percentage: 0, amount: 0, previousChange: 0 },
+      necesidades: { percentage: 0, amount: 0, previousChange: 0 },
+      disponible: { percentage: 0, amount: 0, previousChange: 0 },
+      invertido: { percentage: 0, amount: 0, previousChange: 0 }
     }
   };
 
-  // Datos para análisis financiero - porcentual
-  const monthlyTrend = [
-    { month: 'Ene', consumo: 42, necesidades: 57, ahorro: 19, invertido: 8 },
-    { month: 'Feb', consumo: 38, necesidades: 55, ahorro: 22, invertido: 10 },
-    { month: 'Mar', consumo: 45, necesidades: 60, ahorro: 15, invertido: 6 },
-    { month: 'Abr', consumo: 40, necesidades: 52, ahorro: 25, invertido: 12 },
-    { month: 'May', consumo: 43, necesidades: 58, ahorro: 18, invertido: 9 },
-    { month: 'Jun', consumo: 42, necesidades: 57, ahorro: 19, invertido: 8 }
+  // Datos para análisis financiero - porcentual (usar datos reales si están disponibles)
+  const monthlyTrend = monthlyStats ? [
+    { month: 'Ene', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
+    { month: 'Feb', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
+    { month: 'Mar', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
+    { month: 'Abr', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
+    { month: 'May', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
+    { month: 'Jun', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment }
+  ] : [
+    { month: 'Ene', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+    { month: 'Feb', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+    { month: 'Mar', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+    { month: 'Abr', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+    { month: 'May', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+    { month: 'Jun', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 }
   ];
 
-  const categoryAnalysis = [
-    { name: 'Vivienda', value: 120000, color: '#ef4444' },
-    { name: 'Alimentación', value: 60000, color: '#f97316' },
-    { name: 'Transporte', value: 40000, color: '#eab308' },
-    { name: 'Entretenimiento', value: 30000, color: '#8b5cf6' },
-    { name: 'Salud', value: 20000, color: '#06b6d4' },
-    { name: 'Otros', value: 48000, color: '#10b981' }
+  const categoryAnalysis = monthlyStats ? [
+    { name: 'Necesidades', value: monthlyStats.totalExpenses * (monthlyStats.percentages.needs / 100), color: '#ef4444' },
+    { name: 'Consumo', value: monthlyStats.totalExpenses * (monthlyStats.percentages.wants / 100), color: '#f97316' },
+    { name: 'Ahorro', value: monthlyStats.balance * (monthlyStats.percentages.savings / 100), color: '#eab308' },
+    { name: 'Inversión', value: monthlyStats.balance * (monthlyStats.percentages.investment / 100), color: '#8b5cf6' }
+  ] : [
+    { name: 'Necesidades', value: 0, color: '#ef4444' },
+    { name: 'Consumo', value: 0, color: '#f97316' },
+    { name: 'Ahorro', value: 0, color: '#eab308' },
+    { name: 'Inversión', value: 0, color: '#8b5cf6' }
   ];
 
-  const weeklySpending = [
-    { day: 'Lun', amount: 12000 },
-    { day: 'Mar', amount: 8500 },
-    { day: 'Mié', amount: 20000 },
-    { day: 'Jue', amount: 15000 },
-    { day: 'Vie', amount: 30000 },
-    { day: 'Sáb', amount: 45000 },
-    { day: 'Dom', amount: 18000 }
-  ];
+  // Calcular gastos semanales basados en el historial real
+  const calculateWeeklySpending = () => {
+    if (!balanceHistory || balanceHistory.length === 0) {
+      return [
+        { day: 'Lun', amount: 0 },
+        { day: 'Mar', amount: 0 },
+        { day: 'Mié', amount: 0 },
+        { day: 'Jue', amount: 0 },
+        { day: 'Vie', amount: 0 },
+        { day: 'Sáb', amount: 0 },
+        { day: 'Dom', amount: 0 }
+      ];
+    }
 
-  const financialGoals = [
-    { name: 'Fondo de Emergencia', target: 1000000, current: 800000, deadline: 'Dic 2024', priority: 'high' },
-    { name: 'Vacaciones', target: 300000, current: 120000, deadline: 'Ago 2024', priority: 'medium' },
-    { name: 'Casa Propia', target: 5000000, current: 1250000, deadline: '2026', priority: 'high' }
+    // Obtener gastos de la última semana
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const weeklyExpenses = balanceHistory
+      .filter(record => 
+        record.type === 'expense' && 
+        record.date >= weekAgo && 
+        record.date <= now
+      )
+      .reduce((acc, record) => {
+        const dayOfWeek = record.date.getDay();
+        const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const dayName = dayNames[dayOfWeek];
+        
+        if (!acc[dayName]) {
+          acc[dayName] = 0;
+        }
+        acc[dayName] += record.amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+    return [
+      { day: 'Lun', amount: weeklyExpenses['Lun'] || 0 },
+      { day: 'Mar', amount: weeklyExpenses['Mar'] || 0 },
+      { day: 'Mié', amount: weeklyExpenses['Mié'] || 0 },
+      { day: 'Jue', amount: weeklyExpenses['Jue'] || 0 },
+      { day: 'Vie', amount: weeklyExpenses['Vie'] || 0 },
+      { day: 'Sáb', amount: weeklyExpenses['Sáb'] || 0 },
+      { day: 'Dom', amount: weeklyExpenses['Dom'] || 0 }
+    ];
+  };
+
+  const weeklySpending = calculateWeeklySpending();
+
+  const financialGoals = user?.savingsGoal ? [
+    { 
+      name: 'Meta de Ahorro', 
+      target: user.savingsGoal, 
+      current: currentBalance || 0, 
+      deadline: 'Dic 2024', 
+      priority: 'high' as const 
+    },
+    { 
+      name: 'Fondo de Emergencia', 
+      target: (user.monthlyIncome || 0) * 6, // 6 meses de ingresos
+      current: (currentBalance || 0) * 0.3, // 30% del disponible actual
+      deadline: '2025', 
+      priority: 'high' as const 
+    }
+  ] : [
+    { name: 'Fondo de Emergencia', target: 0, current: 0, deadline: 'Dic 2024', priority: 'high' as const },
+    { name: 'Meta de Ahorro', target: 0, current: 0, deadline: '2025', priority: 'medium' as const }
   ];
 
   const insights = [
     {
       type: 'info',
       title: 'Regla del 50/30/20',
-      description: 'Asigna el 50% de tus ingresos a necesidades básicas, 30% a deseos personales y 20% a ahorros e inversiones. Esta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.',
+      description: 'Asigna el 50% de tus ingresos a necesidades básicas, 30% a deseos personales y 20% a disponibles e inversiones. Esta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.',
       icon: 'information-circle',
       action: 'Ver detalle',
-      detail: 'La regla del 50/30/20 es una estrategia de presupuesto simple y efectiva:\n\n• 50% para necesidades básicas (vivienda, alimentación, transporte, servicios)\n• 30% para deseos personales (entretenimiento, viajes, hobbies)\n• 20% para ahorros e inversiones (fondo de emergencia, jubilación, inversiones)\n\nEsta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.'
+      detail: 'La regla del 50/30/20 es una estrategia de presupuesto simple y efectiva:\n\n• 50% para necesidades básicas (vivienda, alimentación, transporte, servicios)\n• 30% para deseos personales (entretenimiento, viajes, hobbies)\n• 20% para disponibles e inversiones (fondo de emergencia, jubilación, inversiones)\n\nEsta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.'
     },
     {
       type: 'warning',
@@ -244,10 +331,10 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                 <Text style={styles.verticalMetricLabel}>Ahorro Mensual</Text>
                 <View style={styles.verticalMetricValues}>
                   <Text style={[styles.verticalMetricPercentage, { color: COLORS.success }]}>
-                    {userData.financialData?.ahorro?.percentage || 19}%
+                    {userData.financialData?.disponible?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
-                    ${userData.financialData?.ahorro?.amount?.toLocaleString() || '60,000'}
+                    ${userData.financialData?.disponible?.amount?.toLocaleString() || '60,000'}
                   </Text>
                 </View>
               </View>
@@ -255,7 +342,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
             <View style={styles.verticalMetricTrend}>
               <TrendingUp size={12} color={COLORS.success} />
               <Text style={[styles.verticalMetricTrendText, { color: COLORS.success }]}>
-                +{userData.financialData?.ahorro?.previousChange || 3}% vs mes anterior
+                +{userData.financialData?.disponible?.previousChange || 3}% vs mes anterior
               </Text>
             </View>
           </View>
@@ -268,7 +355,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                 <Text style={styles.verticalMetricLabel}>Consumo</Text>
                 <View style={styles.verticalMetricValues}>
                   <Text style={[styles.verticalMetricPercentage, { color: '#f59e0b' }]}>
-                    {userData.financialData?.consumo?.percentage || 42}%
+                    {userData.financialData?.consumo?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
                     ${userData.financialData?.consumo?.amount?.toLocaleString() || '133,500'}
@@ -299,7 +386,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                 <Text style={styles.verticalMetricLabel}>Necesidades</Text>
                 <View style={styles.verticalMetricValues}>
                   <Text style={[styles.verticalMetricPercentage, { color: '#3b82f6' }]}>
-                    {userData.financialData?.necesidades?.percentage || 57}%
+                    {userData.financialData?.necesidades?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
                     ${userData.financialData?.necesidades?.amount?.toLocaleString() || '181,300'}
@@ -330,7 +417,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                 <Text style={styles.verticalMetricLabel}>Invertido</Text>
                 <View style={styles.verticalMetricValues}>
                   <Text style={[styles.verticalMetricPercentage, { color: COLORS.success }]}>
-                    {userData.financialData?.invertido?.percentage || 8}%
+                    {userData.financialData?.invertido?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
                     ${userData.financialData?.invertido?.amount?.toLocaleString() || '25,000'}
@@ -372,8 +459,8 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                     color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`, // Azul para necesidades
                     strokeWidth: 3
                   }, {
-                    data: monthlyTrend.map(item => item.ahorro),
-                    color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`, // Púrpura para ahorro
+                    data: monthlyTrend.map(item => item.disponible),
+                    color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`, // Púrpura para disponible
                     strokeWidth: 3
                   }, {
                     data: monthlyTrend.map(item => item.invertido),

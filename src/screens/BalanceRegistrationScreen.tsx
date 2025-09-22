@@ -17,7 +17,8 @@ import Button from '../components/Button';
 import BalanceRecordItem from '../components/BalanceRecordItem';
 import { BalanceRecord, BalanceCategory, BalanceRegistrationData } from '../types';
 import { BalanceService } from '../services/balanceService';
-import { useBalance } from '../hooks/useBalance';
+import { useFinancialData } from '../contexts/FinancialDataContext';
+import { useUser } from '../contexts/UserContext';
 import { formatChileanPeso } from '../utils/currencyUtils';
 
 const { width } = Dimensions.get('window');
@@ -41,8 +42,9 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
   const [fadeAnim] = useState(new Animated.Value(1));
   const [slideAnim] = useState(new Animated.Value(0));
   
-  // Usar el hook de balance (en una implementación real, el userId vendría del contexto)
-  const { saveBalanceRegistration, loading } = useBalance('user-id');
+  // Obtener el usuario del contexto
+  const { user } = useUser();
+  const { registerBalance, loading } = useFinancialData();
 
   // Calcular la diferencia
   const currentAmountNum = parseFloat(currentAmount) || 0;
@@ -108,14 +110,25 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
 
   const handleRegister = async () => {
     if (validateRecords()) {
-      const balanceData: BalanceRegistrationData = {
-        currentAmount: currentAmountNum,
-        records: records,
-      };
-
-      const success = await saveBalanceRegistration(balanceData);
+      // Registrar cada transacción individualmente
+      let allSuccess = true;
       
-      if (success) {
+      for (const record of records) {
+        const type = record.category === 'Ingreso' ? 'income' : 'expense';
+        const success = await registerBalance(
+          type,
+          `Registro de ${record.category}`,
+          record.amount,
+          record.category
+        );
+        
+        if (!success) {
+          allSuccess = false;
+          break;
+        }
+      }
+      
+      if (allSuccess) {
         Alert.alert(
           'Balance Registrado',
           'Tu balance financiero ha sido registrado exitosamente.',
@@ -125,6 +138,12 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
               onPress: onComplete,
             },
           ]
+        );
+      } else {
+        Alert.alert(
+          'Error',
+          'Hubo un error al registrar algunos de los balances. Inténtalo de nuevo.',
+          [{ text: 'OK' }]
         );
       }
     }

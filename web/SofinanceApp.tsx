@@ -5,23 +5,24 @@ import WebAppNavigator from '../src/navigation/WebAppNavigator';
 import { AuthService } from '../src/services/authService';
 import { User } from '../src/types';
 import { UserProvider, useUser } from '../src/contexts/UserContext';
+import { FinancialDataProvider, useFinancialData } from '../src/contexts/FinancialDataContext';
+import { formatChileanPeso } from '../src/utils/currencyUtils';
 import FloatingNavigationPanel from '../src/components/FloatingNavigationPanel';
 import WebAnalysisScreen from '../src/screens/web/WebAnalysisScreen';
 import SettingsMenu from '../src/components/SettingsMenu';
-import { RECENT_TRANSACTIONS } from '../src/data/mockData';
 import AllTransactionsModal from '../src/components/AllTransactionsModal';
 import BalanceChart from '../src/components/BalanceChart';
+import AppSkeleton from '../src/components/AppSkeleton';
 import logo from '../assets/logo.png';
 import avatar from '../assets/avatar.png';
 
 const SofinanceAppContent = () => {
   const [currentView, setCurrentView] = useState('finance');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [scrollY, setScrollY] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAllTransactionsModalOpen, setIsAllTransactionsModalOpen] = useState(false);
-  const { user, setUser } = useUser();
+  const { user, isAuthenticated, loading: userLoading, setUser, logout } = useUser();
+  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading, financialData, userData, refreshData } = useFinancialData();
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -32,62 +33,19 @@ const SofinanceAppContent = () => {
   ]);
   const [chatInput, setChatInput] = useState('');
 
-  useEffect(() => {
-    const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
-      if (firebaseUser) {
-        // Usar datos mock del usuario desde UserContext
-        setUser(firebaseUser);
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [setUser]);
-
+  // Todos los hooks deben estar antes de cualquier return condicional
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Datos del usuario desde el contexto (en pesos chilenos)
-  const userData = user ? {
-    name: user.name || 'Usuario',
-    monthlyIncome: user.monthlyIncome || 420000,
-    currentScore: user.currentScore || 52,
-    riskScore: user.riskScore || 48,
-    monthlyExpenses: user.monthlyExpenses || 318000,
-    currentSavings: user.currentSavings || 1250000,
-    savingsGoal: user.savingsGoal || 1800000,
-    alerts: user.alerts || 3,
-    // Nuevos datos financieros
-    financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
-    }
-  } : {
-    name: 'Usuario',
-    monthlyIncome: 420000,
-    currentScore: 52,
-    riskScore: 48,
-    monthlyExpenses: 318000,
-    currentSavings: 1250000,
-    savingsGoal: 1800000,
-    alerts: 3,
-    // Nuevos datos financieros
-    financialData: {
-      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
-      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
-    }
-  };
+  // Mostrar skeleton mientras se cargan los datos del usuario
+  if (userLoading) {
+    return <AppSkeleton />;
+  }
+
+  // Los datos del usuario y financieros ahora vienen del contexto centralizado
 
   // Gráfico de salud financiera - 7 días
   const currentMonth = "Septiembre";
@@ -140,31 +98,36 @@ const SofinanceAppContent = () => {
   ];
 
   // Importar las transacciones desde mockData
-  const recentTransactions = RECENT_TRANSACTIONS;
+  // Convertir el historial de balance a formato de transacciones recientes
+  const recentTransactions = balanceHistory.length > 0 ? 
+    balanceHistory.slice(0, 10).map(registration => ({
+      id: registration.id,
+      description: registration.description,
+      amount: registration.type === 'income' ? registration.amount : -registration.amount,
+      category: registration.category,
+      date: registration.date,
+      time: registration.date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+    })) : [];
 
   // Lista completa de transacciones para el modal
-  const allTransactions = RECENT_TRANSACTIONS;
+  const allTransactions = recentTransactions;
 
   const achievements = [
     { id: 1, title: 'Consistencia Semanal', description: 'Registraste tus gastos 7 días seguidos', icon: '🎯', unlocked: true },
     { id: 2, title: 'Consumo Consciente', description: 'Redujiste gastos de consumo esta semana', icon: '🏆', unlocked: true },
-    { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de ahorro mensual', icon: '💎', unlocked: false }
+    { id: 3, title: 'Meta del Mes', description: 'Cumple tu meta de disponible mensual', icon: '💎', unlocked: false }
   ];
 
   const handleLoginSuccess = (loggedInUser: User) => {
     setUser(loggedInUser);
-    setIsAuthenticated(true);
   };
 
   const handleRegistrationSuccess = (registeredUser: User) => {
     setUser(registeredUser);
-    setIsAuthenticated(true);
   };
 
   const handleLogout = async () => {
-    await AuthService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
+    await logout();
     setCurrentView('finance');
     setIsSettingsOpen(false);
   };
@@ -210,13 +173,7 @@ const SofinanceAppContent = () => {
 
   const scoreStatus = getScoreStatus(userData.currentScore);
 
-  if (isLoading) {
-    return (
-        <div className="min-h-screen bg-light flex items-center justify-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-400"></div>
-        </div>
-    );
-  }
+  // Loading state ya manejado arriba
 
   // Si no está autenticado, mostrar WebAppNavigator
   if (!isAuthenticated) {
@@ -410,30 +367,39 @@ const SofinanceAppContent = () => {
         </div>
           
         {/* Gráfico de Balance Diario con Rangos de Seguridad */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl p-2 border border-white/20 mb-2">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl p-2 border border-white/20 mb-4">
           <BalanceChart data={balanceData} height={300} />
         </div>
 
-        {/* Grid de Métricas - Solo Porcentajes */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Disponible en pesos chilenos */}
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 mb-6 text-center">
+          <h3 className="text-lg font-semibold text-white mb-2">Disponible</h3>
+          <div className="text-4xl font-bold text-white">
+            {formatChileanPeso(financialData.disponible.amount)}
+          </div>
+          <p className="text-purple-100 text-sm mt-1">
+            {financialData.disponible.percentage}% de tus ingresos
+          </p>
+        </div>
+
+        {/* Grid de Porcentajes - 3 columnas */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-orange-600 mb-1">{userData.financialData.consumo.percentage}%</div>
+            <div className="text-3xl font-bold text-orange-600 mb-1">{financialData.consumo.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Consumo</p>
+            <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.consumo.amount)}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-blue-600 mb-1">{userData.financialData.necesidades.percentage}%</div>
+            <div className="text-3xl font-bold text-blue-600 mb-1">{financialData.necesidades.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Necesidades</p>
+            <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.necesidades.amount)}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-purple-600 mb-1">{userData.financialData.ahorro.percentage}%</div>
-            <p className="text-sm font-medium text-gray-600">Ahorro</p>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-green-600 mb-1">{userData.financialData.invertido.percentage}%</div>
+            <div className="text-3xl font-bold text-green-600 mb-1">{financialData.invertido.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Invertido</p>
+            <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.invertido.amount)}</p>
           </div>
         </div>
 
@@ -466,7 +432,7 @@ const SofinanceAppContent = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{transaction.description}</p>
-                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
+                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -509,7 +475,9 @@ const SofinanceAppContent = () => {
 const SofinanceApp = () => {
   return (
     <UserProvider>
-      <SofinanceAppContent />
+      <FinancialDataProvider>
+        <SofinanceAppContent />
+      </FinancialDataProvider>
     </UserProvider>
   );
 };

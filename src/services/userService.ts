@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase
 import { User } from '../types';
 
 export const fetchUserData = async (userId: string): Promise<User | null> => {
+  console.log('fetchUserData llamado para userId:', userId);
   const userDocRef = doc(db, "users", userId);
 
   try {
@@ -30,7 +31,7 @@ export const fetchUserData = async (userId: string): Promise<User | null> => {
         lastName: userData.last_name || '',
         age: userData.age || 0,
         monthlyIncome: userData.wallet?.monthly_income || 0,
-        currentSavings: userData.wallet?.savings || 0,
+        currentSavings: userData.wallet?.amount || 0,
         preferences: userData.preferences || {
           needs_percent: 0,
           saving_percent: 0,
@@ -38,14 +39,14 @@ export const fetchUserData = async (userId: string): Promise<User | null> => {
         },
         wallet: userData.wallet || {
           monthly_income: 0,
-          savings: 0,
+          amount: 0,
         },
         financialProfile: userData.financial_profile || '',
         // Valores por defecto para campos opcionales
         currentScore: 0,
         riskScore: 0,
         monthlyExpenses: 0,
-        savingsGoal: 0,
+        savingsGoal: userData.savings_goal || 0,
         alerts: 0,
       };
       

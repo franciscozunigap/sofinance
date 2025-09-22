@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { BalanceRegistrationData, BalanceRecord } from '../types';
+import { BalanceRegistration, MonthlyStats } from '../types';
 import { BalanceService } from '../services/balanceService';
 
 export const useBalance = (userId: string) => {
   const [currentBalance, setCurrentBalance] = useState<number>(0);
-  const [balanceHistory, setBalanceHistory] = useState<BalanceRegistrationData[]>([]);
+  const [balanceHistory, setBalanceHistory] = useState<BalanceRegistration[]>([]);
+  const [monthlyStats, setMonthlyStats] = useState<MonthlyStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,45 +39,79 @@ export const useBalance = (userId: string) => {
     }
   };
 
-  // Guardar nuevo registro de balance
-  const saveBalanceRegistration = async (data: BalanceRegistrationData): Promise<boolean> => {
+  // Cargar estadísticas del mes actual
+  const loadMonthlyStats = async () => {
+    try {
+      console.log('loadMonthlyStats llamado para userId:', userId);
+      setLoading(true);
+      setError(null);
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      const year = now.getFullYear();
+      
+      console.log('Obteniendo estadísticas para mes:', month, 'año:', year);
+      const stats = await BalanceService.getMonthlyStats(userId, month, year);
+      console.log('Estadísticas obtenidas:', stats);
+      setMonthlyStats(stats);
+    } catch (err) {
+      setError('Error al cargar las estadísticas mensuales');
+      console.error('Error loading monthly stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Registrar nuevo balance
+  const registerBalance = async (
+    type: 'income' | 'expense' | 'adjustment',
+    description: string,
+    amount: number,
+    category: string
+  ): Promise<boolean> => {
     try {
       setLoading(true);
       setError(null);
-      const result = await BalanceService.saveBalanceRegistration(userId, data);
+      const result = await BalanceService.registerBalance(userId, type, description, amount, category);
       
       if (result.success) {
-        // Actualizar el balance actual
-        setCurrentBalance(data.currentAmount);
-        // Recargar el historial
-        await loadBalanceHistory();
+        // Recargar todos los datos
+        await Promise.all([
+          loadCurrentBalance(),
+          loadBalanceHistory(),
+          loadMonthlyStats()
+        ]);
         return true;
       } else {
-        setError(result.error || 'Error al guardar el balance');
+        setError(result.error || 'Error al registrar el balance');
         return false;
       }
     } catch (err) {
-      setError('Error al guardar el balance');
-      console.error('Error saving balance registration:', err);
+      setError('Error al registrar el balance');
+      console.error('Error registering balance:', err);
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar datos iniciales
+  // Cargar datos iniciales solo si el userId es válido
   useEffect(() => {
-    loadCurrentBalance();
-    loadBalanceHistory();
+    if (userId && userId !== 'user-id') {
+      loadCurrentBalance();
+      loadBalanceHistory();
+      loadMonthlyStats();
+    }
   }, [userId]);
 
   return {
     currentBalance,
     balanceHistory,
+    monthlyStats,
     loading,
     error,
     loadCurrentBalance,
     loadBalanceHistory,
-    saveBalanceRegistration,
+    loadMonthlyStats,
+    registerBalance,
   };
 };

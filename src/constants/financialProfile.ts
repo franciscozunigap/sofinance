@@ -6,7 +6,7 @@ export const FINANCIAL_PROFILE_TAGS: FinancialProfileTag[] = [
   { id: 'pago_dividendo', label: 'Pago dividendo', category: 'responsabilidades', icon: '🏠' },
   { id: 'tengo_vehiculo', label: 'Tengo vehículo', category: 'activos', icon: '🚗' },
   { id: 'tengo_casa', label: 'Tengo casa propia', category: 'activos', icon: '🏠' },
-  { id: 'tengo_ahorros', label: 'Tengo ahorros', category: 'activos', icon: '💰' },
+  { id: 'tengo_disponibles', label: 'Tengo disponibles', category: 'activos', icon: '💰' },
   { id: 'tengo_inversiones_activas', label: 'Tengo inversiones activas', category: 'activos', icon: '📊' },
   { id: 'tengo_oro', label: 'Tengo oro/metales preciosos', category: 'activos', icon: '🥇' },
   { id: 'pago_arriendo', label: 'Pago arriendo', category: 'responsabilidades', icon: '🏡' },

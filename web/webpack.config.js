@@ -64,8 +64,18 @@ module.exports = {
         test: /\.css$/,
         exclude: /react-native-web\.css$/,
         use: [
-          'style-loader',
-          'css-loader',
+          {
+            loader: 'style-loader',
+            options: {
+              injectType: 'styleTag',
+            },
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
           {
             loader: 'postcss-loader',
             options: {
@@ -81,7 +91,15 @@ module.exports = {
       },
       {
         test: /react-native-web\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          {
+            loader: 'style-loader',
+            options: {
+              injectType: 'styleTag',
+            },
+          },
+          'css-loader',
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/,
@@ -128,12 +146,20 @@ module.exports = {
   devServer: {
     static: {
       directory: path.join(__dirname, '../dist'),
+      publicPath: '/',
     },
     compress: true,
     port: 3000,
     hot: true,
-    historyApiFallback: true,
+    historyApiFallback: {
+      index: '/index.html',
+    },
     open: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+    },
   },
   devtool: 'source-map',
 };

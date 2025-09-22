@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, DollarSign, Search, Filter } from 'lucide-react';
 
 interface Transaction {
-  id: number;
+  id: string;
   description: string;
   amount: number;
   category: string;
-  date: string;
+  date: Date;
   time: string;
 }
 
@@ -178,7 +178,7 @@ const AllTransactionsModal: React.FC<AllTransactionsModalProps> = ({
                     <div>
                       <p className="font-semibold text-gray-900">{transaction.description}</p>
                       <p className="text-sm text-gray-500">
-                        {transaction.category} • {transaction.date} {transaction.time}
+                        {transaction.category} • {transaction.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}
                       </p>
                     </div>
                   </div>

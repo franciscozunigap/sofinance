@@ -217,10 +217,11 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ data, height = 300 }) => {
             stroke="#858BF2"
             strokeWidth={2.5}
             connectNulls={true}
-            dot={({ cx, cy, payload }) => {
+            dot={({ cx, cy, payload, index }) => {
               if (!payload?.hasData) {
                 return (
                   <circle
+                    key={`dot-${index}`}
                     cx={cx}
                     cy={cy}
                     r={4}
@@ -233,6 +234,7 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ data, height = 300 }) => {
               }
               return (
                 <circle
+                  key={`dot-${index}`}
                   cx={cx}
                   cy={cy}
                   r={6}

@@ -46,7 +46,7 @@ export const calculateFinancialHealth = (data: {
   const expenseRatio = monthlyExpenses / monthlyIncome;
   const expenseScore = Math.max(0, 40 - (expenseRatio - 0.5) * 80);
   
-  // Calcular ratio de ahorros vs meta (30% del score)
+  // Calcular ratio de disponibles vs meta (30% del score)
   const savingsRatio = currentSavings / savingsGoal;
   const savingsScore = Math.min(30, savingsRatio * 30);
   
@@ -97,14 +97,14 @@ export const getFinancialAdvice = (score: number): string[] => {
   if (score < 40) {
     advice.push('Reduce tus gastos no esenciales');
     advice.push('Crea un presupuesto mensual detallado');
-    advice.push('Establece una meta de ahorro realista');
+    advice.push('Establece una meta de disponible realista');
   } else if (score < 60) {
     advice.push('Mantén el control de tus gastos');
-    advice.push('Considera aumentar tu porcentaje de ahorro');
+    advice.push('Considera aumentar tu porcentaje de disponible');
     advice.push('Revisa tus gastos recurrentes');
   } else {
     advice.push('¡Excelente trabajo! Mantén esta disciplina');
-    advice.push('Considera invertir parte de tus ahorros');
+    advice.push('Considera invertir parte de tus disponibles');
     advice.push('Evalúa oportunidades de crecimiento');
   }
   

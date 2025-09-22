@@ -88,7 +88,7 @@ export const validateRegistrationForm = (data: {
   }
 
   if (!validateSavings(data.currentSavings)) {
-    errors.currentSavings = 'Los ahorros actuales no pueden ser negativos';
+    errors.currentSavings = 'Los disponibles actuales no pueden ser negativos';
   }
 
   return errors;

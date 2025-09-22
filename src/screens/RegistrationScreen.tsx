@@ -103,7 +103,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                 </View>
                 <View style={styles.stepContent}>
                   <Text style={styles.stepTitle}>Información financiera</Text>
-                  <Text style={styles.stepDescription}>Ingresos mensuales, distribución de gastos y ahorro actual</Text>
+                  <Text style={styles.stepDescription}>Ingresos mensuales, distribución de gastos y disponible actual</Text>
                 </View>
               </View>
 
