@@ -246,7 +246,10 @@ const WebDashboardScreen = () => {
       }}
     >
       {/* Header Mejorado con Gradiente */}
-      <div className="relative w-full h-64 lg:h-80 overflow-hidden" style={{ minHeight: '256px', maxHeight: '320px' }}>
+      <div className="relative w-full h-64 lg:h-80 overflow-hidden" style={{ 
+        minHeight: '256px', 
+        maxHeight: '320px'
+      }}>
         {/* Gradiente de fondo */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
         
@@ -280,41 +283,64 @@ const WebDashboardScreen = () => {
             maxHeight: '320px',
             // Asegurar que el contenedor no se redimensione
             flexShrink: 0,
-            flexGrow: 0
+            flexGrow: 0,
+            // Centrar el contenido para pantallas muy horizontales
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
-          <img 
-            src={avatar} 
-            alt="Avatar" 
-            className="absolute inset-0"
+          {/* Contenedor del avatar con tamaño fijo para evitar zoom */}
+          <div 
+            className="relative"
             style={{
-              filter: 'brightness(1.2) contrast(1.1) saturate(1.1)',
-              mixBlendMode: 'multiply',
-              opacity: 0.9,
+              position: 'relative',
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'top center',
-              // Asegurar consistencia en el redimensionamiento
-              minWidth: '100%',
-              minHeight: '100%',
-              maxWidth: 'none',
-              maxHeight: 'none',
-              // Mejoras para consistencia
-              imageRendering: 'crisp-edges',
-              backfaceVisibility: 'hidden',
-              transform: 'translateZ(0)', // Forzar aceleración por hardware
-              willChange: 'transform'
+              maxWidth: '1200px', // Tamaño máximo fijo
+              maxHeight: '320px',
+              // Centrar el contenido
+              margin: '0 auto',
+              // Permitir que la escala funcione correctamente
+              overflow: 'visible'
             }}
-          />
-          {/* Overlay para integrar mejor con el fondo */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 via-transparent to-primary-600/20"></div>
+          >
+            <img 
+              src={avatar} 
+              alt="Avatar" 
+              className="absolute"
+              style={{
+                filter: 'brightness(1.2) contrast(1.1) saturate(1.1)',
+                mixBlendMode: 'multiply',
+                opacity: 0.9,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center center',
+                // Mejoras para calidad de imagen
+                imageRendering: 'auto',
+                backfaceVisibility: 'hidden',
+                // Centrar y escalar la imagen
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) scale(0.7)',
+                willChange: 'transform',
+                // Asegurar que no se haga zoom
+                transformOrigin: 'center center',
+                // Prevenir distorsión y mantener calidad
+                aspectRatio: 'auto'
+              }}
+            />
+            {/* Overlay para integrar mejor con el fondo */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 via-transparent to-primary-600/20"></div>
+          </div>
         </div>
 
         {/* Información del usuario en el header */}
         <div className="absolute bottom-6 left-6 right-6 z-10">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
-            <p className="text-white/90 text-sm mb-1">¡Hola {userData.name}! 👋</p>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+            <p className="text-white/90 text-sm">¡Hola {userData.name}! 👋</p>
             <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">¡Qué bien lo estás haciendo!</h1>
             <p className="text-white/80 text-sm">
             Hoy mantuviste tus gastos bajo control. Cada vez que tus ingresos superan tus gastos, estás construyendo una base más fuerte para tu libertad financiera. ¡Un gran paso!            </p>

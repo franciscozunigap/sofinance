@@ -397,7 +397,7 @@ const SofinanceAppContent = () => {
       {/* Main Content con superposición */}
       <main className="relative z-10 bg-white rounded-t-3xl -mt-2 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6">
         {/* Bienvenida */}
-        <div className="mb-6">
+        <div className="mb-2">
           <p className="text-sm text-gray-600">¡Hola {userData.name}!</p>
         </div>
 
