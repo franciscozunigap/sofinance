@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, AreaChart, Area } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon, X, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
+import WebBalanceRegistrationScreen from './WebBalanceRegistrationScreen';
 
 interface WebAnalysisScreenProps {}
 
 const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
   const { user } = useUser();
   const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
+  const [showBalanceRegistration, setShowBalanceRegistration] = useState(false);
 
   // Datos mock del usuario
   const userData = {
@@ -125,6 +127,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
             </div>
             <div className="flex items-center space-x-4 slide-in-right">
               <button
+                onClick={() => setShowBalanceRegistration(true)}
                 className="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-2xl shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-xl"
                 title="Agregar movimiento"
               >
@@ -326,6 +329,17 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
             </div>
           </div>
         )}
+
+        {/* Modal de Registro de Balance */}
+        <WebBalanceRegistrationScreen
+          isOpen={showBalanceRegistration}
+          onClose={() => setShowBalanceRegistration(false)}
+          onComplete={() => {
+            // Aquí podrías actualizar el estado o refrescar los datos
+            console.log('Registro de balance completado');
+          }}
+          currentBalance={userData.currentSavings}
+        />
       </div>
     </div>
   );
