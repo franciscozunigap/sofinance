@@ -22,13 +22,13 @@ const { width } = Dimensions.get('window');
 
 interface AnalysisScreenProps {
   currentView: string;
-  onViewChange: (view: string) => void;
+  onViewChange: (view: 'dashboard' | 'analysis' | 'chat' | 'settings') => void;
 }
 
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChange }) => {
   const { user } = useUser();
   const [showBalanceRegistration, setShowBalanceRegistration] = useState(false);
-  const [selectedRecommendation, setSelectedRecommendation] = useState(null);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<typeof insights[0] | null>(null);
 
   // Datos del usuario
   const userData = user || {

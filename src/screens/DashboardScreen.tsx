@@ -225,9 +225,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
 
           {/* Título y descripción principal */}
           <View style={styles.titleSection}>
-            <Text style={styles.mainTitle}>Tu Salud Financiera</Text>
+            <Text style={styles.mainTitle}>¡Qué bien lo estás haciendo!</Text>
             <Text style={styles.mainDescription}>
-              Optimiza tus finanzas diariamente con nuestro análisis inteligente. Visualiza tendencias, identifica oportunidades de ahorro y toma decisiones financieras más inteligentes.
+            Hoy mantuviste tus gastos bajo control. Cada vez que tus ingresos superan tus gastos, estás construyendo una base más fuerte para tu libertad financiera. ¡Un gran paso!
             </Text>
           </View>
 
@@ -283,8 +283,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                 style={[
                   styles.registroItem,
                   { 
-                    backgroundColor: 'rgba(243, 244, 246, 0.5)',
-                    animationDelay: `${index * 100}ms`
+                    backgroundColor: 'rgba(243, 244, 246, 0.5)'
                   }
                 ]}
               >

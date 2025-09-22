@@ -438,9 +438,9 @@ const SofinanceAppContent = () => {
 
         {/* Título y descripción principal */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-dark mb-2">Tu Salud Financiera</h1>
+          <h1 className="text-2xl font-bold text-dark mb-2">¡Qué bien lo estás haciendo!</h1>
           <p className="text-sm text-gray-600">
-            Optimiza tus finanzas diariamente con nuestro análisis inteligente. Visualiza tendencias, identifica oportunidades de ahorro y toma decisiones financieras más inteligentes.
+            Hoy mantuviste tus gastos bajo control. Cada vez que tus ingresos superan tus gastos, estás construyendo una base más fuerte para tu libertad financiera. ¡Un gran paso!
           </p>
         </div>
           

@@ -291,10 +291,9 @@ const WebDashboardScreen = () => {
         <div className="absolute bottom-6 left-6 right-6 z-10">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
             <p className="text-white/90 text-sm mb-1">¡Hola {userData.name}! 👋</p>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Tu Salud Financiera</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">¡Qué bien lo estás haciendo!</h1>
             <p className="text-white/80 text-sm">
-              Optimiza tus finanzas diariamente con nuestro análisis inteligente
-            </p>
+            Hoy mantuviste tus gastos bajo control. Cada vez que tus ingresos superan tus gastos, estás construyendo una base más fuerte para tu libertad financiera. ¡Un gran paso!            </p>
           </div>
         </div>
       </div>
