@@ -92,7 +92,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
     };
   };
 
-  // Datos para análisis financiero - Mostrar últimos 6 meses a partir del mes actual
+  // Datos para análisis financiero - Mostrar últimos 6 meses con datos dispersos
   const generateMonthlyTrend = () => {
     const currentDate = new Date();
     const months = [];
@@ -105,16 +105,22 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
       // Calcular montos reales para este mes
       const categoryData = calculateCategoryAmountsForMonth(date.getFullYear(), date.getMonth());
       
+      // Verificar si hay datos reales para este mes
+      const hasData = categoryData.consume.amount > 0 || 
+                     categoryData.necesidades.amount > 0 || 
+                     categoryData.disponible.amount > 0 || 
+                     categoryData.invest.amount > 0;
+      
       months.push({
         month: monthName,
-        consume: categoryData.consume,
-        necesidades: categoryData.necesidades,
-        disponible: categoryData.disponible,
-        invest: categoryData.invest
+        consume: hasData ? categoryData.consume : { amount: undefined, percent: 0 },
+        necesidades: hasData ? categoryData.necesidades : { amount: undefined, percent: 0 },
+        disponible: hasData ? categoryData.disponible : { amount: undefined, percent: 0 },
+        invest: hasData ? categoryData.invest : { amount: undefined, percent: 0 }
       });
     }
 
-    // Si no hay datos, mostrar todos los meses con valores 0
+    // Si no hay datos en absoluto, mostrar todos los meses con valores 0
     if (!monthlyStats && balanceHistory.length === 0) {
       return months.map(month => ({
         ...month,
@@ -125,12 +131,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
       }));
     }
 
-    // Si solo hay datos del mes actual, mostrar solo el mes actual
-    if (balanceHistory.length <= 1) {
-      return [months[months.length - 1]]; // Solo el último mes (mes actual)
-    }
-
-    // Retornar todos los meses con datos calculados
+    // Retornar todos los meses (con datos reales donde estén disponibles, undefined donde no)
     return months;
   };
 
@@ -327,9 +328,6 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
 
         {/* Gráficos de Categorías */}
         <div className="mb-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">
-            {monthlyTrend.length === 1 ? 'Análisis del Mes Actual' : 'Tendencias de Categorías'}
-          </h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Gráfico de Consumo */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">

@@ -73,22 +73,35 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
     }
   };
 
-  // Datos para análisis financiero - porcentual (usar datos reales si están disponibles)
-  const monthlyTrend = monthlyStats ? [
-    { month: 'Ene', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
-    { month: 'Feb', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
-    { month: 'Mar', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
-    { month: 'Abr', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
-    { month: 'May', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment },
-    { month: 'Jun', consumo: monthlyStats.percentages.wants, necesidades: monthlyStats.percentages.needs, disponible: monthlyStats.percentages.savings, invertido: monthlyStats.percentages.investment }
-  ] : [
-    { month: 'Ene', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
-    { month: 'Feb', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
-    { month: 'Mar', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
-    { month: 'Abr', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
-    { month: 'May', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
-    { month: 'Jun', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 }
-  ];
+  // Datos para análisis financiero - mostrar solo meses con datos reales
+  const generateMonthlyTrend = () => {
+    if (!monthlyStats || balanceHistory.length === 0) {
+      // Si no hay datos, mostrar datos mock
+      return [
+        { month: 'Ene', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+        { month: 'Feb', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+        { month: 'Mar', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+        { month: 'Abr', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+        { month: 'May', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 },
+        { month: 'Jun', consumo: 0, necesidades: 0, disponible: 0, invertido: 0 }
+      ];
+    }
+
+    // Obtener el mes actual donde hay datos
+    const currentMonth = new Date();
+    const monthName = currentMonth.toLocaleDateString('es-CL', { month: 'short' });
+    
+    // Mostrar solo el mes actual con datos reales
+    return [{
+      month: monthName,
+      consumo: monthlyStats.percentages.wants,
+      necesidades: monthlyStats.percentages.needs,
+      disponible: monthlyStats.percentages.savings,
+      invertido: monthlyStats.percentages.investment
+    }];
+  };
+
+  const monthlyTrend = generateMonthlyTrend();
 
   const categoryAnalysis = monthlyStats ? [
     { name: 'Necesidades', value: monthlyStats.totalExpenses * (monthlyStats.percentages.needs / 100), color: '#ef4444' },

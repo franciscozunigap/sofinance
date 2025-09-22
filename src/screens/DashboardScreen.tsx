@@ -106,22 +106,59 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     }
   };
 
-  // Datos de balance diario - usar datos reales si están disponibles
-  const balanceData = balanceHistory.length > 0 ? 
-    balanceHistory.slice(0, 7).map((registration, index) => ({
-      date: registration.date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' }),
-      amount: registration.balanceAfter,
-      upper_amount: registration.balanceAfter * 1.2,
-      lower_amount: registration.balanceAfter * 0.8,
-    })) : monthlyStats ? [
-      { date: 'Hoy', amount: currentBalance, upper_amount: currentBalance * 1.2, lower_amount: currentBalance * 0.8 },
-    ] : [
-      // Datos de ejemplo si no hay datos reales
-      { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
-      { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
-      { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
-      { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
-    ];
+  // Datos de balance diario - generar últimos 7 días con datos reales donde estén disponibles
+  const generateBalanceData = () => {
+    if (balanceHistory.length === 0) {
+      // Si no hay datos reales, usar datos mock
+      return monthlyStats ? [
+        { date: 'Hoy', amount: currentBalance, upper_amount: currentBalance * 1.2, lower_amount: currentBalance * 0.8 },
+      ] : [
+        { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+      ];
+    }
+
+    // Generar los últimos 7 días
+    const last7Days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateStr = date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' });
+      
+      // Buscar si hay datos para este día
+      const dayData = balanceHistory.find(registration => {
+        const regDate = new Date(registration.date);
+        return regDate.toDateString() === date.toDateString();
+      });
+      
+      if (dayData) {
+        // Si hay datos para este día, usarlos
+        last7Days.push({
+          date: dateStr,
+          amount: dayData.balanceAfter,
+          upper_amount: dayData.balanceAfter * 1.2,
+          lower_amount: dayData.balanceAfter * 0.8,
+        });
+      } else {
+        // Si no hay datos para este día, crear entrada sin punto
+        const lastKnownBalance = balanceHistory[0]?.balanceAfter || currentBalance;
+        last7Days.push({
+          date: dateStr,
+          amount: undefined, // Sin punto en el gráfico
+          upper_amount: lastKnownBalance * 1.2,
+          lower_amount: lastKnownBalance * 0.8,
+        });
+      }
+    }
+    
+    return last7Days;
+  };
+
+  const balanceData = generateBalanceData();
 
   // Simular carga de datos del usuario
   useEffect(() => {

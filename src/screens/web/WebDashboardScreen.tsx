@@ -37,21 +37,57 @@ const WebDashboardScreen = () => {
 
   // Los datos del usuario y financieros ahora vienen del contexto centralizado
 
-  // Gráfico de salud financiera - 7 días
+  // Gráfico de salud financiera - 7 días usando datos reales de Firebase
   const currentMonth = new Date().toLocaleDateString('es-CL', { month: 'long' });
-  const dailyScoreData = balanceHistory.length > 0 ? 
-    balanceHistory.slice(0, 7).map((registration, index) => ({
-      day: registration.date.toLocaleDateString('es-CL', { weekday: 'short' }),
-      score: Math.min(100, Math.max(0, 50 + (registration.balanceAfter / 100000) * 10)) // Score basado en balance
-    })) : [
-      { day: 'Lun', score: 45 },
-      { day: 'Mar', score: 48 },
-      { day: 'Mié', score: 44 },
-      { day: 'Jue', score: 46 },
-      { day: 'Vie', score: 50 },
-      { day: 'Sáb', score: 48 },
-      { day: 'Dom', score: 52 }
-    ];
+  
+  const generateDailyScoreData = () => {
+    if (balanceHistory.length === 0) {
+      return [
+        { day: 'Lun', score: 45 },
+        { day: 'Mar', score: 48 },
+        { day: 'Mié', score: 44 },
+        { day: 'Jue', score: 46 },
+        { day: 'Vie', score: 50 },
+        { day: 'Sáb', score: 48 },
+        { day: 'Dom', score: 52 }
+      ];
+    }
+
+    // Generar los últimos 7 días
+    const last7Days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dayStr = date.toLocaleDateString('es-CL', { weekday: 'short' });
+      
+      // Buscar si hay datos para este día
+      const dayData = balanceHistory.find(registration => {
+        const regDate = new Date(registration.date);
+        return regDate.toDateString() === date.toDateString();
+      });
+      
+      if (dayData) {
+        // Si hay datos para este día, calcular score basado en balance
+        const score = Math.min(100, Math.max(0, 50 + (dayData.balanceAfter / 100000) * 10));
+        last7Days.push({
+          day: dayStr,
+          score: score
+        });
+      } else {
+        // Si no hay datos para este día, crear entrada sin punto
+        last7Days.push({
+          day: dayStr,
+          score: undefined // Sin punto en el gráfico
+        });
+      }
+    }
+    
+    return last7Days;
+  };
+
+  const dailyScoreData = generateDailyScoreData();
 
   // Categorías de gastos (en pesos chilenos)
   const expenseCategories = monthlyStats ? [

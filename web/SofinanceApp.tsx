@@ -47,55 +47,133 @@ const SofinanceAppContent = () => {
 
   // Los datos del usuario y financieros ahora vienen del contexto centralizado
 
-  // Gráfico de salud financiera - 7 días
-  const currentMonth = "Septiembre";
-  const dailyScoreData = [
-    { day: 'Lun', score: 45 },
-    { day: 'Mar', score: 48 },
-    { day: 'Mié', score: 44 },
-    { day: 'Jue', score: 46 },
-    { day: 'Vie', score: 50 },
-    { day: 'Sáb', score: 48 },
-    { day: 'Dom', score: 52 }
+  // Gráfico de salud financiera - 7 días usando datos reales de Firebase
+  const currentMonth = new Date().toLocaleDateString('es-CL', { month: 'long' });
+  
+  const generateDailyScoreData = () => {
+    if (balanceHistory.length === 0) {
+      return [
+        { day: 'Lun', score: 45 },
+        { day: 'Mar', score: 48 },
+        { day: 'Mié', score: 44 },
+        { day: 'Jue', score: 46 },
+        { day: 'Vie', score: 50 },
+        { day: 'Sáb', score: 48 },
+        { day: 'Dom', score: 52 }
+      ];
+    }
+
+    // Generar los últimos 7 días
+    const last7Days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dayStr = date.toLocaleDateString('es-CL', { weekday: 'short' });
+      
+      // Buscar si hay datos para este día
+      const dayData = balanceHistory.find(registration => {
+        const regDate = new Date(registration.date);
+        return regDate.toDateString() === date.toDateString();
+      });
+      
+      if (dayData) {
+        // Si hay datos para este día, calcular score basado en balance
+        const score = Math.min(100, Math.max(0, 50 + (dayData.balanceAfter / 100000) * 10));
+        last7Days.push({
+          day: dayStr,
+          score: score
+        });
+      } else {
+        // Si no hay datos para este día, crear entrada sin punto
+        last7Days.push({
+          day: dayStr,
+          score: undefined // Sin punto en el gráfico
+        });
+      }
+    }
+    
+    return last7Days;
+  };
+
+  const dailyScoreData = generateDailyScoreData();
+
+  // Datos de balance diario - generar últimos 7 días con datos reales donde estén disponibles
+  const generateBalanceData = () => {
+    if (balanceHistory.length === 0) {
+      // Si no hay datos reales, usar datos mock
+      return monthlyStats ? [
+        { date: 'Hoy', amount: currentBalance, upper_amount: currentBalance * 1.2, lower_amount: currentBalance * 0.8 },
+      ] : [
+        { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+      ];
+    }
+
+    // Generar los últimos 7 días
+    const last7Days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateStr = date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' });
+      
+      // Buscar si hay datos para este día
+      const dayData = balanceHistory.find(registration => {
+        const regDate = new Date(registration.date);
+        return regDate.toDateString() === date.toDateString();
+      });
+      
+      if (dayData) {
+        // Si hay datos para este día, usarlos
+        last7Days.push({
+          date: dateStr,
+          amount: dayData.balanceAfter,
+          upper_amount: dayData.balanceAfter * 1.2,
+          lower_amount: dayData.balanceAfter * 0.8,
+        });
+      } else {
+        // Si no hay datos para este día, crear entrada sin punto
+        const lastKnownBalance = balanceHistory[0]?.balanceAfter || currentBalance;
+        last7Days.push({
+          date: dateStr,
+          amount: undefined, // Sin punto en el gráfico
+          upper_amount: lastKnownBalance * 1.2,
+          lower_amount: lastKnownBalance * 0.8,
+        });
+      }
+    }
+    
+    return last7Days;
+  };
+
+  const balanceData = generateBalanceData();
+
+  // Categorías de gastos usando datos reales de Firebase
+  const expenseCategories = monthlyStats ? [
+    { name: 'Necesidades', value: monthlyStats.totalExpenses * 0.6, color: '#ea580c' },
+    { name: 'Consumo', value: monthlyStats.totalExpenses * 0.4, color: '#fb923c' },
+    { name: 'Ahorro', value: monthlyStats.balance * 0.7, color: '#fed7aa' }
+  ] : [
+    { name: 'Necesidades', value: 1800000, color: '#ea580c' }, // 1.800.000 pesos
+    { name: 'Consumo', value: 780000, color: '#fb923c' }, // 780.000 pesos
+    { name: 'Ahorro', value: 600000, color: '#fed7aa' } // 600.000 pesos
   ];
 
-  // Datos de balance diario para los últimos 7 días (en pesos chilenos)
-  const balanceData = [
-    // Lunes - Verde (dentro del rango seguro)
-    { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Martes - Verde (dentro del rango seguro)
-    { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Miércoles - Amarillo (por debajo del rango inferior)
-    { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Jueves - Verde (dentro del rango seguro)
-    { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Viernes - Rojo (por encima del rango superior)
-    { date: '2024-01-19', amount: 1520000, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Sábado - Sin datos
-    { date: '2024-01-20', amount: undefined, upper_amount: 1500000, lower_amount: 1000000 },
-    
-    // Domingo - Verde (dentro del rango seguro)
-    { date: '2024-01-21', amount: 1270000, upper_amount: 1500000, lower_amount: 1000000 },
-  ];
-
-  // Categorías de gastos
-  const expenseCategories = [
-    { name: 'Necesidades', value: 1800, color: '#ea580c' },
-    { name: 'Consumo', value: 780, color: '#fb923c' },
-    { name: 'Ahorro', value: 600, color: '#fed7aa' }
-  ];
-
-  const weeklyTrend = [
-    { week: 'S1', gastos: 720 },
-    { week: 'S2', gastos: 890 },
-    { week: 'S3', gastos: 650 },
-    { week: 'S4', gastos: 920 }
-  ];
+  const weeklyTrend = balanceHistory.length > 0 ? 
+    balanceHistory.slice(0, 4).map((registration, index) => ({
+      week: `S${index + 1}`,
+      gastos: Math.abs(registration.amount)
+    })) : [
+      { week: 'S1', gastos: 720000 }, // 720.000 pesos
+      { week: 'S2', gastos: 890000 }, // 890.000 pesos
+      { week: 'S3', gastos: 650000 }, // 650.000 pesos
+      { week: 'S4', gastos: 920000 } // 920.000 pesos
+    ];
 
   // Importar las transacciones desde mockData
   // Convertir el historial de balance a formato de transacciones recientes
