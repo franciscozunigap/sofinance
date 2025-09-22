@@ -102,17 +102,6 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ data, height = 300 }) => {
                 <div className="text-lg font-medium text-slate-400">No hay información disponible</div>
               </div>
             )}
-            
-            <div className="border-t border-slate-100 pt-3 mt-4">
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                <span className="font-medium">Rango superior:</span>
-                <span className="font-semibold text-slate-700">{formatChileanPeso(data.upper_amount)}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-medium">Rango inferior:</span>
-                <span className="font-semibold text-slate-700">{formatChileanPeso(data.lower_amount)}</span>
-              </div>
-            </div>
           </div>
         </div>
       );
