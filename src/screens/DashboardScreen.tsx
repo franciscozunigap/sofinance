@@ -277,7 +277,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.registrosList}>
-            {RECENT_TRANSACTIONS.map((transaction, index) => (
+            {RECENT_TRANSACTIONS.slice(0, 5).map((transaction, index) => (
               <View 
                 key={transaction.id} 
                 style={[

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
+import { RECENT_TRANSACTIONS } from '../../data/mockData';
 import avatar from '../../../assets/avatar.svg';
 
 const WebDashboardScreen = () => {
@@ -29,35 +30,35 @@ const WebDashboardScreen = () => {
   // Datos del usuario (se actualizarán desde el contexto)
   const userData = user ? {
     name: user.name || 'Usuario',
-    monthlyIncome: user.monthlyIncome || 4200,
+    monthlyIncome: user.monthlyIncome || 4200000, // 4.200.000 pesos
     currentScore: user.currentScore || 52,
     riskScore: user.riskScore || 48,
-    monthlyExpenses: user.monthlyExpenses || 3180,
-    currentSavings: user.currentSavings || 12500,
-    savingsGoal: user.savingsGoal || 18000,
+    monthlyExpenses: user.monthlyExpenses || 3180000, // 3.180.000 pesos
+    currentSavings: user.currentSavings || 12500000, // 12.500.000 pesos
+    savingsGoal: user.savingsGoal || 18000000, // 18.000.000 pesos
     alerts: user.alerts || 3,
-    // Nuevos datos financieros
+    // Nuevos datos financieros (en pesos chilenos)
     financialData: {
-      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
-      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
     }
   } : {
     name: 'Usuario',
-    monthlyIncome: 4200,
+    monthlyIncome: 4200000, // 4.200.000 pesos
     currentScore: 52,
     riskScore: 48,
-    monthlyExpenses: 3180,
-    currentSavings: 12500,
-    savingsGoal: 18000,
+    monthlyExpenses: 3180000, // 3.180.000 pesos
+    currentSavings: 12500000, // 12.500.000 pesos
+    savingsGoal: 18000000, // 18.000.000 pesos
     alerts: 3,
-    // Nuevos datos financieros
+    // Nuevos datos financieros (en pesos chilenos)
     financialData: {
-      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
-      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
     }
   };
 
@@ -73,27 +74,22 @@ const WebDashboardScreen = () => {
     { day: 'Dom', score: 52 }
   ];
 
-  // Categorías de gastos
+  // Categorías de gastos (en pesos chilenos)
   const expenseCategories = [
-    { name: 'Necesidades', value: 1800, color: '#ea580c' },
-    { name: 'Consumo', value: 780, color: '#fb923c' },
-    { name: 'Ahorro', value: 600, color: '#fed7aa' }
+    { name: 'Necesidades', value: 1800000, color: '#ea580c' }, // 1.800.000 pesos
+    { name: 'Consumo', value: 780000, color: '#fb923c' }, // 780.000 pesos
+    { name: 'Ahorro', value: 600000, color: '#fed7aa' } // 600.000 pesos
   ];
 
   const weeklyTrend = [
-    { week: 'S1', gastos: 720 },
-    { week: 'S2', gastos: 890 },
-    { week: 'S3', gastos: 650 },
-    { week: 'S4', gastos: 920 }
+    { week: 'S1', gastos: 720000 }, // 720.000 pesos
+    { week: 'S2', gastos: 890000 }, // 890.000 pesos
+    { week: 'S3', gastos: 650000 }, // 650.000 pesos
+    { week: 'S4', gastos: 920000 } // 920.000 pesos
   ];
 
-  const recentTransactions = [
-    { id: 1, description: 'Supermercado Jumbo', amount: -85.50, category: 'Necesidades', date: '08 Sep', time: '14:30' },
-    { id: 2, description: 'Cena en restaurante', amount: -45.00, category: 'Consumo', date: '08 Sep', time: '21:15' },
-    { id: 3, description: 'Netflix', amount: -9.99, category: 'Consumo', date: '07 Sep', time: '16:45' },
-    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Ahorro', date: '07 Sep', time: '08:00' },
-    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingresos', date: '05 Sep', time: '09:00' }
-  ];
+  // Importar las transacciones desde mockData
+  const recentTransactions = RECENT_TRANSACTIONS;
 
   const achievements = [
     { id: 1, title: 'Consistencia Semanal', description: 'Registraste tus gastos 7 días seguidos', icon: '🎯', unlocked: true },
@@ -385,7 +381,7 @@ const WebDashboardScreen = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {recentTransactions.map((transaction, index) => (
+            {recentTransactions.slice(0, 5).map((transaction, index) => (
               <div 
                 key={transaction.id} 
                 className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-100/50 transition-all duration-200 group"
@@ -401,7 +397,7 @@ const WebDashboardScreen = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{transaction.description}</p>
-                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
+                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date}</p>
                   </div>
                 </div>
                 <div className="text-right">

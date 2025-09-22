@@ -8,6 +8,7 @@ import { UserProvider, useUser } from '../src/contexts/UserContext';
 import FloatingNavigationPanel from '../src/components/FloatingNavigationPanel';
 import WebAnalysisScreen from '../src/screens/web/WebAnalysisScreen';
 import SettingsMenu from '../src/components/SettingsMenu';
+import { RECENT_TRANSACTIONS } from '../src/data/mockData';
 import AllTransactionsModal from '../src/components/AllTransactionsModal';
 import BalanceChart from '../src/components/BalanceChart';
 import logo from '../assets/logo.png';
@@ -138,47 +139,11 @@ const SofinanceAppContent = () => {
     { week: 'S4', gastos: 920 }
   ];
 
-  const recentTransactions = [
-    { id: 1, description: 'Supermercado Jumbo', amount: -85.50, category: 'Necesidades', date: '08 Sep', time: '14:30' },
-    { id: 2, description: 'Cena en restaurante', amount: -45.00, category: 'Consumo', date: '08 Sep', time: '21:15' },
-    { id: 3, description: 'Netflix', amount: -9.99, category: 'Consumo', date: '07 Sep', time: '16:45' },
-    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Invertido', date: '07 Sep', time: '08:00' },
-    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingreso', date: '05 Sep', time: '09:00' }
-  ];
+  // Importar las transacciones desde mockData
+  const recentTransactions = RECENT_TRANSACTIONS;
 
   // Lista completa de transacciones para el modal
-  const allTransactions = [
-    { id: 1, description: 'Supermercado Jumbo', amount: -85.50, category: 'Necesidades', date: '08 Sep', time: '14:30' },
-    { id: 2, description: 'Cena en restaurante', amount: -45.00, category: 'Consumo', date: '08 Sep', time: '21:15' },
-    { id: 3, description: 'Netflix', amount: -9.99, category: 'Consumo', date: '07 Sep', time: '16:45' },
-    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Invertido', date: '07 Sep', time: '08:00' },
-    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingreso', date: '05 Sep', time: '09:00' },
-    { id: 6, description: 'Uber', amount: -12.50, category: 'Necesidades', date: '06 Sep', time: '18:20' },
-    { id: 7, description: 'Farmacia', amount: -28.75, category: 'Necesidades', date: '06 Sep', time: '11:30' },
-    { id: 8, description: 'Café', amount: -4.50, category: 'Consumo', date: '05 Sep', time: '08:15' },
-    { id: 9, description: 'Gasolina', amount: -45.00, category: 'Necesidades', date: '05 Sep', time: '16:45' },
-    { id: 10, description: 'Almuerzo', amount: -18.90, category: 'Consumo', date: '04 Sep', time: '13:20' },
-    { id: 11, description: 'Gimnasio', amount: -35.00, category: 'Necesidades', date: '04 Sep', time: '19:00' },
-    { id: 12, description: 'Compra online', amount: -67.80, category: 'Consumo', date: '03 Sep', time: '20:30' },
-    { id: 13, description: 'Luz', amount: -89.50, category: 'Necesidades', date: '03 Sep', time: '10:00' },
-    { id: 14, description: 'Agua', amount: -32.25, category: 'Necesidades', date: '02 Sep', time: '09:15' },
-    { id: 15, description: 'Internet', amount: -45.00, category: 'Necesidades', date: '02 Sep', time: '08:30' },
-    { id: 16, description: 'Cine', amount: -25.00, category: 'Consumo', date: '01 Sep', time: '21:00' },
-    { id: 17, description: 'Libros', amount: -78.90, category: 'Consumo', date: '01 Sep', time: '15:30' },
-    { id: 18, description: 'Ropa', amount: -120.00, category: 'Consumo', date: '31 Ago', time: '14:20' },
-    { id: 19, description: 'Medicamentos', amount: -45.60, category: 'Necesidades', date: '31 Ago', time: '11:45' },
-    { id: 20, description: 'Taxi', amount: -15.00, category: 'Necesidades', date: '30 Ago', time: '22:10' },
-    { id: 21, description: 'Desayuno', amount: -8.50, category: 'Consumo', date: '30 Ago', time: '07:30' },
-    { id: 22, description: 'Spotify', amount: -5.99, category: 'Consumo', date: '29 Ago', time: '12:00' },
-    { id: 23, description: 'Reparación auto', amount: -180.00, category: 'Necesidades', date: '29 Ago', time: '16:00' },
-    { id: 24, description: 'Supermercado', amount: -95.30, category: 'Necesidades', date: '28 Ago', time: '17:45' },
-    { id: 25, description: 'Inversión', amount: -500.00, category: 'Invertido', date: '28 Ago', time: '10:00' },
-    { id: 26, description: 'Bono trabajo', amount: 200.00, category: 'Ingreso', date: '27 Ago', time: '14:00' },
-    { id: 27, description: 'Restaurante', amount: -65.00, category: 'Consumo', date: '27 Ago', time: '20:30' },
-    { id: 28, description: 'Dentista', amount: -150.00, category: 'Necesidades', date: '26 Ago', time: '15:30' },
-    { id: 29, description: 'Gas', amount: -25.00, category: 'Necesidades', date: '26 Ago', time: '09:00' },
-    { id: 30, description: 'Ahorro emergencia', amount: -200.00, category: 'Invertido', date: '25 Ago', time: '08:00' }
-  ];
+  const allTransactions = RECENT_TRANSACTIONS;
 
   const achievements = [
     { id: 1, title: 'Consistencia Semanal', description: 'Registraste tus gastos 7 días seguidos', icon: '🎯', unlocked: true },
@@ -485,7 +450,7 @@ const SofinanceAppContent = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {recentTransactions.map((transaction, index) => (
+            {recentTransactions.slice(0, 5).map((transaction, index) => (
               <div 
                 key={transaction.id} 
                 className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-100/50 transition-all duration-200 group"

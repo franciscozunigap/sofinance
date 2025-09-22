@@ -45,7 +45,12 @@ export const RECENT_TRANSACTIONS = [
   { id: 2, description: 'Cena en restaurante', amount: -45000, category: 'Consumo', date: '08 Sep', time: '21:15' }, // 45.000 pesos
   { id: 3, description: 'Netflix', amount: -10000, category: 'Consumo', date: '07 Sep', time: '16:45' }, // 10.000 pesos
   { id: 4, description: 'Transferencia Ahorro', amount: -150000, category: 'Ahorro', date: '07 Sep', time: '08:00' }, // 150.000 pesos
-  { id: 5, description: 'Salario', amount: 4200000, category: 'Ingresos', date: '05 Sep', time: '09:00' } // 4.200.000 pesos
+  { id: 5, description: 'Salario', amount: 4200000, category: 'Ingresos', date: '05 Sep', time: '09:00' }, // 4.200.000 pesos
+  { id: 6, description: 'Compra en tienda', amount: -120000, category: 'Consumo', date: '06 Sep', time: '15:20' }, // 120.000 pesos
+  { id: 7, description: 'Gasolina', amount: -35000, category: 'Necesidades', date: '06 Sep', time: '08:45' }, // 35.000 pesos
+  { id: 8, description: 'Farmacia', amount: -25000, category: 'Necesidades', date: '05 Sep', time: '19:30' }, // 25.000 pesos
+  { id: 9, description: 'Café', amount: -15000, category: 'Consumo', date: '05 Sep', time: '10:15' }, // 15.000 pesos
+  { id: 10, description: 'Uber', amount: -18000, category: 'Necesidades', date: '04 Sep', time: '22:00' } // 18.000 pesos
 ];
 
 export const ACHIEVEMENTS = [
