@@ -1,23 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, AreaChart, Area } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon, X, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
 interface WebAnalysisScreenProps {}
 
 const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
   const { user } = useUser();
+  const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
 
-  // Datos del usuario
-  const userData = user || {
-    name: 'Usuario',
-    monthlyIncome: 4200,
-    currentScore: 52,
-    riskScore: 48,
-    monthlyExpenses: 3180,
-    currentSavings: 12500,
-    savingsGoal: 18000,
-    alerts: 3
+  // Datos mock del usuario
+  const userData = {
+    name: user?.name || 'Usuario Demo',
+    monthlyIncome: user?.monthlyIncome || 4200,
+    currentScore: user?.currentScore || 52,
+    riskScore: user?.riskScore || 48,
+    monthlyExpenses: user?.monthlyExpenses || 3180,
+    currentSavings: user?.currentSavings || 12500,
+    savingsGoal: user?.savingsGoal || 18000,
+    alerts: user?.alerts || 3,
+    // Datos financieros mock
+    financialData: {
+      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
+      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+    }
   };
 
   // Datos para análisis financiero
@@ -55,27 +63,27 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
     { name: 'Casa Propia', target: 50000, current: 12500, deadline: '2026', priority: 'high' }
   ];
 
-  const insights = [
+  const recommendations = [
     {
-      type: 'warning',
-      title: 'Gasto Alto en Entretenimiento',
-      description: 'Has gastado 15% más en entretenimiento este mes. Considera reducir actividades costosas.',
-      icon: AlertTriangle,
-      action: 'Ver detalles'
-    },
-    {
-      type: 'success',
-      title: 'Excelente Control de Alimentación',
-      description: 'Redujiste 8% tus gastos en alimentación manteniendo una dieta saludable.',
-      icon: Award,
-      action: 'Ver estrategias'
-    },
-    {
-      type: 'info',
-      title: 'Oportunidad de Ahorro',
-      description: 'Podrías ahorrar $200 extra si optimizas tus gastos de transporte.',
+      id: 1,
+      title: 'Regla del 50/30/20',
+      description: 'Asigna el 50% de tus ingresos a necesidades básicas, 30% a deseos personales y 20% a ahorros e inversiones. Esta regla te ayuda a mantener un equilibrio financiero saludable y te permite disfrutar de la vida mientras construyes tu futuro financiero.',
       icon: Target,
-      action: 'Crear plan'
+      type: 'info'
+    },
+    {
+      id: 2,
+      title: 'Fondo de Emergencia',
+      description: 'Mantén un fondo de emergencia equivalente a 3-6 meses de gastos. Este dinero debe estar en una cuenta de fácil acceso y te protegerá ante imprevistos como pérdida de empleo, gastos médicos inesperados o reparaciones urgentes en tu hogar.',
+      icon: AlertTriangle,
+      type: 'warning'
+    },
+    {
+      id: 3,
+      title: 'Presupuesto Mensual',
+      description: 'Crea y sigue un presupuesto mensual detallado. Registra todos tus ingresos y gastos, categorízalos y revisa tu progreso semanalmente. Un presupuesto bien estructurado es la base de una buena salud financiera.',
+      icon: Award,
+      type: 'success'
     }
   ];
 
@@ -104,208 +112,176 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pb-32">
+      {/* Header Mejorado */}
+      <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Análisis Financiero</h1>
-              <p className="text-sm text-gray-600 mt-1">Insights detallados sobre tu comportamiento financiero</p>
+            <div className="slide-in-left">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Análisis Financiero
+              </h1>
+
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4 slide-in-right">
               <button
-                className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                className="w-12 h-12 bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-2xl shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-xl"
                 title="Agregar movimiento"
               >
                 <span className="text-xl font-bold">+</span>
               </button>
+
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6">
-        {/* Métricas Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500">Ahorro Mensual</p>
-                <p className="text-lg font-bold text-green-600">$1,020</p>
-                <p className="text-xs text-green-600 flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +12% vs mes anterior
-                </p>
-              </div>
-              <DollarSign className="h-6 w-6 text-green-500" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Monto Actual - Sección Superior */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 mb-8 border border-white/20">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Monto Actual</h2>
+            <div className="text-5xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent mb-2">
+              ${userData.currentSavings.toLocaleString()}
             </div>
           </div>
+        </div>
 
-          <div className="bg-white rounded-xl shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500">Gastos Promedio</p>
-                <p className="text-lg font-bold text-red-600">$3,180</p>
-                <p className="text-xs text-red-600 flex items-center mt-1">
+        {/* Montos y Análisis - Métricas Detalladas */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <ShoppingCart className="h-6 w-6 text-orange-600" />
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-orange-600">{userData.financialData.consumo.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.consumo.amount.toLocaleString()}</p>
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-2">Consumo</p>
+              <div className={`flex items-center text-xs ${userData.financialData.consumo.previousChange >= 0 ? 'text-orange-500' : 'text-green-500'}`}>
+                {userData.financialData.consumo.previousChange >= 0 ? (
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                ) : (
                   <TrendingDown className="h-3 w-3 mr-1" />
-                  -5% vs mes anterior
-                </p>
+                )}
+                {userData.financialData.consumo.previousChange >= 0 ? '+' : ''}{userData.financialData.consumo.previousChange}% vs mes anterior
               </div>
-              <BarChart3 className="h-6 w-6 text-red-500" />
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500">Eficiencia</p>
-                <p className="text-lg font-bold text-blue-600">76%</p>
-                <p className="text-xs text-blue-600 flex items-center mt-1">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in" style={{ animationDelay: '0.1s' }}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                  <HomeIcon className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-red-600">{userData.financialData.necesidades.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.necesidades.amount.toLocaleString()}</p>
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-2">Necesidades</p>
+              <div className={`flex items-center text-xs ${userData.financialData.necesidades.previousChange >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                {userData.financialData.necesidades.previousChange >= 0 ? (
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  +3% vs mes anterior
-                </p>
+                ) : (
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                )}
+                {userData.financialData.necesidades.previousChange >= 0 ? '+' : ''}{userData.financialData.necesidades.previousChange}% vs mes anterior
               </div>
-              <Target className="h-6 w-6 text-blue-500" />
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500">Meta Ahorro</p>
-                <p className="text-lg font-bold text-purple-600">69%</p>
-                <p className="text-xs text-purple-600 flex items-center mt-1">
-                  <Target className="h-3 w-3 mr-1" />
-                  $5,500 restantes
-                </p>
-              </div>
-              <Award className="h-6 w-6 text-purple-500" />
-            </div>
-          </div>
-        </div>
-
-        {/* Gráficos Principales */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Tendencias Mensuales */}
-          <div className="bg-white rounded-xl shadow p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Tendencias de los Últimos 6 Meses</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={monthlyTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Area type="monotone" dataKey="income" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
-                <Area type="monotone" dataKey="expenses" stackId="2" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
-                <Area type="monotone" dataKey="savings" stackId="3" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Gastos por Categoría */}
-          <div className="bg-white rounded-xl shadow p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Distribución de Gastos</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={categoryAnalysis}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={120}
-                  paddingAngle={5}
-                  dataKey="amount"
-                >
-                  {categoryAnalysis.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              {categoryAnalysis.map((category, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: category.color }} />
-                    <span className="text-sm text-gray-600">{category.name}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium text-gray-900">${category.amount}</span>
-                    {getTrendIcon(category.trend)}
-                  </div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <PiggyBank className="h-6 w-6 text-green-600" />
                 </div>
-              ))}
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-green-600">{userData.financialData.ahorro.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.ahorro.amount.toLocaleString()}</p>
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-2">Ahorro</p>
+              <div className={`flex items-center text-xs ${userData.financialData.ahorro.previousChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {userData.financialData.ahorro.previousChange >= 0 ? (
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                ) : (
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                )}
+                {userData.financialData.ahorro.previousChange >= 0 ? '+' : ''}{userData.financialData.ahorro.previousChange}% vs mes anterior
+              </div>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 hover-lift border border-white/20 scale-in" style={{ animationDelay: '0.3s' }}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <TrendingUpIcon className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-purple-600">{userData.financialData.invertido.percentage}%</p>
+                  <p className="text-lg font-semibold text-gray-900">${userData.financialData.invertido.amount.toLocaleString()}</p>
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-2">Invertido</p>
+              <div className={`flex items-center text-xs ${userData.financialData.invertido.previousChange >= 0 ? 'text-purple-500' : 'text-red-500'}`}>
+                {userData.financialData.invertido.previousChange >= 0 ? (
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                ) : (
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                )}
+                {userData.financialData.invertido.previousChange >= 0 ? '+' : ''}{userData.financialData.invertido.previousChange}% vs mes anterior
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Análisis Semanal */}
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Patrones de Gasto Semanal</h3>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={weeklySpending}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        {/* Tendencias Últimos 6 Meses */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Tendencias Últimos 6 Meses</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+            {/* Tendencias Mensuales */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Evolución de Ingresos y Gastos</h4>
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={monthlyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="income" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="expenses" stackId="2" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="savings" stackId="3" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
-        {/* Metas Financieras */}
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Metas Financieras</h3>
+        {/* Recomendaciones Generales */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Recomendaciones Generales</h3>
           <div className="space-y-4">
-            {financialGoals.map((goal, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900">{goal.name}</h4>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(goal.priority)}`}>
-                    {goal.priority === 'high' ? 'Alta' : goal.priority === 'medium' ? 'Media' : 'Baja'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Progreso: ${goal.current.toLocaleString()} / ${goal.target.toLocaleString()}</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {Math.round((goal.current / goal.target) * 100)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(goal.current / goal.target) * 100}%` }}
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Meta: {goal.deadline}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Insights y Recomendaciones */}
-        <div className="bg-white rounded-xl shadow p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Insights y Recomendaciones</h3>
-          <div className="space-y-4">
-            {insights.map((insight, index) => (
-              <div key={index} className={`border-l-4 p-4 rounded-r-lg ${
-                insight.type === 'warning' ? 'border-red-500 bg-red-50' :
-                insight.type === 'success' ? 'border-green-500 bg-green-50' :
+            {recommendations.map((recommendation, index) => (
+              <div key={recommendation.id} className={`border-l-4 p-4 rounded-r-lg ${
+                recommendation.type === 'warning' ? 'border-red-500 bg-red-50' :
+                recommendation.type === 'success' ? 'border-green-500 bg-green-50' :
                 'border-blue-500 bg-blue-50'
               }`}>
                 <div className="flex items-start">
-                  <insight.icon className={`h-5 w-5 mt-0.5 mr-3 ${
-                    insight.type === 'warning' ? 'text-red-500' :
-                    insight.type === 'success' ? 'text-green-500' :
+                  <recommendation.icon className={`h-5 w-5 mt-0.5 mr-3 ${
+                    recommendation.type === 'warning' ? 'text-red-500' :
+                    recommendation.type === 'success' ? 'text-green-500' :
                     'text-blue-500'
                   }`} />
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{insight.title}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
-                    <button className="text-sm font-medium text-blue-600 hover:text-blue-800 mt-2">
-                      {insight.action} →
+                    <h4 className="font-medium text-gray-900">{recommendation.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">{recommendation.description.substring(0, 100)}...</p>
+                    <button 
+                      onClick={() => setSelectedRecommendation(recommendation)}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800 mt-2"
+                    >
+                      Ver detalle →
                     </button>
                   </div>
                 </div>
@@ -313,6 +289,43 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
             ))}
           </div>
         </div>
+
+        {/* Ventana Emergente de Recomendación */}
+        {selectedRecommendation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <selectedRecommendation.icon className={`h-6 w-6 mr-3 ${
+                      selectedRecommendation.type === 'warning' ? 'text-red-500' :
+                      selectedRecommendation.type === 'success' ? 'text-green-500' :
+                      'text-blue-500'
+                    }`} />
+                    <h3 className="text-xl font-bold text-gray-900">{selectedRecommendation.title}</h3>
+                  </div>
+                  <button
+                    onClick={() => setSelectedRecommendation(null)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="h-5 w-5 text-gray-500" />
+                  </button>
+                </div>
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed">{selectedRecommendation.description}</p>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => setSelectedRecommendation(null)}
+                    className="px-6 py-2 bg-primary-400 hover:bg-primary-500 text-white rounded-lg transition-colors"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

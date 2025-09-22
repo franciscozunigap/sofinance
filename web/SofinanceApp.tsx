@@ -8,6 +8,7 @@ import { UserProvider, useUser } from '../src/contexts/UserContext';
 import FloatingNavigationPanel from '../src/components/FloatingNavigationPanel';
 import WebAnalysisScreen from '../src/screens/web/WebAnalysisScreen';
 import SettingsMenu from '../src/components/SettingsMenu';
+import AllTransactionsModal from '../src/components/AllTransactionsModal';
 import logo from '../assets/logo.png';
 import avatar from '../assets/avatar.svg';
 
@@ -17,6 +18,7 @@ const SofinanceAppContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [scrollY, setScrollY] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAllTransactionsModalOpen, setIsAllTransactionsModalOpen] = useState(false);
   const { user, setUser } = useUser();
   const [chatMessages, setChatMessages] = useState([
     {
@@ -59,7 +61,14 @@ const SofinanceAppContent = () => {
     monthlyExpenses: user.monthlyExpenses || 3180,
     currentSavings: user.currentSavings || 12500,
     savingsGoal: user.savingsGoal || 18000,
-    alerts: user.alerts || 3
+    alerts: user.alerts || 3,
+    // Nuevos datos financieros
+    financialData: {
+      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
+      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+    }
   } : {
     name: 'Usuario',
     monthlyIncome: 4200,
@@ -68,7 +77,14 @@ const SofinanceAppContent = () => {
     monthlyExpenses: 3180,
     currentSavings: 12500,
     savingsGoal: 18000,
-    alerts: 3
+    alerts: 3,
+    // Nuevos datos financieros
+    financialData: {
+      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
+      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+    }
   };
 
   // Gráfico de salud financiera - 7 días
@@ -101,8 +117,42 @@ const SofinanceAppContent = () => {
     { id: 1, description: 'Supermercado Jumbo', amount: -85.50, category: 'Necesidades', date: '08 Sep', time: '14:30' },
     { id: 2, description: 'Cena en restaurante', amount: -45.00, category: 'Consumo', date: '08 Sep', time: '21:15' },
     { id: 3, description: 'Netflix', amount: -9.99, category: 'Consumo', date: '07 Sep', time: '16:45' },
-    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Ahorro', date: '07 Sep', time: '08:00' },
-    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingresos', date: '05 Sep', time: '09:00' }
+    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Invertido', date: '07 Sep', time: '08:00' },
+    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingreso', date: '05 Sep', time: '09:00' }
+  ];
+
+  // Lista completa de transacciones para el modal
+  const allTransactions = [
+    { id: 1, description: 'Supermercado Jumbo', amount: -85.50, category: 'Necesidades', date: '08 Sep', time: '14:30' },
+    { id: 2, description: 'Cena en restaurante', amount: -45.00, category: 'Consumo', date: '08 Sep', time: '21:15' },
+    { id: 3, description: 'Netflix', amount: -9.99, category: 'Consumo', date: '07 Sep', time: '16:45' },
+    { id: 4, description: 'Transferencia Ahorro', amount: -150.00, category: 'Invertido', date: '07 Sep', time: '08:00' },
+    { id: 5, description: 'Salario', amount: 4200.00, category: 'Ingreso', date: '05 Sep', time: '09:00' },
+    { id: 6, description: 'Uber', amount: -12.50, category: 'Necesidades', date: '06 Sep', time: '18:20' },
+    { id: 7, description: 'Farmacia', amount: -28.75, category: 'Necesidades', date: '06 Sep', time: '11:30' },
+    { id: 8, description: 'Café', amount: -4.50, category: 'Consumo', date: '05 Sep', time: '08:15' },
+    { id: 9, description: 'Gasolina', amount: -45.00, category: 'Necesidades', date: '05 Sep', time: '16:45' },
+    { id: 10, description: 'Almuerzo', amount: -18.90, category: 'Consumo', date: '04 Sep', time: '13:20' },
+    { id: 11, description: 'Gimnasio', amount: -35.00, category: 'Necesidades', date: '04 Sep', time: '19:00' },
+    { id: 12, description: 'Compra online', amount: -67.80, category: 'Consumo', date: '03 Sep', time: '20:30' },
+    { id: 13, description: 'Luz', amount: -89.50, category: 'Necesidades', date: '03 Sep', time: '10:00' },
+    { id: 14, description: 'Agua', amount: -32.25, category: 'Necesidades', date: '02 Sep', time: '09:15' },
+    { id: 15, description: 'Internet', amount: -45.00, category: 'Necesidades', date: '02 Sep', time: '08:30' },
+    { id: 16, description: 'Cine', amount: -25.00, category: 'Consumo', date: '01 Sep', time: '21:00' },
+    { id: 17, description: 'Libros', amount: -78.90, category: 'Consumo', date: '01 Sep', time: '15:30' },
+    { id: 18, description: 'Ropa', amount: -120.00, category: 'Consumo', date: '31 Ago', time: '14:20' },
+    { id: 19, description: 'Medicamentos', amount: -45.60, category: 'Necesidades', date: '31 Ago', time: '11:45' },
+    { id: 20, description: 'Taxi', amount: -15.00, category: 'Necesidades', date: '30 Ago', time: '22:10' },
+    { id: 21, description: 'Desayuno', amount: -8.50, category: 'Consumo', date: '30 Ago', time: '07:30' },
+    { id: 22, description: 'Spotify', amount: -5.99, category: 'Consumo', date: '29 Ago', time: '12:00' },
+    { id: 23, description: 'Reparación auto', amount: -180.00, category: 'Necesidades', date: '29 Ago', time: '16:00' },
+    { id: 24, description: 'Supermercado', amount: -95.30, category: 'Necesidades', date: '28 Ago', time: '17:45' },
+    { id: 25, description: 'Inversión', amount: -500.00, category: 'Invertido', date: '28 Ago', time: '10:00' },
+    { id: 26, description: 'Bono trabajo', amount: 200.00, category: 'Ingreso', date: '27 Ago', time: '14:00' },
+    { id: 27, description: 'Restaurante', amount: -65.00, category: 'Consumo', date: '27 Ago', time: '20:30' },
+    { id: 28, description: 'Dentista', amount: -150.00, category: 'Necesidades', date: '26 Ago', time: '15:30' },
+    { id: 29, description: 'Gas', amount: -25.00, category: 'Necesidades', date: '26 Ago', time: '09:00' },
+    { id: 30, description: 'Ahorro emergencia', amount: -200.00, category: 'Invertido', date: '25 Ago', time: '08:00' }
   ];
 
   const achievements = [
@@ -307,30 +357,40 @@ const SofinanceAppContent = () => {
 
   return (
     <div 
-      className="min-h-screen bg-light overflow-x-hidden pb-20" 
+      className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 overflow-x-hidden pb-20" 
       style={{ 
         scrollbarWidth: 'none', 
         msOverflowStyle: 'none'
       }}
     >
-      {/* Header con Avatar */}
-      <div className="relative w-full h-52 overflow-hidden" style={{ backgroundColor: '#858bf2' }}>
-        <div className="absolute top-3 right-3 z-10">
-          {/* Botón de configuración */}
+      {/* Header Mejorado con Gradiente */}
+      <div className="relative w-full h-64 lg:h-80 overflow-hidden">
+        {/* Gradiente de fondo */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
+        
+        {/* Patrón decorativo */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-white rounded-full blur-3xl"></div>
+        </div>
+
+        {/* Botón de configuración mejorado */}
+        <div className="absolute top-4 right-4 z-10">
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="w-7 h-7 bg-white hover:bg-gray-50 text-gray-600 rounded-full shadow-md flex items-center justify-center transition-all duration-200 hover:scale-110"
+            className="w-10 h-10 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 border border-white/30"
             title="Configuración"
           >
-            <Settings className="h-4 w-4" />
+            <Settings className="h-5 w-5" />
           </button>
         </div>
         
-        {/* Avatar que abarca toda la pantalla */}
+        {/* Avatar con efecto parallax mejorado */}
         <div 
-          className="relative w-full h-full transition-all duration-300 ease-out"
+          className="relative w-full h-full transition-all duration-500 ease-out"
           style={{
-            transform: `translateY(${Math.min(scrollY * 0.3, 30)}px) scale(${Math.max(1 - scrollY * 0.001, 0.9)})`,
+            transform: `translateY(${Math.min(scrollY * 0.2, 20)}px) scale(${Math.max(1 - scrollY * 0.0008, 0.95)})`,
           }}
         >
           <img 
@@ -338,97 +398,115 @@ const SofinanceAppContent = () => {
             alt="Avatar" 
             className="w-full h-full object-cover object-top"
           />
+          {/* Overlay sutil */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
         </div>
+
       </div>
 
       {/* Main Content con superposición */}
       <main className="relative z-10 bg-white rounded-t-3xl -mt-2 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6">
         {/* Bienvenida */}
         <div className="mb-6">
-          <p className="text-sm text-gray-600">¡Hola {userData.name}! 👋</p>
+          <p className="text-sm text-gray-600">¡Hola {userData.name}!</p>
         </div>
 
         {/* Título y descripción principal */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-dark mb-2">Tu Salud Financiera</h1>
           <p className="text-sm text-gray-600">
-          Optimiza tus finanzas diariamente con nuestro análisis inteligente. Visualiza tendencias, identifica oportunidades de ahorro y toma decisiones financieras más inteligentes.
+            Optimiza tus finanzas diariamente con nuestro análisis inteligente. Visualiza tendencias, identifica oportunidades de ahorro y toma decisiones financieras más inteligentes.
           </p>
         </div>
-
-        {/* Zona Financiera Saludable */}
-        <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
-          {/* Gráfica de Zona Saludable */}
-          <div className="h-52 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-3 relative">
-            {/* Zona Saludable */}
-            <div className="absolute inset-x-4 top-8 bottom-16 bg-primary-200 bg-opacity-30 rounded border-2 border-dashed border-primary-300">
-              <div className="absolute top-2 left-2 text-xs font-medium text-primary-700">
-                Zona Saludable (40-80 pts)
-              </div>
+          
+        {/* Gráfica de Zona Saludable Mejorada */}
+        <div className="h-64 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-4 relative overflow-hidden mb-8">
+          {/* Zona Saludable con mejor diseño */}
+          <div className="absolute inset-x-6 top-12 bottom-20 bg-gradient-to-r from-green-200/40 to-emerald-200/40 rounded-xl border-2 border-dashed border-green-300/60">
+            <div className="absolute top-3 left-3 text-xs font-semibold text-green-700 bg-white/80 px-2 py-1 rounded-full">
+              Zona Saludable (40-80 pts)
             </div>
-            
-            {/* Línea de Progreso */}
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dailyScoreData}>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} />
-                <YAxis domain={[30, 70]} hide />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="#858BF2" 
-                  strokeWidth={3}
-                  dot={{ fill: '#858BF2', r: 6 }}
-                  activeDot={{ r: 8, fill: '#858BF2' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          </div>
+          
+          {/* Línea de Progreso Mejorada */}
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={dailyScoreData}>
+              <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false}
+                tick={{ fontSize: 12, fill: '#6B7280' }}
+              />
+              <YAxis domain={[30, 70]} hide />
+              <Line 
+                type="monotone" 
+                dataKey="score" 
+                stroke="#858BF2" 
+                strokeWidth={4}
+                dot={{ fill: '#858BF2', r: 8, strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 10, fill: '#6366F1', stroke: '#fff', strokeWidth: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Grid de Métricas - Solo Porcentajes */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="text-3xl font-bold text-orange-600 mb-1">{userData.financialData.consumo.percentage}%</div>
+            <p className="text-sm font-medium text-gray-600">Consumo</p>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="text-3xl font-bold text-red-600 mb-1">{userData.financialData.necesidades.percentage}%</div>
+            <p className="text-sm font-medium text-gray-600">Necesidades</p>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="text-3xl font-bold text-green-600 mb-1">{userData.financialData.ahorro.percentage}%</div>
+            <p className="text-sm font-medium text-gray-600">Ahorro</p>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="text-3xl font-bold text-purple-600 mb-1">{userData.financialData.invertido.percentage}%</div>
+            <p className="text-sm font-medium text-gray-600">Invertido</p>
           </div>
         </div>
 
-        {/* 4 Columnas de Porcentajes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white rounded-xl shadow p-4 text-center">
-            <div className="text-2xl font-bold text-orange-600 mb-1">42%</div>
-            <p className="text-xs font-medium text-gray-600">Consumo</p>
+        {/* Lista de Registros Mejorada */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Registros Recientes</h3>
+            <button 
+              onClick={() => setIsAllTransactionsModalOpen(true)}
+              className="text-primary-400 hover:text-primary-500 text-sm font-medium flex items-center transition-colors"
+            >
+              Ver todos
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </button>
           </div>
-
-          <div className="bg-white rounded-xl shadow p-4 text-center">
-            <div className="text-2xl font-bold text-red-600 mb-1">57%</div>
-            <p className="text-xs font-medium text-gray-600">Necesidades</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-4 text-center">
-            <div className="text-2xl font-bold text-green-600 mb-1">19%</div>
-            <p className="text-xs font-medium text-gray-600">Ahorro</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600 mb-1">8%</div>
-            <p className="text-xs font-medium text-gray-600">Deuda</p>
-          </div>
-        </div>
-
-        {/* Lista de Registros */}
-        <div className="bg-white rounded-xl shadow p-4">
-          <h3 className="text-sm font-semibold text-dark mb-4">Registros Recientes</h3>
-          <div className="space-y-3">
-            {recentTransactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+          <div className="space-y-4">
+            {recentTransactions.map((transaction, index) => (
+              <div 
+                key={transaction.id} 
+                className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-100/50 transition-all duration-200 group"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex items-center space-x-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                     transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
-                    <DollarSign className={`h-4 w-4 ${
+                  } group-hover:scale-110 transition-transform duration-200`}>
+                    <DollarSign className={`h-6 w-6 ${
                       transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                     }`} />
                   </div>
                   <div>
-                    <p className="font-medium text-dark text-sm">{transaction.description}</p>
-                    <p className="text-xs text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
+                    <p className="font-semibold text-gray-900">{transaction.description}</p>
+                    <p className="text-sm text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold text-sm ${
+                  <p className={`text-lg font-bold ${
                     transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
@@ -452,6 +530,13 @@ const SofinanceAppContent = () => {
         onClose={() => setIsSettingsOpen(false)}
         onLogout={handleLogout}
         user={user}
+      />
+
+      {/* Modal de Todas las Transacciones */}
+      <AllTransactionsModal
+        isOpen={isAllTransactionsModalOpen}
+        onClose={() => setIsAllTransactionsModalOpen(false)}
+        transactions={allTransactions}
       />
     </div>
   );

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
-import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangle, Award, Mic, Send, ArrowLeft, ChevronRight, Home, BarChart3, Settings, HelpCircle, LogOut, ShoppingCart, Home as HomeIcon, PiggyBank, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
+import avatar from '../../../assets/avatar.svg';
 
 const WebDashboardScreen = () => {
   const { user } = useUser();
   const [currentView, setCurrentView] = useState('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [showRegistration, setShowRegistration] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -18,8 +20,30 @@ const WebDashboardScreen = () => {
   ]);
   const [chatInput, setChatInput] = useState('');
 
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Datos del usuario (se actualizarán desde el contexto)
-  const userData = user || {
+  const userData = user ? {
+    name: user.name || 'Usuario',
+    monthlyIncome: user.monthlyIncome || 4200,
+    currentScore: user.currentScore || 52,
+    riskScore: user.riskScore || 48,
+    monthlyExpenses: user.monthlyExpenses || 3180,
+    currentSavings: user.currentSavings || 12500,
+    savingsGoal: user.savingsGoal || 18000,
+    alerts: user.alerts || 3,
+    // Nuevos datos financieros
+    financialData: {
+      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
+      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+    }
+  } : {
     name: 'Usuario',
     monthlyIncome: 4200,
     currentScore: 52,
@@ -27,16 +51,26 @@ const WebDashboardScreen = () => {
     monthlyExpenses: 3180,
     currentSavings: 12500,
     savingsGoal: 18000,
-    alerts: 3
+    alerts: 3,
+    // Nuevos datos financieros
+    financialData: {
+      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
+      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+    }
   };
 
-  // Gráfico de salud financiera
+  // Gráfico de salud financiera - 7 días
   const currentMonth = "Septiembre";
-  const monthlyScoreData = [
-    { week: 'Semana 1', score: 45 },
-    { week: 'Semana 2', score: 48 },
-    { week: 'Semana 3', score: 44 },
-    { week: 'Semana 4', score: 52 }
+  const dailyScoreData = [
+    { day: 'Lun', score: 45 },
+    { day: 'Mar', score: 48 },
+    { day: 'Mié', score: 44 },
+    { day: 'Jue', score: 46 },
+    { day: 'Vie', score: 50 },
+    { day: 'Sáb', score: 48 },
+    { day: 'Dom', score: 52 }
   ];
 
   // Categorías de gastos
@@ -208,121 +242,171 @@ const WebDashboardScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light">
-      {/* Círculo flotante de configuración */}
-      <button
-        className="fixed top-6 right-6 z-50 w-12 h-12 bg-white hover:bg-gray-50 text-gray-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-        title="Configuración"
-      >
-        <Settings className="h-6 w-6" />
-      </button>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Título y descripción principal */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-dark mb-4">Tu Salud Financiera</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Monitorea tu progreso financiero y mantén el control de tus gastos con nuestro dashboard inteligente
-          </p>
+    <div 
+      className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 overflow-x-hidden pb-20" 
+      style={{ 
+        scrollbarWidth: 'none', 
+        msOverflowStyle: 'none'
+      }}
+    >
+      {/* Header Mejorado con Gradiente */}
+      <div className="relative w-full h-64 lg:h-80 overflow-hidden">
+        {/* Gradiente de fondo */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
+        
+        {/* Patrón decorativo */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-white rounded-full blur-3xl"></div>
         </div>
 
-        {/* Bienvenida */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-dark">¡Hola {userData.name}! 👋</h2>
-            <p className="text-gray-600 mt-1">Score actual: <span className="font-semibold text-primary-400">{userData.currentScore}/100</span> - Tu progreso mensual es constante</p>
-          </div>
+        {/* Botón de configuración mejorado */}
+        <div className="absolute top-4 right-4 z-10">
+          <button
+            className="w-10 h-10 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 border border-white/30"
+            title="Configuración"
+          >
+            <Settings className="h-5 w-5" />
+          </button>
+        </div>
+        
+        {/* Avatar con efecto parallax mejorado */}
+        <div 
+          className="relative w-full h-full transition-all duration-500 ease-out"
+          style={{
+            transform: `translateY(${Math.min(scrollY * 0.2, 20)}px) scale(${Math.max(1 - scrollY * 0.0008, 0.95)})`,
+          }}
+        >
+          <img 
+            src={avatar} 
+            alt="Avatar" 
+            className="w-full h-full object-cover object-top"
+          />
+          {/* Overlay sutil */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
         </div>
 
-        {/* Zona Financiera Saludable */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-semibold text-dark">Salud Financiera de {currentMonth}</h3>
-              <p className="text-sm text-gray-600">Evolución semanal de tu score</p>
-            </div>
-            <div className={`flex items-center space-x-2 ${scoreStatus.color}`}>
-              <span className="text-2xl">{scoreStatus.emoji}</span>
-              <span className="font-medium">{scoreStatus.text}</span>
+        {/* Información del usuario en el header */}
+        <div className="absolute bottom-6 left-6 right-6 z-10">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+            <p className="text-white/90 text-sm mb-1">¡Hola {userData.name}! 👋</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Tu Salud Financiera</h1>
+            <p className="text-white/80 text-sm">
+              Optimiza tus finanzas diariamente con nuestro análisis inteligente
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content mejorado */}
+      <main className="relative z-10 -mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Score Card Principal */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 mb-8 border border-white/20">
+          <div className="flex items-center justify-end mb-4">
+            <div className={`px-3 py-1 rounded-full text-sm font-medium ${scoreStatus.color} bg-opacity-10`}>
+              {scoreStatus.emoji} {scoreStatus.text}
             </div>
           </div>
-
-          {/* Gráfica de Zona Saludable */}
-          <div className="h-64 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-4 relative">
-            {/* Zona Saludable */}
-            <div className="absolute inset-x-4 top-8 bottom-16 bg-primary-200 bg-opacity-30 rounded border-2 border-dashed border-primary-300">
-              <div className="absolute top-2 left-2 text-xs font-medium text-primary-700">
+          
+          {/* Gráfica de Zona Saludable Mejorada */}
+          <div className="h-64 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-4 relative overflow-hidden">
+            {/* Zona Saludable con mejor diseño */}
+            <div className="absolute inset-x-6 top-12 bottom-20 bg-gradient-to-r from-green-200/40 to-emerald-200/40 rounded-xl border-2 border-dashed border-green-300/60">
+              <div className="absolute top-3 left-3 text-xs font-semibold text-green-700 bg-white/80 px-2 py-1 rounded-full">
                 Zona Saludable (40-80 pts)
               </div>
             </div>
             
-            {/* Línea de Progreso */}
+            {/* Línea de Progreso Mejorada */}
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyScoreData}>
-                <XAxis dataKey="week" axisLine={false} tickLine={false} />
+              <LineChart data={dailyScoreData}>
+                <XAxis 
+                  dataKey="day" 
+                  axisLine={false} 
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#6B7280' }}
+                />
                 <YAxis domain={[30, 70]} hide />
                 <Line 
                   type="monotone" 
                   dataKey="score" 
                   stroke="#858BF2" 
-                  strokeWidth={3}
-                  dot={{ fill: '#858BF2', r: 6 }}
-                  activeDot={{ r: 8, fill: '#858BF2' }}
+                  strokeWidth={4}
+                  dot={{ fill: '#858BF2', r: 8, strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 10, fill: '#6366F1', stroke: '#fff', strokeWidth: 3 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* 4 Columnas de Porcentajes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-orange-600 mb-2">42%</div>
+        {/* Grid de Métricas - Solo Porcentajes con Iconos */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <ShoppingCart className="h-6 w-6 text-orange-600" />
+            </div>
+            <div className="text-3xl font-bold text-orange-600 mb-1">{userData.financialData.consumo.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Consumo</p>
-            <p className="text-xs text-gray-500 mt-1">$780</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-red-600 mb-2">57%</div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <HomeIcon className="h-6 w-6 text-red-600" />
+            </div>
+            <div className="text-3xl font-bold text-red-600 mb-1">{userData.financialData.necesidades.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Necesidades</p>
-            <p className="text-xs text-gray-500 mt-1">$1,800</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">19%</div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <PiggyBank className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="text-3xl font-bold text-green-600 mb-1">{userData.financialData.ahorro.percentage}%</div>
             <p className="text-sm font-medium text-gray-600">Ahorro</p>
-            <p className="text-xs text-gray-500 mt-1">$600</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl font-bold text-purple-600 mb-2">8%</div>
-            <p className="text-sm font-medium text-gray-600">Deuda</p>
-            <p className="text-xs text-gray-500 mt-1">$250</p>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <TrendingUpIcon className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="text-3xl font-bold text-purple-600 mb-1">{userData.financialData.invertido.percentage}%</div>
+            <p className="text-sm font-medium text-gray-600">Invertido</p>
           </div>
         </div>
 
-        {/* Lista de Registros */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-lg font-semibold text-dark mb-6">Registros Recientes</h3>
+        {/* Lista de Registros Mejorada */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Registros Recientes</h3>
+            <button className="text-primary-400 hover:text-primary-500 text-sm font-medium flex items-center">
+              Ver todos
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </button>
+          </div>
           <div className="space-y-4">
-            {recentTransactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0">
+            {recentTransactions.map((transaction, index) => (
+              <div 
+                key={transaction.id} 
+                className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-100/50 transition-all duration-200 group"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                     transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
+                  } group-hover:scale-110 transition-transform duration-200`}>
                     <DollarSign className={`h-6 w-6 ${
                       transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                     }`} />
                   </div>
                   <div>
-                    <p className="font-medium text-dark text-lg">{transaction.description}</p>
+                    <p className="font-semibold text-gray-900">{transaction.description}</p>
                     <p className="text-sm text-gray-500">{transaction.category} • {transaction.date} {transaction.time}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold text-lg ${
+                  <p className={`text-lg font-bold ${
                     transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
@@ -333,14 +417,6 @@ const WebDashboardScreen = () => {
           </div>
         </div>
       </main>
-
-      {/* Chat Button - Ocultado */}
-      {/* <button
-        onClick={() => setCurrentView('chat')}
-        className="fixed bottom-6 right-6 bg-primary-400 hover:bg-primary-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-      >
-        <MessageCircle className="h-6 w-6" />
-      </button> */}
     </div>
   );
 };

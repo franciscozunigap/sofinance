@@ -42,3 +42,4 @@ export const parseChileanPeso = (currencyString: string): number => {
   const parsed = parseFloat(cleanString);
   return isNaN(parsed) ? 0 : parsed;
 };
+

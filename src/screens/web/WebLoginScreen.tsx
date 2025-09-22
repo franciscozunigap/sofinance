@@ -76,20 +76,30 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
   };
 
   return (
-    <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-            <div className="text-center">
-              <div className="mx-auto h-20 w-20 mb-6 bg-light rounded-full shadow-lg overflow-hidden">
-                <img 
-                  src={logo} 
-                  alt="SoFinance Logo" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h2 className="text-3xl font-bold text-dark">SoFinance</h2>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100/30 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Patrón decorativo de fondo */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-300/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-100/30 rounded-full blur-3xl"></div>
+      </div>
 
-        <div className="bg-white py-8 px-6 shadow-lg rounded-lg">
+      <div className="max-w-md w-full space-y-8 relative z-10">
+        <div className="text-center slide-in-left">
+          <div className="mx-auto h-24 w-24 mb-6 bg-gradient-to-br from-primary-400 to-primary-600 rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center">
+            <img 
+              src={logo} 
+              alt="SoFinance Logo" 
+              className="w-16 h-16 object-cover"
+            />
+          </div>
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent mb-2">
+            SoFinance
+          </h2>
+          <p className="text-gray-600">Gestiona tus finanzas de manera inteligente</p>
+        </div>
+
+        <div className="bg-white/80 backdrop-blur-sm py-8 px-8 shadow-2xl rounded-3xl border border-white/20 slide-in-right">
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-dark mb-2">
@@ -112,8 +122,8 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                       setErrors(prev => ({ ...prev, email: undefined, general: undefined }));
                     }
                   }}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
-                    errors.email ? 'border-danger' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200 ${
+                    errors.email ? 'border-danger bg-red-50' : 'border-gray-200 bg-gray-50/50 hover:bg-white focus:bg-white'
                   }`}
                   placeholder="Ingresa tu email"
                 />
@@ -144,8 +154,8 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
                       setErrors(prev => ({ ...prev, password: undefined, general: undefined }));
                     }
                   }}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${
-                    errors.password ? 'border-danger' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-10 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200 ${
+                    errors.password ? 'border-danger bg-red-50' : 'border-gray-200 bg-gray-50/50 hover:bg-white focus:bg-white'
                   }`}
                   placeholder="Ingresa tu contraseña"
                 />
@@ -176,11 +186,11 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-400 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-4 px-6 border border-transparent rounded-2xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-xl"
               >
                 {loading ? (
                   <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
                     Iniciando sesión...
                   </div>
                 ) : (
