@@ -90,11 +90,11 @@ const WebRegistrationScreen: React.FC<WebRegistrationScreenProps> = ({ onRegistr
     <div className="min-h-screen bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-20 w-20 mb-6 bg-light rounded-full shadow-lg overflow-hidden">
+          <div className="mx-auto h-20 w-20 mb-6 flex items-center justify-center">
             <img 
               src={logo} 
               alt="SoFinance Logo" 
-              className="w-full h-full object-cover"
+              className="w-16 h-16 object-cover rounded-3xl shadow-lg"
             />
           </div>
           <h2 className="text-3xl font-bold text-dark">Crear Cuenta</h2>

@@ -86,11 +86,11 @@ const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ onLoginSuccess, onShowR
 
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="text-center slide-in-left">
-          <div className="mx-auto h-24 w-24 mb-6 bg-gradient-to-br from-primary-400 to-primary-600 rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center">
+          <div className="mx-auto h-24 w-24 mb-6 flex items-center justify-center">
             <img 
               src={logo} 
               alt="SoFinance Logo" 
-              className="w-16 h-16 object-cover"
+              className="w-20 h-20 object-cover rounded-3xl shadow-2xl"
             />
           </div>
           <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent mb-2">
