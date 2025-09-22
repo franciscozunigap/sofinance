@@ -14,6 +14,7 @@ import Button from '../components/Button';
 import { COLORS, SIZES, FONTS, FINANCIAL_PROFILE_TAGS, getTagsByCategory } from '../constants';
 import { validatePassword } from '../utils';
 import { OnboardingData, FinancialProfileTag } from '../types';
+import { User } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -112,7 +113,12 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ data, onComplete, onB
             <View style={styles.formContainer}>
               {/* Sección de perfil financiero */}
               <View style={styles.profileSection}>
-                <Text style={styles.sectionTitle}>👤 Perfil Financiero</Text>
+                <View style={styles.sectionHeader}>
+                  <View style={styles.iconContainer}>
+                    <User size={20} color={COLORS.primary} />
+                  </View>
+                  <Text style={styles.sectionTitle}>Perfil Financiero</Text>
+                </View>
                 <Text style={styles.sectionSubtitle}>
                   Selecciona las características que mejor te describan
                 </Text>
@@ -265,11 +271,24 @@ const styles = StyleSheet.create({
   profileSection: {
     marginBottom: SIZES.xl,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.md,
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SIZES.sm,
+  },
   sectionTitle: {
     fontSize: 18,
     fontFamily: FONTS.semiBold,
     color: COLORS.dark,
-    marginBottom: SIZES.md,
   },
   sectionSubtitle: {
     fontSize: 14,

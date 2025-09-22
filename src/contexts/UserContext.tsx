@@ -8,6 +8,7 @@ interface UserContextType {
   updateUser: (updates: Partial<User>) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -45,12 +46,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     setUser,
     updateUser,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    loading
   };
 
   return (
     <UserContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </UserContext.Provider>
   );
 };

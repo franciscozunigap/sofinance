@@ -117,9 +117,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
                 <Text style={styles.stepText}>de 3</Text>
               </View>
               <Text style={styles.title}>¡Bienvenido a SoFinance!</Text>
-              <Text style={styles.subtitle}>
-                Comencemos con algunos datos básicos para personalizar tu experiencia
-              </Text>
+
             </View>
             
             {/* Formulario con mejor diseño */}
@@ -174,13 +172,13 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ data, onNext, onBack 
                     title="Atrás"
                     onPress={onBack}
                     variant="secondary"
-                    style={[styles.button, styles.backButton]}
+                    style={StyleSheet.flatten([styles.button, styles.backButton])}
                   />
                 )}
                 <Button
                   title="Continuar"
                   onPress={handleNext}
-                  style={[styles.button, styles.nextButton]}
+                  style={StyleSheet.flatten([styles.button, styles.nextButton])}
                 />
               </View>
             </View>
@@ -243,7 +241,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     color: COLORS.dark, // Negro Suave
     textAlign: 'center',
-    marginBottom: SIZES.md,
+    marginBottom: SIZES.xs,
   },
   subtitle: {
     fontSize: 16,
@@ -265,6 +263,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
+    top: -20,
   },
   form: {
     width: '100%',

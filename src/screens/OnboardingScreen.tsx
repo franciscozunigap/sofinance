@@ -52,6 +52,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
         firstName: completeData.firstName,
         lastName: completeData.lastName,
         email: completeData.email,
+        age: completeData.age,
         password: completeData.password,
         monthlyIncome: completeData.monthlyIncome,
         savingsPercentage: completeData.savingsPercentage,

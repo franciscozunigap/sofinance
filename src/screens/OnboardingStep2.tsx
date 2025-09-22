@@ -13,6 +13,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { OnboardingData } from '../types';
+import { PiggyBank, Home, ShoppingCart, TrendingUp } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -168,9 +169,6 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                 <Text style={styles.stepText}>de 3</Text>
               </View>
               <Text style={styles.title}>Información Financiera</Text>
-              <Text style={styles.subtitle}>
-                Ayúdanos a entender tu situación financiera actual
-              </Text>
             </View>
             
             {/* Formulario principal */}
@@ -178,7 +176,9 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
               {/* Sección de montos */}
               <View style={styles.amountsSection}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionIcon}>💰</Text>
+                  <View style={styles.iconContainer}>
+                    <PiggyBank size={24} color={COLORS.primary} />
+                  </View>
                   <Text style={styles.sectionTitle}>Información Financiera</Text>
                 </View>
                 
@@ -195,7 +195,6 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
               {/* Sección de distribución con sliders */}
               <View style={styles.distributionSection}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionIcon}>📊</Text>
                   <Text style={styles.sectionTitle}>Distribución de Gastos</Text>
                 </View>
                 <Text style={styles.sectionSubtitle}>
@@ -248,7 +247,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   {/* Necesidades */}
                   <View style={styles.sliderItem}>
                     <View style={styles.sliderHeader}>
-                      <Text style={styles.sliderLabel}>🏠 Necesidades</Text>
+                      <View style={styles.sliderIconContainer}>
+                        <Home size={16} color="#ea580c" />
+                      </View>
+                      <Text style={styles.sliderLabel}>Necesidades</Text>
                       <View style={styles.sliderValueContainer}>
                         <Text style={[styles.sliderValue, { color: '#ea580c' }]}>
                           {needsPercentage}%
@@ -277,7 +279,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   {/* Consumo */}
                   <View style={styles.sliderItem}>
                     <View style={styles.sliderHeader}>
-                      <Text style={styles.sliderLabel}>🛍️ Consumo</Text>
+                      <View style={styles.sliderIconContainer}>
+                        <ShoppingCart size={16} color="#3b82f6" />
+                      </View>
+                      <Text style={styles.sliderLabel}>Consumo</Text>
                       <View style={styles.sliderValueContainer}>
                         <Text style={[styles.sliderValue, { color: '#3b82f6' }]}>
                           {consumptionPercentage}%
@@ -306,7 +311,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                   {/* Inversión */}
                   <View style={styles.sliderItem}>
                     <View style={styles.sliderHeader}>
-                      <Text style={styles.sliderLabel}>📈 Inversión</Text>
+                      <View style={styles.sliderIconContainer}>
+                        <TrendingUp size={16} color="#8b5cf6" />
+                      </View>
+                      <Text style={styles.sliderLabel}>Inversión</Text>
                       <View style={styles.sliderValueContainer}>
                         <Text style={[styles.sliderValue, { color: '#8b5cf6' }]}>
                           {investmentPercentage}%
@@ -369,13 +377,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ data, onNext, onBack 
                     title="Atrás"
                     onPress={onBack}
                     variant="secondary"
-                    style={[styles.button, styles.backButton]}
+                    style={StyleSheet.flatten([styles.button, styles.backButton])}
                   />
                 )}
                 <Button
                   title="Continuar"
                   onPress={handleNext}
-                  style={[styles.button, styles.nextButton]}
+                  style={StyleSheet.flatten([styles.button, styles.nextButton])}
                 />
               </View>
             </View>
@@ -460,6 +468,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
+    top: -20,
   },
   amountsSection: {
     marginBottom: SIZES.xl,
@@ -482,9 +491,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SIZES.md,
   },
-  sectionIcon: {
-    fontSize: 20,
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: SIZES.sm,
+  },
+  sliderIconContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
   sectionTitle: {
     fontSize: 18,

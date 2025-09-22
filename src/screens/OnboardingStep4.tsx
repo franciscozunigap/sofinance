@@ -13,6 +13,7 @@ import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { validatePassword } from '../utils';
 import { OnboardingData } from '../types';
+import { Lock } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -131,7 +132,9 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ data, onComplete, onB
               {/* Consejos de contraseña con mejor diseño */}
               <View style={styles.passwordTips}>
                 <View style={styles.tipsHeader}>
-                  <Text style={styles.tipsIcon}>🔒</Text>
+                  <View style={styles.tipsIconContainer}>
+                    <Lock size={16} color={COLORS.primary} />
+                  </View>
                   <Text style={styles.tipsTitle}>Consejos para una contraseña segura</Text>
                 </View>
                 <View style={styles.tipsList}>
@@ -272,8 +275,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SIZES.md,
   },
-  tipsIcon: {
-    fontSize: 20,
+  tipsIconContainer: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: SIZES.sm,
   },
   tipsTitle: {

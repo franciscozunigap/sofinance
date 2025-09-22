@@ -11,7 +11,7 @@ import { KeyboardAvoidingView, ScrollView, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { RootStackParamList } from '../types';
 import Button from '../components/Button';
 import { COLORS, SIZES, FONTS } from '../constants';
 
@@ -31,7 +31,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   const [slideAnim] = useState(new Animated.Value(50));
 
   const handleStartOnboarding = () => {
-    navigation.navigate('Onboarding', { onComplete: onRegistrationSuccess });
+    navigation.navigate('Onboarding', { onComplete: onRegistrationSuccess || (() => {}) });
   };
 
   React.useEffect(() => {
@@ -131,7 +131,7 @@ const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                   if (Platform.OS === 'web' && onBackToLogin) {
                     onBackToLogin();
                   } else {
-                    navigation.navigate('Login');
+                    navigation.navigate('Login', { onLoginSuccess: () => {} });
                   }
                 }}
                 variant="secondary"
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 18,
-    fontFamily: FONTS.semiBold,
+    fontFamily: FONTS.medium,
     color: COLORS.dark,
     textAlign: 'center',
     marginBottom: SIZES.lg,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontSize: 16,
-    fontFamily: FONTS.semiBold,
+    fontFamily: FONTS.medium,
     color: COLORS.dark,
     marginBottom: SIZES.xs,
   },

@@ -10,9 +10,11 @@ import AppNavigator from './src/navigation/AppNavigator';
 import WebAppNavigator from './src/navigation/WebAppNavigator';
 import { AuthService } from './src/services/authService';
 import { COLORS } from './src/constants';
-import { UserProvider } from './src/contexts/UserContext';
+import { UserProvider, useUser } from './src/contexts/UserContext';
 import { testFirebaseConfig } from './src/firebase/testConnection';
 import IOSStatusBar from './src/components/IOSStatusBar';
+import AppSkeleton from './src/components/AppSkeleton';
+import WebAppSkeleton from './src/components/WebAppSkeleton';
 
 // Componente de carga
 const LoadingScreen = ({ firebaseReady }: { firebaseReady: boolean }) => (
@@ -42,6 +44,7 @@ const AppContent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [firebaseReady, setFirebaseReady] = useState(false);
+  const { loading: userLoading } = useUser();
 
   useEffect(() => {
     // Probar la configuración de Firebase al iniciar
@@ -86,8 +89,14 @@ const AppContent = () => {
     setIsLoggedIn(false);
   };
 
-  if (isLoading || !firebaseReady) {
-    return <LoadingScreen firebaseReady={firebaseReady} />;
+  // Mostrar skeleton mientras se carga el contexto del usuario o Firebase
+  if (isLoading || !firebaseReady || userLoading) {
+    if (!firebaseReady) {
+      return <LoadingScreen firebaseReady={firebaseReady} />;
+    }
+    return Platform.OS === 'web' 
+      ? <WebAppSkeleton message="Cargando tu información financiera..." />
+      : <AppSkeleton message="Cargando tu información financiera..." />;
   }
 
   return (
