@@ -14,11 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
-import { LineChart } from 'react-native-chart-kit';
 import AnalysisScreen from './AnalysisScreen';
 import FloatingNavBar from '../components/FloatingNavBar';
 import ChatComponent from '../components/ChatComponent';
 import SettingsComponent from '../components/SettingsComponent';
+import BalanceChartMobile from '../components/BalanceChartMobile';
 import { Header, Card, TransactionItem, PercentageCard, SkeletonLoader } from '../components/shared';
 import { 
   MOCK_USER_DATA, 
@@ -52,12 +52,27 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     ...MOCK_USER_DATA,
     // Datos financieros mejorados como en la versión web
     financialData: {
-      consumo: { percentage: 42, amount: 1335, previousChange: 2 },
-      necesidades: { percentage: 57, amount: 1813, previousChange: -1 },
-      ahorro: { percentage: 19, amount: 600, previousChange: 3 },
-      invertido: { percentage: 8, amount: 250, previousChange: 5 }
+      consumo: { percentage: 42, amount: 133500, previousChange: 2 },
+      necesidades: { percentage: 57, amount: 181300, previousChange: -1 },
+      ahorro: { percentage: 19, amount: 60000, previousChange: 3 },
+      invertido: { percentage: 8, amount: 25000, previousChange: 5 }
     }
   };
+
+  // Datos de balance diario para los últimos 4 días (en pesos chilenos) - igual que en web
+  const balanceData = [
+    // Lunes - Verde (dentro del rango seguro)
+    { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Martes - Verde (dentro del rango seguro)
+    { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Miércoles - Amarillo (por debajo del rango inferior)
+    { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
+    
+    // Jueves - Verde (dentro del rango seguro)
+    { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+  ];
 
   // Simular carga de datos del usuario
   useEffect(() => {
@@ -137,52 +152,56 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header con Avatar */}
-      <View style={styles.avatarHeader}>
-        <View style={styles.avatarHeaderContent}>
-          {/* Botón de perfil */}
-          <TouchableOpacity
-            onPress={() => handleViewChange('settings')}
-            style={styles.profileButton}
-          >
-            <Ionicons name="person-outline" size={18} color={COLORS.white} />
-          </TouchableOpacity>
-          
-          {/* Avatar que abarca toda la pantalla */}
-          <Animated.View 
-            style={[
-              styles.avatarContainer,
-              {
-                transform: [
-                  {
-                    translateY: scrollY.interpolate({
-                      inputRange: [0, 100],
-                      outputRange: [0, 30],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                  {
-                    scale: scrollY.interpolate({
-                      inputRange: [0, 100],
-                      outputRange: [0.96, 0.84], // Aumentado 20% (0.8*1.2 = 0.96, 0.7*1.2 = 0.84)
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <Image 
-              source={require('../../assets/avatar.png')} 
-              style={styles.avatarImage}
-              resizeMode="cover"
-              onError={(error) => console.log('Error loading avatar image:', error)}
-              onLoad={() => console.log('Avatar image loaded successfully')}
-            />
-          </Animated.View>
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        {/* Header con Avatar - igual que web */}
+        <View style={styles.avatarHeader}>
+          <View style={styles.avatarHeaderContent}>
+            {/* Botón de configuración mejorado */}
+            <TouchableOpacity
+              onPress={() => handleViewChange('settings')}
+              style={styles.settingsButton}
+            >
+              <Ionicons name="settings-outline" size={20} color={COLORS.white} />
+            </TouchableOpacity>
+            
+            {/* Avatar con efecto parallax mejorado */}
+            <Animated.View 
+              style={[
+                styles.avatarContainer,
+                {
+                  transform: [
+                    {
+                      translateY: scrollY.interpolate({
+                        inputRange: [0, 100],
+                        outputRange: [0, 20],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                    {
+                      scale: scrollY.interpolate({
+                        inputRange: [0, 100],
+                        outputRange: [1, 0.95],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Image 
+                source={require('../../assets/avatar.png')} 
+                style={styles.avatarImage}
+                resizeMode="cover"
+                onError={(error) => console.log('Error loading avatar image:', error)}
+                onLoad={() => console.log('Avatar image loaded successfully')}
+              />
+              {/* Overlay sutil */}
+              <View style={styles.avatarOverlay} />
+            </Animated.View>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
 
       {/* Main Content con superposición */}
       <View style={styles.mainContentOverlay}>
@@ -212,138 +231,95 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             </Text>
           </View>
 
-        {/* Zona Financiera Saludable */}
-        <View style={styles.healthCard}>
+        {/* Gráfico de Balance Diario con Rangos de Seguridad */}
+        <View style={styles.balanceChartCard}>
+          <BalanceChartMobile data={balanceData} height={300} />
+        </View>
 
-          {/* Gráfica de Zona Saludable */}
-          <View style={styles.chartContainer}>
-            <LineChart
-              data={{
-                labels: DAILY_SCORE_DATA.map(item => item.day),
-                datasets: [{
-                  data: DAILY_SCORE_DATA.map(item => item.score),
-                  color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`,
-                  strokeWidth: 3
-                }]
-              }}
-              width={width - 120}
-              height={200}
-              chartConfig={{
-                backgroundColor: '#f0f2ff',
-                backgroundGradientFrom: '#f0f2ff',
-                backgroundGradientTo: '#f0f2ff',
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: '#858BF2'
-                }
-              }}
-              style={styles.chartView}
-            />
+        {/* Grid de Métricas - Solo Porcentajes como en web */}
+        <View style={styles.percentageGrid}>
+          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
+            <Text style={[styles.percentageValue, { color: '#ea580c' }]}>
+              {userData.financialData?.consumo?.percentage || 42}%
+            </Text>
+            <Text style={styles.percentageLabel}>Consumo</Text>
+          </View>
+
+          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
+            <Text style={[styles.percentageValue, { color: '#3b82f6' }]}>
+              {userData.financialData?.necesidades?.percentage || 57}%
+            </Text>
+            <Text style={styles.percentageLabel}>Necesidades</Text>
+          </View>
+
+          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
+            <Text style={[styles.percentageValue, { color: '#8b5cf6' }]}>
+              {userData.financialData?.ahorro?.percentage || 19}%
+            </Text>
+            <Text style={styles.percentageLabel}>Ahorro</Text>
+          </View>
+
+          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
+            <Text style={[styles.percentageValue, { color: '#10b981' }]}>
+              {userData.financialData?.invertido?.percentage || 8}%
+            </Text>
+            <Text style={styles.percentageLabel}>Invertido</Text>
           </View>
         </View>
 
-        {/* Métricas Financieras Mejoradas */}
-        <View style={styles.financialMetricsContainer}>
-          <Text style={styles.financialMetricsTitle}>Distribución Financiera</Text>
-          <View style={styles.financialMetricsGrid}>
-            {/* Ahorro */}
-            <View style={[styles.financialMetricCard, { backgroundColor: '#f0fdf4', borderColor: '#10b981' }]}>
-              <View style={styles.financialMetricHeader}>
-                <Text style={[styles.financialMetricLabel, { color: '#10b981' }]}>💚 Ahorro</Text>
-                <Text style={[styles.financialMetricPercentage, { color: '#10b981' }]}>
-                  {userData.financialData?.ahorro?.percentage || 19}%
-                </Text>
-              </View>
-              <Text style={[styles.financialMetricAmount, { color: '#10b981' }]}>
-                ${userData.financialData?.ahorro?.amount?.toLocaleString() || '60,000'}
-              </Text>
-              <View style={styles.financialMetricTrend}>
-                <Text style={[styles.financialMetricTrendText, { color: '#10b981' }]}>
-                  +{userData.financialData?.ahorro?.previousChange || 3}% vs mes anterior
-                </Text>
-              </View>
-            </View>
-
-            {/* Necesidades */}
-            <View style={[styles.financialMetricCard, { backgroundColor: '#fff7ed', borderColor: '#ea580c' }]}>
-              <View style={styles.financialMetricHeader}>
-                <Text style={[styles.financialMetricLabel, { color: '#ea580c' }]}>🏠 Necesidades</Text>
-                <Text style={[styles.financialMetricPercentage, { color: '#ea580c' }]}>
-                  {userData.financialData?.necesidades?.percentage || 57}%
-                </Text>
-              </View>
-              <Text style={[styles.financialMetricAmount, { color: '#ea580c' }]}>
-                ${userData.financialData?.necesidades?.amount?.toLocaleString() || '181,300'}
-              </Text>
-              <View style={styles.financialMetricTrend}>
-                <Text style={[styles.financialMetricTrendText, { color: '#ea580c' }]}>
-                  {userData.financialData?.necesidades?.previousChange || -1}% vs mes anterior
-                </Text>
-              </View>
-            </View>
-
-            {/* Consumo */}
-            <View style={[styles.financialMetricCard, { backgroundColor: '#eff6ff', borderColor: '#3b82f6' }]}>
-              <View style={styles.financialMetricHeader}>
-                <Text style={[styles.financialMetricLabel, { color: '#3b82f6' }]}>🛒 Consumo</Text>
-                <Text style={[styles.financialMetricPercentage, { color: '#3b82f6' }]}>
-                  {userData.financialData?.consumo?.percentage || 42}%
-                </Text>
-              </View>
-              <Text style={[styles.financialMetricAmount, { color: '#3b82f6' }]}>
-                ${userData.financialData?.consumo?.amount?.toLocaleString() || '133,500'}
-              </Text>
-              <View style={styles.financialMetricTrend}>
-                <Text style={[styles.financialMetricTrendText, { color: '#3b82f6' }]}>
-                  +{userData.financialData?.consumo?.previousChange || 2}% vs mes anterior
-                </Text>
-              </View>
-            </View>
-
-            {/* Inversión */}
-            <View style={[styles.financialMetricCard, { backgroundColor: '#faf5ff', borderColor: '#8b5cf6' }]}>
-              <View style={styles.financialMetricHeader}>
-                <Text style={[styles.financialMetricLabel, { color: '#8b5cf6' }]}>📈 Inversión</Text>
-                <Text style={[styles.financialMetricPercentage, { color: '#8b5cf6' }]}>
-                  {userData.financialData?.invertido?.percentage || 8}%
-                </Text>
-              </View>
-              <Text style={[styles.financialMetricAmount, { color: '#8b5cf6' }]}>
-                ${userData.financialData?.invertido?.amount?.toLocaleString() || '25,000'}
-              </Text>
-              <View style={styles.financialMetricTrend}>
-                <Text style={[styles.financialMetricTrendText, { color: '#8b5cf6' }]}>
-                  +{userData.financialData?.invertido?.previousChange || 5}% vs mes anterior
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-          {/* Lista de Registros */}
-          <View style={styles.registrosCard}>
+        {/* Lista de Registros Mejorada */}
+        <View style={styles.registrosCard}>
+          <View style={styles.registrosHeader}>
             <Text style={styles.registrosTitle}>Registros Recientes</Text>
-            <View style={styles.registrosList}>
-              {RECENT_TRANSACTIONS.map((transaction) => (
-                <TransactionItem
-                  key={transaction.id}
-                  id={transaction.id}
-                  description={transaction.description}
-                  amount={transaction.amount}
-                  category={transaction.category}
-                  date={transaction.date}
-                  time={transaction.time}
-                />
-              ))}
-            </View>
+            <TouchableOpacity style={styles.verTodosButton}>
+              <Text style={styles.verTodosText}>Ver todos</Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
+            </TouchableOpacity>
           </View>
+          <View style={styles.registrosList}>
+            {RECENT_TRANSACTIONS.map((transaction, index) => (
+              <View 
+                key={transaction.id} 
+                style={[
+                  styles.registroItem,
+                  { 
+                    backgroundColor: 'rgba(243, 244, 246, 0.5)',
+                    animationDelay: `${index * 100}ms`
+                  }
+                ]}
+              >
+                <View style={styles.registroLeft}>
+                  <View style={[
+                    styles.registroIcon,
+                    { 
+                      backgroundColor: transaction.amount > 0 ? '#dcfce7' : '#fef2f2'
+                    }
+                  ]}>
+                    <Ionicons 
+                      name="cash-outline" 
+                      size={20} 
+                      color={transaction.amount > 0 ? '#16a34a' : '#dc2626'} 
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.registroDescription}>{transaction.description}</Text>
+                    <Text style={styles.registroCategory}>
+                      {transaction.category} • {transaction.date} {transaction.time}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.registroRight}>
+                  <Text style={[
+                    styles.registroAmount,
+                    { color: transaction.amount > 0 ? '#16a34a' : '#dc2626' }
+                  ]}>
+                    {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
 
         </Animated.ScrollView>
       </View>
@@ -361,7 +337,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
         currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
         onViewChange={handleViewChange}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -370,32 +346,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2F2F2', // Color gris claro para unificar con AnalysisScreen
   },
-  // Avatar Header styles
+  safeArea: {
+    flex: 0,
+  },
+  // Avatar Header styles - igual que web
   avatarHeader: {
-    height: 200, // Reducido a 1/3 de la vista (aproximadamente 200px de 600px)
+    height: 256, // Aumentado para coincidir con web (h-64 = 256px)
     backgroundColor: '#858bf2',
     position: 'relative',
+    overflow: 'hidden',
   },
   avatarHeaderContent: {
     flex: 1,
     position: 'relative',
   },
-  profileButton: {
+  settingsButton: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 32,
-    height: 32,
-    backgroundColor: COLORS.primary, // Color de la app
-    borderRadius: 16,
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   avatarContainer: {
     flex: 1,
@@ -421,13 +403,21 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
-  // Main content overlay
+  avatarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  },
+  // Main content overlay - igual que web
   mainContentOverlay: {
     flex: 1,
     backgroundColor: '#F2F2F2', // Color gris claro como en AnalysisScreen
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: -5, // Aumentado para cubrir completamente el área del avatar
+    marginTop: -8, // Aumentado para cubrir completamente el área del avatar
     zIndex: 10,
     marginBottom: isIOS ? -100 : -120,
     width: '100%',
@@ -471,29 +461,31 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     lineHeight: 20,
   },
-  // Percentage grid
+  // Percentage grid - igual que web
   percentageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: SIZES.lg,
+    marginBottom: SIZES.xl,
   },
   percentageCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: SIZES.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 16,
+    padding: SIZES.lg,
     width: (width - SIZES.lg * 3) / 2,
-    marginBottom: SIZES.sm,
+    marginBottom: SIZES.md,
     alignItems: 'center',
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    minHeight: 80, // Para coincidir con la altura de web
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    minHeight: 100,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   percentageValue: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: SIZES.xs,
   },
@@ -560,34 +552,51 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.gray,
   },
-  // Registros styles
+  // Registros styles - igual que web
   registrosCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: SIZES.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 16,
+    padding: SIZES.lg,
     marginBottom: SIZES.lg,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8, // Para coincidir con shadow-lg de web
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  registrosHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.lg,
   },
   registrosTitle: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.dark,
-    marginBottom: SIZES.md,
+  },
+  verTodosButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  verTodosText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.primary,
+    marginRight: 4,
   },
   registrosList: {
-    gap: SIZES.sm,
+    gap: SIZES.md,
   },
   registroItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: SIZES.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    padding: SIZES.md,
+    borderRadius: 12,
+    marginBottom: SIZES.sm,
   },
   registroLeft: {
     flexDirection: 'row',
@@ -595,20 +604,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   registroIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: SIZES.sm,
+    marginRight: SIZES.md,
   },
   registroDescription: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
     color: COLORS.dark,
   },
   registroCategory: {
-    fontSize: 12,
+    fontSize: 14,
     color: COLORS.gray,
     marginTop: 2,
   },
@@ -616,29 +625,22 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   registroAmount: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
   },
-  // Health card styles
-  healthCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SIZES.lg,
-    marginBottom: SIZES.lg,
+  // Balance chart card styles - igual que web
+  balanceChartCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 12,
+    padding: 8,
+    marginBottom: 8,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8, // Para coincidir con shadow-lg de web
-    elevation: 3,
-  },
-  chartContainer: {
-    height: 208, // Ajustado para coincidir con web (52 * 4)
-    backgroundColor: '#f0f2ff', // Azul muy claro para coincidir con web
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SIZES.md,
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   chartPlaceholder: {
     flex: 1,

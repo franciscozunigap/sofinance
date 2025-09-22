@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
@@ -27,6 +28,7 @@ interface AnalysisScreenProps {
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChange }) => {
   const { user } = useUser();
   const [showBalanceRegistration, setShowBalanceRegistration] = useState(false);
+  const [selectedRecommendation, setSelectedRecommendation] = useState(null);
 
   // Datos del usuario
   const userData = user || {
@@ -47,14 +49,14 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
     }
   };
 
-  // Datos para análisis financiero
+  // Datos para análisis financiero - porcentual
   const monthlyTrend = [
-    { month: 'Ene', income: 420000, expenses: 350000, savings: 70000 },
-    { month: 'Feb', income: 420000, expenses: 320000, savings: 100000 },
-    { month: 'Mar', income: 420000, expenses: 380000, savings: 40000 },
-    { month: 'Abr', income: 420000, expenses: 310000, savings: 110000 },
-    { month: 'May', income: 420000, expenses: 330000, savings: 90000 },
-    { month: 'Jun', income: 420000, expenses: 318000, savings: 102000 }
+    { month: 'Ene', consumo: 42, necesidades: 57, ahorro: 19, invertido: 8 },
+    { month: 'Feb', consumo: 38, necesidades: 55, ahorro: 22, invertido: 10 },
+    { month: 'Mar', consumo: 45, necesidades: 60, ahorro: 15, invertido: 6 },
+    { month: 'Abr', consumo: 40, necesidades: 52, ahorro: 25, invertido: 12 },
+    { month: 'May', consumo: 43, necesidades: 58, ahorro: 18, invertido: 9 },
+    { month: 'Jun', consumo: 42, necesidades: 57, ahorro: 19, invertido: 8 }
   ];
 
   const categoryAnalysis = [
@@ -85,24 +87,27 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
   const insights = [
     {
       type: 'warning',
-      title: 'Gasto Alto en Entretenimiento',
+      title: 'Optimiza tus Gastos de Entretenimiento',
       description: 'Has gastado 15% más en entretenimiento este mes. Considera reducir actividades costosas.',
       icon: 'warning',
-      action: 'Ver detalles'
+      action: 'Ver detalles',
+      detail: 'Tu gasto en entretenimiento ha aumentado significativamente. Te recomendamos:\n\n• Reducir salidas a restaurantes caros\n• Buscar alternativas gratuitas de entretenimiento\n• Establecer un presupuesto mensual para diversión\n• Aprovechar descuentos y promociones\n\nEsto te permitirá ahorrar hasta $50,000 mensuales.'
     },
     {
       type: 'success',
       title: 'Excelente Control de Alimentación',
       description: 'Redujiste 8% tus gastos en alimentación manteniendo una dieta saludable.',
       icon: 'checkmark-circle',
-      action: 'Ver estrategias'
+      action: 'Ver estrategias',
+      detail: '¡Felicitaciones! Has logrado un excelente balance entre economía y salud:\n\n• Planificación de comidas semanales\n• Compra en mercados locales\n• Cocina en casa más frecuentemente\n• Aprovechamiento de ofertas en supermercados\n\nMantén estas estrategias para seguir ahorrando.'
     },
     {
       type: 'info',
-      title: 'Oportunidad de Ahorro',
+      title: 'Oportunidad de Ahorro en Transporte',
       description: 'Podrías ahorrar $200 extra si optimizas tus gastos de transporte.',
       icon: 'information-circle',
-      action: 'Crear plan'
+      action: 'Crear plan',
+      detail: 'Tu gasto en transporte puede optimizarse significativamente:\n\n• Usar transporte público en lugar de taxi\n• Compartir viajes con compañeros de trabajo\n• Caminar distancias cortas\n• Usar bicicleta para trayectos medios\n• Planificar rutas eficientes\n\nEsto podría ahorrarte hasta $200,000 anuales.'
     }
   ];
 
@@ -230,24 +235,28 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
 
         {/* Gráficos Principales */}
         <View style={styles.chartsContainer}>
-          {/* Tendencias Mensuales */}
+          {/* Tendencias Mensuales - Porcentual */}
           <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Tendencias de los Últimos 6 Meses</Text>
+            <Text style={styles.chartTitle}>Tendencias de los Últimos 6 Meses (%)</Text>
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
                   labels: monthlyTrend.map(item => item.month),
                   datasets: [{
-                    data: monthlyTrend.map(item => item.income),
-                    color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
+                    data: monthlyTrend.map(item => item.consumo),
+                    color: (opacity = 1) => `rgba(234, 88, 12, ${opacity})`, // Naranja para consumo
                     strokeWidth: 3
                   }, {
-                    data: monthlyTrend.map(item => item.expenses),
-                    color: (opacity = 1) => `rgba(239, 68, 68, ${opacity})`,
+                    data: monthlyTrend.map(item => item.necesidades),
+                    color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`, // Azul para necesidades
                     strokeWidth: 3
                   }, {
-                    data: monthlyTrend.map(item => item.savings),
-                    color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
+                    data: monthlyTrend.map(item => item.ahorro),
+                    color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`, // Púrpura para ahorro
+                    strokeWidth: 3
+                  }, {
+                    data: monthlyTrend.map(item => item.invertido),
+                    color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`, // Verde para invertido
                     strokeWidth: 3
                   }]
                 }}
@@ -268,110 +277,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
             </View>
           </View>
 
-          {/* Gastos por Categoría */}
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Distribución de Gastos</Text>
-            <View style={styles.chartContainer}>
-              <PieChart
-                data={categoryAnalysis}
-                width={width - 80}
-                height={200}
-                chartConfig={{
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                }}
-                accessor="value"
-                backgroundColor="transparent"
-                paddingLeft="15"
-                center={[10, 0]}
-                absolute
-              />
-            </View>
-            
-            {/* Leyenda */}
-            <View style={styles.legendContainer}>
-              {categoryAnalysis.map((category, index) => (
-                <View key={index} style={styles.legendItem}>
-                  <View 
-                    style={[
-                      styles.legendDot, 
-                      { backgroundColor: category.color }
-                    ]} 
-                  />
-                  <Text style={styles.legendText}>{category.name}</Text>
-                  <Text style={styles.legendValue}>${category.value}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* Análisis Semanal */}
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Patrones de Gasto Semanal</Text>
-          <View style={styles.chartContainer}>
-            <BarChart
-              data={{
-                labels: weeklySpending.map(item => item.day),
-                datasets: [{
-                  data: weeklySpending.map(item => item.amount)
-                }]
-              }}
-              width={width - 80}
-              height={180}
-              yAxisLabel="$"
-              yAxisSuffix=""
-              chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: { borderRadius: 16 },
-                propsForDots: { r: "4", strokeWidth: "2" }
-              }}
-              style={styles.chartView}
-            />
-          </View>
-        </View>
-
-        {/* Metas Financieras */}
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Metas Financieras</Text>
-          <View style={styles.goalsContainer}>
-            {financialGoals.map((goal, index) => {
-              const progress = (goal.current / goal.target) * 100;
-              const priorityStyle = getPriorityColor(goal.priority);
-              
-              return (
-                <View key={index} style={styles.goalItem}>
-                  <View style={styles.goalHeader}>
-                    <Text style={styles.goalName}>{goal.name}</Text>
-                    <View style={[styles.priorityBadge, { backgroundColor: priorityStyle.backgroundColor }]}>
-                      <Text style={[styles.priorityText, { color: priorityStyle.color }]}>
-                        {goal.priority === 'high' ? 'Alta' : goal.priority === 'medium' ? 'Media' : 'Baja'}
-                      </Text>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.goalProgress}>
-                    <Text style={styles.goalProgressText}>
-                      Progreso: ${goal.current.toLocaleString()} / ${goal.target.toLocaleString()}
-                    </Text>
-                    <Text style={styles.goalPercentage}>{Math.round(progress)}%</Text>
-                  </View>
-                  
-                  <View style={styles.progressBar}>
-                    <View 
-                      style={[styles.progressFill, { width: `${progress}%` }]}
-                    />
-                  </View>
-                  
-                  <Text style={styles.goalDeadline}>Meta: {goal.deadline}</Text>
-                </View>
-              );
-            })}
-          </View>
         </View>
 
         {/* Insights y Recomendaciones */}
@@ -404,7 +309,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                         {insight.title}
                       </Text>
                       <Text style={styles.insightDescription}>{insight.description}</Text>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={() => setSelectedRecommendation(insight)}>
                         <Text style={[styles.insightAction, { color: COLORS.primary }]}>
                           {insight.action} →
                         </Text>
@@ -424,6 +329,43 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
         currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
         onViewChange={onViewChange}
       />
+
+      {/* Modal de Recomendación */}
+      <Modal
+        visible={selectedRecommendation !== null}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setSelectedRecommendation(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {selectedRecommendation?.title}
+              </Text>
+              <TouchableOpacity 
+                onPress={() => setSelectedRecommendation(null)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color={COLORS.gray} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.modalDetail}>
+                {selectedRecommendation?.detail}
+              </Text>
+            </ScrollView>
+            <View style={styles.modalFooter}>
+              <TouchableOpacity 
+                style={styles.modalButton}
+                onPress={() => setSelectedRecommendation(null)}
+              >
+                <Text style={styles.modalButtonText}>Entendido</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -686,6 +628,69 @@ const styles = StyleSheet.create({
   insightAction: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    width: '100%',
+    maxHeight: '80%',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.dark,
+    flex: 1,
+    marginRight: 10,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalBody: {
+    padding: 20,
+    maxHeight: 400,
+  },
+  modalDetail: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: COLORS.gray,
+  },
+  modalFooter: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  modalButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
