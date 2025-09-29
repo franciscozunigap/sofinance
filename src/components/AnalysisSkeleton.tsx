@@ -1,123 +1,219 @@
 import React from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { COLORS } from '../constants';
 
 const AnalysisSkeleton: React.FC = () => {
+  const pulseAnim = new Animated.Value(0.3);
+
+  React.useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 0.3,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, []);
+
+  const SkeletonBox = ({ width, height, style = {} }: { width: number | string; height: number; style?: any }) => (
+    <Animated.View
+      style={[
+        {
+          width,
+          height,
+          backgroundColor: COLORS.lightGray,
+          opacity: pulseAnim,
+          borderRadius: 8,
+        },
+        style,
+      ]}
+    />
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <View style={styles.container}>
       {/* Header Skeleton */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="ml-3 w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-              <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <SkeletonBox width={32} height={32} />
+          <SkeletonBox width={96} height={24} style={{ marginLeft: 12 }} />
+        </View>
+        <View style={styles.headerContent}>
+          <SkeletonBox width={32} height={32} style={{ borderRadius: 16 }} />
+          <SkeletonBox width={80} height={16} style={{ marginLeft: 16 }} />
+        </View>
+      </View>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Title Skeleton */}
-        <div className="mb-8">
-          <div className="w-64 h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
-          <div className="w-96 h-4 bg-gray-200 rounded animate-pulse"></div>
-        </div>
+      {/* Main Content Skeleton */}
+      <View style={styles.content}>
+        {/* Title Section */}
+        <View style={styles.titleSection}>
+          <SkeletonBox width={200} height={28} />
+          <SkeletonBox width={300} height={16} style={{ marginTop: 8 }} />
+        </View>
 
-        {/* Financial Overview Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Metrics Cards */}
+        <View style={styles.metricsGrid}>
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-              <div className="w-20 h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
-              <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
-            </div>
+            <View key={item} style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <SkeletonBox width={48} height={48} />
+                <SkeletonBox width={32} height={32} />
+              </View>
+              <SkeletonBox width={80} height={28} style={{ marginTop: 16 }} />
+              <SkeletonBox width={64} height={16} style={{ marginTop: 8 }} />
+            </View>
           ))}
-        </div>
+        </View>
 
-        {/* Charts Section Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Monthly Trend Chart */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="w-40 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          
-          {/* Category Analysis Chart */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="w-48 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
+        {/* Charts Section */}
+        <View style={styles.chartsSection}>
+          <View style={styles.chartCard}>
+            <SkeletonBox width={160} height={24} />
+            <SkeletonBox width="100%" height={200} style={{ marginTop: 16 }} />
+          </View>
+          <View style={styles.chartCard}>
+            <SkeletonBox width={140} height={24} />
+            <SkeletonBox width="100%" height={200} style={{ marginTop: 16 }} />
+          </View>
+        </View>
 
-        {/* Weekly Spending Skeleton */}
-        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-          <div className="w-48 h-6 bg-gray-200 rounded animate-pulse mb-6"></div>
-          <div className="grid grid-cols-7 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7].map((item) => (
-              <div key={item} className="text-center">
-                <div className="w-8 h-8 bg-gray-200 rounded mx-auto mb-2 animate-pulse"></div>
-                <div className="w-12 h-4 bg-gray-200 rounded mx-auto mb-1 animate-pulse"></div>
-                <div className="w-16 h-3 bg-gray-200 rounded mx-auto animate-pulse"></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Analysis Cards */}
+        <View style={styles.analysisCards}>
+          <View style={styles.analysisCard}>
+            <SkeletonBox width={120} height={24} />
+            <SkeletonBox width="100%" height={150} style={{ marginTop: 16 }} />
+          </View>
+          <View style={styles.analysisCard}>
+            <SkeletonBox width={100} height={24} />
+            <SkeletonBox width="100%" height={150} style={{ marginTop: 16 }} />
+          </View>
+        </View>
 
-        {/* Financial Goals Skeleton */}
-        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-          <div className="w-40 h-6 bg-gray-200 rounded animate-pulse mb-6"></div>
-          <div className="space-y-4">
+        {/* Recommendations Section */}
+        <View style={styles.recommendationsSection}>
+          <SkeletonBox width={180} height={24} />
+          <View style={styles.recommendationsList}>
             {[1, 2, 3].map((item) => (
-              <div key={item} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-                  <div>
-                    <div className="w-32 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                    <div className="w-24 h-3 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="w-20 h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
-                  <div className="w-16 h-3 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-              </div>
+              <View key={item} style={styles.recommendationItem}>
+                <View style={styles.recommendationLeft}>
+                  <SkeletonBox width={40} height={40} />
+                  <View style={styles.recommendationText}>
+                    <SkeletonBox width={120} height={16} />
+                    <SkeletonBox width={200} height={12} style={{ marginTop: 4 }} />
+                    <SkeletonBox width={160} height={12} style={{ marginTop: 4 }} />
+                  </View>
+                </View>
+                <SkeletonBox width={24} height={24} />
+              </View>
             ))}
-          </div>
-        </div>
-
-        {/* Insights Section Skeleton */}
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <div className="w-32 h-6 bg-gray-200 rounded animate-pulse mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="p-4 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-gray-200 rounded-lg mb-3 animate-pulse"></div>
-                <div className="w-24 h-5 bg-gray-200 rounded animate-pulse mb-2"></div>
-                <div className="w-full h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
-                <div className="w-3/4 h-3 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Floating Navigation Skeleton */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2">
-        <div className="flex space-x-2 bg-white rounded-full p-2 shadow-lg">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-          ))}
-        </div>
-      </div>
-    </div>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.light,
+  },
+  header: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightGray,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  titleSection: {
+    marginBottom: 24,
+  },
+  metricsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  metricCard: {
+    width: '48%',
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  metricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  chartsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  chartCard: {
+    width: '48%',
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+  },
+  analysisCards: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  analysisCard: {
+    width: '48%',
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+  },
+  recommendationsSection: {
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+  },
+  recommendationsList: {
+    marginTop: 16,
+  },
+  recommendationItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightGray,
+  },
+  recommendationLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  recommendationText: {
+    marginLeft: 12,
+    flex: 1,
+  },
+});
 
 export default AnalysisSkeleton;

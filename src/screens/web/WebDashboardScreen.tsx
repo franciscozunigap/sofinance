@@ -4,7 +4,7 @@ import { Bell, User, MessageCircle, TrendingUp, DollarSign, Target, AlertTriangl
 import { useUser } from '../../contexts/UserContext';
 import { useFinancialData } from '../../contexts/FinancialDataContext';
 import { formatChileanPeso } from '../../utils/currencyUtils';
-import AppSkeleton from '../../components/AppSkeleton';
+import WebAppSkeleton from './WebAppSkeleton';
 import avatar from '../../../assets/avatar.png';
 
 const WebDashboardScreen = () => {
@@ -15,7 +15,7 @@ const WebDashboardScreen = () => {
 
   // Mostrar skeleton mientras se cargan los datos
   if (balanceLoading) {
-    return <AppSkeleton />;
+    return <WebAppSkeleton />;
   }
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [showRegistration, setShowRegistration] = useState(false);

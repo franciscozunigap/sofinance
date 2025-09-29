@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, Bar
 import { useUser } from '../../contexts/UserContext';
 import { useFinancialData } from '../../contexts/FinancialDataContext';
 import { formatChileanPeso } from '../../utils/currencyUtils';
-import AnalysisSkeleton from '../../components/AnalysisSkeleton';
+import WebAnalysisSkeleton from './WebAnalysisSkeleton';
 import WebBalanceRegistrationScreen from './WebBalanceRegistrationScreen';
 
 interface WebAnalysisScreenProps {}
@@ -17,7 +17,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
 
   // Mostrar skeleton mientras se cargan los datos
   if (balanceLoading) {
-    return <AnalysisSkeleton />;
+    return <WebAnalysisSkeleton />;
   }
 
   // Los datos del usuario y financieros ahora vienen del contexto centralizado

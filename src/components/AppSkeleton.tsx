@@ -1,119 +1,251 @@
 import React from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { COLORS } from '../constants';
 
 const AppSkeleton: React.FC = () => {
+  const pulseAnim = new Animated.Value(0.3);
+
+  React.useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 0.3,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, []);
+
+  const SkeletonBox = ({ width, height, style = {} }: { width: number | string; height: number; style?: any }) => (
+    <Animated.View
+      style={[
+        {
+          width,
+          height,
+          backgroundColor: COLORS.lightGray,
+          opacity: pulseAnim,
+          borderRadius: 8,
+        },
+        style,
+      ]}
+    />
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <View style={styles.container}>
       {/* Header Skeleton */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo Skeleton */}
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="ml-3 w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-            
-            {/* User Info Skeleton */}
-            <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-              <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <SkeletonBox width={32} height={32} />
+          <SkeletonBox width={96} height={24} style={{ marginLeft: 12 }} />
+        </View>
+        <View style={styles.headerContent}>
+          <SkeletonBox width={32} height={32} style={{ borderRadius: 16 }} />
+          <SkeletonBox width={80} height={16} style={{ marginLeft: 16 }} />
+        </View>
+      </View>
 
       {/* Main Content Skeleton */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section Skeleton */}
-        <div className="mb-8">
-          <div className="w-64 h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
-          <div className="w-96 h-4 bg-gray-200 rounded animate-pulse"></div>
-        </div>
+      <View style={styles.content}>
+        {/* Title Skeleton */}
+        <View style={styles.titleSection}>
+          <SkeletonBox width={256} height={32} />
+          <SkeletonBox width={384} height={16} style={{ marginTop: 8 }} />
+        </View>
 
-        {/* Stats Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Cards Grid Skeleton */}
+        <View style={styles.cardsGrid}>
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-              <div className="w-20 h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
-              <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
-            </div>
+            <View key={item} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <SkeletonBox width={48} height={48} />
+                <SkeletonBox width={32} height={32} />
+              </View>
+              <SkeletonBox width={80} height={32} style={{ marginTop: 16 }} />
+              <SkeletonBox width={64} height={16} style={{ marginTop: 8 }} />
+            </View>
           ))}
-        </div>
+        </View>
 
-        {/* Chart Section Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Balance Chart Skeleton */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="w-32 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          
-          {/* Recent Transactions Skeleton */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="w-40 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
-                  <div className="flex-1">
-                    <div className="w-24 h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
-                    <div className="w-16 h-3 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                  <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Charts Grid Skeleton */}
+        <View style={styles.chartsGrid}>
+          <View style={styles.chartCard}>
+            <SkeletonBox width={128} height={24} />
+            <SkeletonBox width="100%" height={256} style={{ marginTop: 16 }} />
+          </View>
+          <View style={styles.chartCard}>
+            <SkeletonBox width={160} height={24} />
+            <SkeletonBox width="100%" height={256} style={{ marginTop: 16 }} />
+          </View>
+        </View>
 
-        {/* Financial Analysis Skeleton */}
-        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-          <div className="w-48 h-6 bg-gray-200 rounded animate-pulse mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Weekly Progress Skeleton */}
+        <View style={styles.weeklyProgress}>
+          <SkeletonBox width={192} height={24} />
+          <View style={styles.weeklyGrid}>
+            {[1, 2, 3, 4, 5, 6, 7].map((item) => (
+              <View key={item} style={styles.weeklyItem}>
+                <SkeletonBox width={32} height={32} style={{ borderRadius: 16 }} />
+                <SkeletonBox width={48} height={24} style={{ marginTop: 8 }} />
+                <SkeletonBox width={64} height={12} style={{ marginTop: 4 }} />
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Transactions Skeleton */}
+        <View style={styles.transactions}>
+          <SkeletonBox width={160} height={24} />
+          <View style={styles.transactionsList}>
             {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="text-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-3 animate-pulse"></div>
-                <div className="w-12 h-6 bg-gray-200 rounded mx-auto mb-2 animate-pulse"></div>
-                <div className="w-20 h-4 bg-gray-200 rounded mx-auto animate-pulse"></div>
-              </div>
+              <View key={item} style={styles.transactionItem}>
+                <View style={styles.transactionLeft}>
+                  <SkeletonBox width={40} height={40} />
+                  <View style={styles.transactionText}>
+                    <SkeletonBox width={96} height={16} />
+                    <SkeletonBox width={64} height={12} style={{ marginTop: 4 }} />
+                  </View>
+                </View>
+                <SkeletonBox width={80} height={16} />
+              </View>
             ))}
-          </div>
-        </div>
+          </View>
+        </View>
 
-        {/* Goals Section Skeleton */}
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <div className="w-32 h-6 bg-gray-200 rounded animate-pulse mb-6"></div>
-          <div className="space-y-4">
+        {/* Recommendations Skeleton */}
+        <View style={styles.recommendations}>
+          <SkeletonBox width={128} height={24} />
+          <View style={styles.recommendationsGrid}>
             {[1, 2, 3].map((item) => (
-              <div key={item} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-                  <div>
-                    <div className="w-32 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                    <div className="w-24 h-3 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                </div>
-                <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-              </div>
+              <View key={item} style={styles.recommendationItem}>
+                <SkeletonBox width={32} height={32} />
+                <SkeletonBox width={96} height={20} style={{ marginTop: 12 }} />
+                <SkeletonBox width="100%" height={12} style={{ marginTop: 4 }} />
+                <SkeletonBox width="75%" height={12} style={{ marginTop: 4 }} />
+              </View>
             ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Floating Navigation Skeleton */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2">
-        <div className="flex space-x-2 bg-white rounded-full p-2 shadow-lg">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-          ))}
-        </div>
-      </div>
-    </div>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.light,
+  },
+  header: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightGray,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  titleSection: {
+    marginBottom: 24,
+  },
+  cardsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  card: {
+    width: '48%',
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  chartsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  chartCard: {
+    width: '48%',
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+  },
+  weeklyProgress: {
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  weeklyGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  weeklyItem: {
+    alignItems: 'center',
+  },
+  transactions: {
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  transactionsList: {
+    marginTop: 16,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightGray,
+  },
+  transactionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  transactionText: {
+    marginLeft: 12,
+  },
+  recommendations: {
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 12,
+  },
+  recommendationsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  recommendationItem: {
+    width: '30%',
+    alignItems: 'center',
+  },
+});
 
 export default AppSkeleton;
