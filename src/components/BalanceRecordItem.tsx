@@ -41,18 +41,28 @@ const BalanceRecordItem: React.FC<BalanceRecordItemProps> = ({
       setAmountError('Ingresa un monto válido');
     } else {
       setAmountError(undefined);
+      
+      // Asegurar que el tipo sea correcto basado en la categoría actual
+      const correctType = record.category === 'Ingreso' ? 'income' : 'expense';
+      
       onUpdate({
         ...record,
         amount: numericValue || 0,
+        type: correctType, // ← Asegurar que el tipo sea correcto
       });
     }
   };
 
   const handleCategoryChange = (newCategory: BalanceCategory) => {
     setCategory(newCategory);
+    
+    // Determinar el tipo basado en la categoría
+    const newType = newCategory === 'Ingreso' ? 'income' : 'expense';
+    
     onUpdate({
       ...record,
       category: newCategory,
+      type: newType,
     });
   };
 

@@ -431,13 +431,24 @@ export class BalanceService {
 
   /**
    * Calcula el total de los registros según las categorías
-   * Solo los ingresos suman, el resto resta del balance
+   * Solo la categoría 'Ingreso' suma, el resto resta del balance
    */
   static calculateTotal(records: BalanceRecord[]): number {
     return records.reduce((total, record) => {
       const amount = typeof record.amount === 'string' ? parseFloat(record.amount) : record.amount;
-      // Solo los ingresos suman, el resto resta
-      return record.type === 'income' ? total + amount : total - amount;
+      // Solo la categoría 'Ingreso' suma, el resto resta
+      return record.category === 'Ingreso' ? total + amount : total - amount;
+    }, 0);
+  }
+
+  /**
+   * Calcula el total absoluto de todos los registros (para mostrar en UI)
+   * Suma todos los montos independientemente del tipo
+   */
+  static calculateAbsoluteTotal(records: BalanceRecord[]): number {
+    return records.reduce((total, record) => {
+      const amount = typeof record.amount === 'string' ? parseFloat(record.amount) : record.amount;
+      return total + amount;
     }, 0);
   }
 
@@ -473,6 +484,31 @@ export class BalanceService {
       amount: 0,
       category: 'Necesidad'
     };
+  }
+
+  /**
+   * Crea un registro vacío inteligente basado en la diferencia esperada
+   */
+  static createSmartEmptyRecord(expectedDifference: number): BalanceRecord {
+    // Si la diferencia es positiva, sugerir un ingreso
+    if (expectedDifference > 0) {
+      return {
+        id: this.generateId(),
+        type: 'income',
+        description: '',
+        amount: 0,
+        category: 'Ingreso'
+      };
+    } else {
+      // Si la diferencia es negativa, sugerir un gasto
+      return {
+        id: this.generateId(),
+        type: 'expense',
+        description: '',
+        amount: 0,
+        category: 'Necesidad'
+      };
+    }
   }
 
   /**

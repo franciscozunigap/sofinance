@@ -1,7 +1,24 @@
 // Utilidades de validación compartidas
 
 export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Validación más estricta de email
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  // Verificaciones adicionales
+  if (!email || email.trim().length === 0) return false;
+  if (email.length > 254) return false; // RFC 5321 limit
+  if (email.startsWith('.') || email.endsWith('.')) return false;
+  if (email.includes('..')) return false; // No double dots
+  
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  
+  const [localPart, domainPart] = parts;
+  if (localPart.length > 64) return false; // RFC 5321 limit
+  if (domainPart.length > 253) return false; // RFC 5321 limit
+  if (domainPart.startsWith('.') || domainPart.endsWith('.')) return false;
+  if (domainPart.includes('..')) return false;
+  
   return emailRegex.test(email);
 };
 

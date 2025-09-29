@@ -52,6 +52,7 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
 
   // Calcular el total de los registros usando el servicio
   const totalRecords = BalanceService.calculateTotal(records);
+  const absoluteTotalRecords = BalanceService.calculateAbsoluteTotal(records);
 
   // Validar monto actual
   const validateCurrentAmount = () => {
@@ -151,7 +152,7 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
 
   const addRecord = () => {
     if (records.length < 5) {
-      const newRecord = BalanceService.createEmptyRecord();
+      const newRecord = BalanceService.createSmartEmptyRecord(difference);
       setRecords([...records, newRecord]);
     }
   };
@@ -312,6 +313,15 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Total registros:</Text>
                 <Text style={styles.summaryValue}>
+                  {formatChileanPeso(absoluteTotalRecords)}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Impacto neto:</Text>
+                <Text style={[
+                  styles.summaryValue,
+                  totalRecords >= 0 ? styles.positiveValue : styles.negativeValue
+                ]}>
                   {formatChileanPeso(totalRecords)}
                 </Text>
               </View>
@@ -515,6 +525,12 @@ const styles = StyleSheet.create({
     color: COLORS.dark,
   },
   summaryValueError: {
+    color: COLORS.danger,
+  },
+  positiveValue: {
+    color: COLORS.success || '#22c55e',
+  },
+  negativeValue: {
     color: COLORS.danger,
   },
   registerButton: {
