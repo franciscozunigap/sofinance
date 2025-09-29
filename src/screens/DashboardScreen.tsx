@@ -289,8 +289,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
                 source={require('../../assets/avatar.png')} 
                 style={styles.avatarImage}
                 resizeMode="cover"
-                onError={(error) => console.log('Error loading avatar image:', error)}
-                onLoad={() => console.log('Avatar image loaded successfully')}
+                onError={() => {}}
+                onLoad={() => {}}
               />
               {/* Overlay para integrar mejor con el fondo */}
               <View style={styles.avatarOverlay} />

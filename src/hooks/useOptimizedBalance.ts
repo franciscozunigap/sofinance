@@ -86,7 +86,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
       setLastSync(offlineData.lastSync);
       setPendingOperations(offlineData.pendingOperations.length);
     } catch (error) {
-      console.error('Error verificando estado offline:', error);
     }
   }, []);
 
@@ -128,7 +127,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
         setCurrentBalance(offlineData.balance);
       }
       
-      console.error('Error loading current balance:', err);
     } finally {
       setLoading(false);
     }
@@ -169,7 +167,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
         setBalanceHistory(offlineData.history);
       }
       
-      console.error('Error loading balance history:', err);
     } finally {
       setLoading(false);
     }
@@ -216,7 +213,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
         setMonthlyStats(offlineData.stats);
       }
       
-      console.error('Error loading monthly stats:', err);
     } finally {
       setLoading(false);
     }
@@ -277,7 +273,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
         await checkOfflineStatus();
       }
       
-      console.error('Error registering balance:', err);
       return false;
     } finally {
       setLoading(false);
@@ -303,7 +298,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
     } catch (err) {
       const errorInfo = ErrorHandler.handleError(err, 'refreshData', userId);
       setError(errorInfo.userMessage);
-      console.error('Error refreshing data:', err);
     }
   }, [loadCurrentBalance, loadBalanceHistory, loadMonthlyStats]);
 
@@ -318,7 +312,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
       // Guardar en caché
       await CacheService.setSummaryStats(stats);
     } catch (err) {
-      console.error('Error loading summary stats:', err);
     }
   }, [userId]);
 
@@ -351,7 +344,6 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
       historyUnsubscribeRef.current = historyUnsubscribe;
       setIsSubscribed(true);
     } catch (err) {
-      console.error('Error subscribing to changes:', err);
     }
   }, [userId, isSubscribed]);
 
@@ -391,14 +383,12 @@ export const useOptimizedBalance = (userId: string): UseOptimizedBalanceReturn =
             }
           }
         } catch (error) {
-          console.error(`Error procesando operación pendiente ${operation.id}:`, error);
         }
       }
       
       // Actualizar estado offline
       await checkOfflineStatus();
     } catch (error) {
-      console.error('Error procesando operaciones pendientes:', error);
     }
   }, [userId, checkOfflineStatus]);
 

@@ -38,9 +38,9 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose, onLogout, 
       icon: User,
       description: 'Gestiona tu información personal',
       items: [
-        { label: 'Información personal', action: () => console.log('Editar perfil') },
-        { label: 'Foto de perfil', action: () => console.log('Cambiar foto') },
-        { label: 'Preferencias', action: () => console.log('Preferencias') }
+        { label: 'Información personal', action: () => {} },
+        { label: 'Foto de perfil', action: () => {} },
+        { label: 'Preferencias', action: () => {} }
       ]
     },
     {
@@ -49,9 +49,9 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose, onLogout, 
       icon: Bell,
       description: 'Configura tus alertas',
       items: [
-        { label: 'Alertas de gastos', action: () => console.log('Alertas gastos') },
-        { label: 'Recordatorios', action: () => console.log('Recordatorios') },
-        { label: 'Resúmenes semanales', action: () => console.log('Resúmenes') }
+        { label: 'Alertas de gastos', action: () => {} },
+        { label: 'Recordatorios', action: () => {} },
+        { label: 'Resúmenes semanales', action: () => {} }
       ]
     },
     {
@@ -60,9 +60,9 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose, onLogout, 
       icon: Shield,
       description: 'Controla tu privacidad',
       items: [
-        { label: 'Datos personales', action: () => console.log('Datos personales') },
-        { label: 'Compartir información', action: () => console.log('Compartir') },
-        { label: 'Eliminar cuenta', action: () => console.log('Eliminar cuenta') }
+        { label: 'Datos personales', action: () => {} },
+        { label: 'Compartir información', action: () => {} },
+        { label: 'Eliminar cuenta', action: () => {} }
       ]
     },
     {
@@ -71,9 +71,9 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose, onLogout, 
       icon: HelpCircle,
       description: 'Soporte y ayuda',
       items: [
-        { label: 'Centro de ayuda', action: () => console.log('Centro ayuda') },
-        { label: 'Contactar soporte', action: () => console.log('Soporte') },
-        { label: 'Términos y condiciones', action: () => console.log('Términos') }
+        { label: 'Centro de ayuda', action: () => {} },
+        { label: 'Contactar soporte', action: () => {} },
+        { label: 'Términos y condiciones', action: () => {} }
       ]
     }
   ];

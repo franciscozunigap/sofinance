@@ -15,14 +15,9 @@ export const useBalance = (userId: string) => {
       setLoading(true);
       setError(null);
       const balance = await BalanceService.getCurrentBalance(userId);
-      console.log('=== DEBUG USE BALANCE ===');
-      console.log('userId:', userId);
-      console.log('balance obtenido de BalanceService:', balance);
-      console.log('========================');
       setCurrentBalance(balance);
     } catch (err) {
       setError('Error al cargar el balance actual');
-      console.error('Error loading current balance:', err);
     } finally {
       setLoading(false);
     }
@@ -37,7 +32,6 @@ export const useBalance = (userId: string) => {
       setBalanceHistory(history);
     } catch (err) {
       setError('Error al cargar el historial de balance');
-      console.error('Error loading balance history:', err);
     } finally {
       setLoading(false);
     }
@@ -46,20 +40,16 @@ export const useBalance = (userId: string) => {
   // Cargar estadísticas del mes actual
   const loadMonthlyStats = async () => {
     try {
-      console.log('loadMonthlyStats llamado para userId:', userId);
       setLoading(true);
       setError(null);
       const now = new Date();
       const month = now.getMonth() + 1;
       const year = now.getFullYear();
       
-      console.log('Obteniendo estadísticas para mes:', month, 'año:', year);
       const stats = await BalanceService.getMonthlyStats(userId, month, year);
-      console.log('Estadísticas obtenidas:', stats);
       setMonthlyStats(stats);
     } catch (err) {
       setError('Error al cargar las estadísticas mensuales');
-      console.error('Error loading monthly stats:', err);
     } finally {
       setLoading(false);
     }
@@ -91,7 +81,6 @@ export const useBalance = (userId: string) => {
       }
     } catch (err) {
       setError('Error al registrar el balance');
-      console.error('Error registering balance:', err);
       return false;
     } finally {
       setLoading(false);

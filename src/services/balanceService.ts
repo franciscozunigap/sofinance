@@ -51,7 +51,6 @@ export class BalanceService {
       // Guardar registro
       const registrationRef = doc(db, 'balance_registrations', balanceRegistration.id);
       await setDoc(registrationRef, balanceRegistration);
-      console.log('Registro guardado en Firestore:', balanceRegistration);
 
       // Actualizar estadísticas mensuales primero
       await this.updateMonthlyStats(userId, month, year, balanceRegistration);
@@ -63,10 +62,8 @@ export class BalanceService {
       await this.handleMonthChange(userId);
 
 
-      console.log('Balance registrado exitosamente para userId:', userId);
       return { success: true, balanceRegistration };
     } catch (error) {
-      console.error('Error al registrar balance:', error);
       return { success: false, error: 'Error al registrar el balance' };
     }
   }
@@ -82,22 +79,13 @@ export class BalanceService {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
       
-      console.log('=== DEBUG BALANCE SERVICE ===');
-      console.log('getCurrentBalance - userId:', userId);
-      console.log('getCurrentBalance - month:', month, 'year:', year);
-      
       const currentMonthBalance = await this.getCurrentMonthBalance(userId, month, year);
-      console.log('getCurrentBalance - currentMonthBalance:', currentMonthBalance);
       
       // Sincronizar el balance actual con el balance del mes actual
       await this.syncCurrentBalanceWithMonthlyStats(userId, currentMonthBalance);
       
-      console.log('getCurrentBalance - balance final retornado:', currentMonthBalance);
-      console.log('=============================');
-      
       return currentMonthBalance;
     } catch (error) {
-      console.error('Error al obtener balance actual:', error);
       return 0;
     }
   }
@@ -111,23 +99,12 @@ export class BalanceService {
       const statsDocRef = doc(db, 'monthly_stats', statsId);
       const statsDocSnap = await getDoc(statsDocRef);
       
-      console.log('=== DEBUG GET CURRENT MONTH BALANCE ===');
-      console.log('statsId:', statsId);
-      console.log('statsDocSnap.exists():', statsDocSnap.exists());
-      
       if (statsDocSnap.exists()) {
         const stats = statsDocSnap.data() as MonthlyStats;
-        console.log('stats encontradas:', stats);
-        console.log('stats.balance:', stats.balance);
-        console.log('=====================================');
         return stats.balance;
       }
-      
-      console.log('No se encontraron estadísticas para el mes actual, retornando 0');
-      console.log('=====================================');
       return 0;
     } catch (error) {
-      console.error('Error al obtener balance del mes actual:', error);
       return 0;
     }
   }
@@ -151,7 +128,6 @@ export class BalanceService {
         await this.createInitialBalance(userId, monthlyBalance);
       }
     } catch (error) {
-      console.error('Error al sincronizar balance actual:', error);
       throw error;
     }
   }
@@ -169,9 +145,7 @@ export class BalanceService {
 
       const balanceDocRef = doc(db, 'balances', userId);
       await setDoc(balanceDocRef, initialBalance);
-      console.log(`Balance inicial creado para el usuario ${userId}: ${initialAmount}`);
     } catch (error) {
-      console.error('Error al crear balance inicial:', error);
       throw error;
     }
   }
@@ -187,7 +161,6 @@ export class BalanceService {
         lastUpdated: new Date()
       });
     } catch (error) {
-      console.error('Error al actualizar balance actual:', error);
       throw error;
     }
   }
@@ -208,9 +181,7 @@ export class BalanceService {
       // Sincronizar el balance actual con el balance del mes actual
       await this.syncCurrentBalanceWithMonthlyStats(userId, currentMonthBalance);
       
-      console.log(`Balance sincronizado para el mes ${month}/${year}: ${currentMonthBalance}`);
     } catch (error) {
-      console.error('Error al manejar cambio de mes:', error);
       throw error;
     }
   }
@@ -287,7 +258,6 @@ export class BalanceService {
 
       await setDoc(statsDocRef, monthlyStats);
     } catch (error) {
-      console.error('Error al actualizar estadísticas mensuales:', error);
       throw error;
     }
   }
@@ -373,7 +343,6 @@ export class BalanceService {
         investment: Math.round(investment * 10) / 10 // Truncar a un decimal
       };
     } catch (error) {
-      console.error('Error al calcular porcentajes mensuales:', error);
       return { needs: 0, wants: 0, savings: 0, investment: 0 };
     }
   }
@@ -422,7 +391,6 @@ export class BalanceService {
       
       return 0;
     } catch (error) {
-      console.error('Error al obtener balance del mes anterior:', error);
       return 0;
     }
   }
@@ -452,7 +420,6 @@ export class BalanceService {
         createdAt: doc.data().createdAt.toDate()
       })) as BalanceRegistration[];
     } catch (error) {
-      console.error('Error al obtener registros del mes actual:', error);
       return [];
     }
   }
@@ -476,7 +443,6 @@ export class BalanceService {
       }
       
       // Si no existen estadísticas, crearlas
-      console.log('Creando estadísticas mensuales iniciales para:', userId, month, year);
       await this.createInitialMonthlyStats(userId);
       
       // Intentar obtener las estadísticas nuevamente
@@ -492,7 +458,6 @@ export class BalanceService {
       
       return null;
     } catch (error) {
-      console.error('Error al obtener estadísticas mensuales:', error);
       return null;
     }
   }
@@ -502,7 +467,6 @@ export class BalanceService {
    */
   static async getBalanceHistory(userId: string): Promise<BalanceRegistration[]> {
     try {
-      console.log('Obteniendo historial de balance para userId:', userId);
       const registrationsRef = collection(db, 'balance_registrations');
       const q = query(
         registrationsRef,
@@ -518,12 +482,9 @@ export class BalanceService {
         createdAt: doc.data().createdAt.toDate()
       })) as BalanceRegistration[];
       
-      console.log('Registros encontrados:', registrations.length);
-      console.log('Primeros registros:', registrations.slice(0, 3));
       
       return registrations;
     } catch (error) {
-      console.error('Error al obtener historial de balance:', error);
       return [];
     }
   }
@@ -697,9 +658,7 @@ export class BalanceService {
 
       const statsDocRef = doc(db, 'monthly_stats', statsId);
       await setDoc(statsDocRef, initialStats);
-      console.log('Estadísticas mensuales iniciales creadas para el usuario:', userId, 'con porcentajes:', percentages);
     } catch (error) {
-      console.error('Error al crear estadísticas mensuales iniciales:', error);
       throw error;
     }
   }

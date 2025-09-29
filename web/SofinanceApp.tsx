@@ -174,20 +174,14 @@ const SofinanceAppContent = () => {
     const currentDate = new Date();
     const months = [];
     
-    console.log('Generando datos de ingresos mensuales...');
-    console.log('monthlyStats:', monthlyStats);
-    
     // Usar datos de monthlyStats
     if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
       const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
-      console.log(`Mes actual (${monthName}): usando monthlyStats.totalIncome = ${monthlyStats.totalIncome}`);
       months.push({
         month: monthName,
         income: monthlyStats.totalIncome
       });
     }
-    
-    console.log('Datos de ingresos mensuales generados:', months);
     return months;
   };
 

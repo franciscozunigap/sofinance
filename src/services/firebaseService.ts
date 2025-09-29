@@ -34,7 +34,6 @@ export class FirebaseService {
     try {
       return await runTransaction(db, transactionFunction);
     } catch (error) {
-      console.error('Error en transacción Firebase:', error);
       throw new Error(`Error en transacción: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -52,7 +51,6 @@ export class FirebaseService {
       
       await batch.commit();
     } catch (error) {
-      console.error('Error en operación en lote:', error);
       throw new Error(`Error en operación en lote: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -73,7 +71,6 @@ export class FirebaseService {
       }
       return null;
     } catch (error) {
-      console.error(`Error obteniendo documento ${collection}/${docId}:`, error);
       throw new Error(`Error obteniendo documento: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -97,7 +94,6 @@ export class FirebaseService {
         await setDoc(docRef, firestoreData);
       }
     } catch (error) {
-      console.error(`Error guardando documento ${collection}/${docId}:`, error);
       throw new Error(`Error guardando documento: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -115,7 +111,6 @@ export class FirebaseService {
       const firestoreData = this.convertToFirestoreData(data);
       await updateDoc(docRef, firestoreData);
     } catch (error) {
-      console.error(`Error actualizando documento ${collection}/${docId}:`, error);
       throw new Error(`Error actualizando documento: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -128,7 +123,6 @@ export class FirebaseService {
       const docRef = doc(db, collection, docId);
       await deleteDoc(docRef);
     } catch (error) {
-      console.error(`Error eliminando documento ${collection}/${docId}:`, error);
       throw new Error(`Error eliminando documento: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -158,7 +152,6 @@ export class FirebaseService {
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs.map(doc => this.convertFirestoreData<T>(doc.data()));
     } catch (error) {
-      console.error(`Error ejecutando consulta en ${collectionName}:`, error);
       throw new Error(`Error ejecutando consulta: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -180,11 +173,9 @@ export class FirebaseService {
           callback(null);
         }
       }, (error) => {
-        console.error(`Error en suscripción a documento ${collection}/${docId}:`, error);
         callback(null);
       });
     } catch (error) {
-      console.error(`Error creando suscripción a documento ${collection}/${docId}:`, error);
       throw new Error(`Error creando suscripción: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -205,11 +196,9 @@ export class FirebaseService {
         const data = querySnapshot.docs.map(doc => this.convertFirestoreData<T>(doc.data()));
         callback(data);
       }, (error) => {
-        console.error(`Error en suscripción a consulta ${collectionName}:`, error);
         callback([]);
       });
     } catch (error) {
-      console.error(`Error creando suscripción a consulta ${collectionName}:`, error);
       throw new Error(`Error creando suscripción: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -263,7 +252,6 @@ export class FirebaseService {
       const docSnap = await getDoc(docRef);
       return docSnap.exists();
     } catch (error) {
-      console.error(`Error verificando existencia de documento ${collection}/${docId}:`, error);
       return false;
     }
   }
@@ -279,7 +267,6 @@ export class FirebaseService {
       const promises = docIds.map(id => this.getDocument<T>(collection, id));
       return await Promise.all(promises);
     } catch (error) {
-      console.error(`Error obteniendo múltiples documentos de ${collection}:`, error);
       throw new Error(`Error obteniendo múltiples documentos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
@@ -297,7 +284,6 @@ export class FirebaseService {
       const querySnapshot = await getDocs(q);
       return querySnapshot.size;
     } catch (error) {
-      console.error(`Error contando documentos en ${collectionName}:`, error);
       throw new Error(`Error contando documentos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }

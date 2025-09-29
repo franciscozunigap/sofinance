@@ -50,7 +50,6 @@ export class CacheService {
 
       await AsyncStorage.setItem(key, JSON.stringify(cacheEntry));
     } catch (error) {
-      console.error(`Error guardando en caché ${key}:`, error);
     }
   }
 
@@ -73,7 +72,6 @@ export class CacheService {
 
       return cacheEntry.data;
     } catch (error) {
-      console.error(`Error obteniendo del caché ${key}:`, error);
       return null;
     }
   }
@@ -91,7 +89,6 @@ export class CacheService {
 
       return now <= cacheEntry.expiresAt;
     } catch (error) {
-      console.error(`Error verificando caché ${key}:`, error);
       return false;
     }
   }
@@ -103,7 +100,6 @@ export class CacheService {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error(`Error eliminando del caché ${key}:`, error);
     }
   }
 
@@ -115,7 +111,6 @@ export class CacheService {
       const keys = Object.values(this.CACHE_KEYS);
       await AsyncStorage.multiRemove(keys);
     } catch (error) {
-      console.error('Error limpiando caché:', error);
     }
   }
 
@@ -148,7 +143,6 @@ export class CacheService {
         await AsyncStorage.multiRemove(expiredKeys);
       }
     } catch (error) {
-      console.error('Error limpiando caché expirado:', error);
     }
   }
 
@@ -220,7 +214,6 @@ export class CacheService {
         keys: keyStats,
       };
     } catch (error) {
-      console.error('Error obteniendo estadísticas del caché:', error);
       return {
         totalKeys: 0,
         expiredKeys: 0,

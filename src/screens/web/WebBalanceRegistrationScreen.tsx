@@ -107,7 +107,6 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
       }
       onClose();
     } catch (error) {
-      console.error('Error al guardar el registro:', error);
       alert('Error al guardar el registro. Inténtalo de nuevo.');
     } finally {
       setLoading(false);

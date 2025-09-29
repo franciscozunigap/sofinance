@@ -29,8 +29,6 @@ const { width } = Dimensions.get('window');
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistration }) => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   
-  // Debug: verificar si las props están llegando
-  console.log('LoginScreen props:', { onLoginSuccess, onShowRegistration });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -62,20 +60,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onShowRegistr
 
     setLoading(true);
     try {
-      console.log('Intentando login con:', { email, password });
       await AuthService.login({ email, password });
-      console.log('Login exitoso');
       
       // Siempre usar la prop onLoginSuccess si está disponible
       if (onLoginSuccess && typeof onLoginSuccess === 'function') {
-        console.log('Usando onLoginSuccess prop');
         onLoginSuccess();
       } else {
-        console.log('onLoginSuccess no disponible, usando navegación directa');
         navigation.navigate('Dashboard');
       }
     } catch (error) {
-      console.error('Error en login:', error);
       const errorMessage = error instanceof Error ? error.message : 'Credenciales inválidas. Inténtalo de nuevo.';
       Alert.alert('Error', errorMessage);
     } finally {

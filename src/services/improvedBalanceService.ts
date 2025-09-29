@@ -72,7 +72,6 @@ export class ImprovedBalanceService {
 
       return result;
     } catch (error) {
-      console.error('Error al registrar balance:', error);
       return { 
         success: false, 
         error: `Error al registrar el balance: ${error instanceof Error ? error.message : 'Error desconocido'}` 
@@ -105,7 +104,6 @@ export class ImprovedBalanceService {
       await this.createInitialBalance(userId);
       return 0;
     } catch (error) {
-      console.error('Error al obtener balance actual:', error);
       return 0;
     }
   }
@@ -130,7 +128,6 @@ export class ImprovedBalanceService {
         constraints
       );
     } catch (error) {
-      console.error('Error al obtener historial de balance:', error);
       return [];
     }
   }
@@ -146,7 +143,6 @@ export class ImprovedBalanceService {
         statsId
       );
     } catch (error) {
-      console.error('Error al obtener estadísticas mensuales:', error);
       return null;
     }
   }
@@ -168,7 +164,6 @@ export class ImprovedBalanceService {
         initialBalance
       );
     } catch (error) {
-      console.error('Error al crear balance inicial:', error);
       throw error;
     }
   }
@@ -196,7 +191,6 @@ export class ImprovedBalanceService {
         await this.createInitialBalance(userId, monthlyBalance);
       }
     } catch (error) {
-      console.error('Error al sincronizar balance actual:', error);
       throw error;
     }
   }
@@ -257,7 +251,6 @@ export class ImprovedBalanceService {
       
       return 0;
     } catch (error) {
-      console.error('Error obteniendo balance desde transacción:', error);
       return 0;
     }
   }
@@ -329,7 +322,6 @@ export class ImprovedBalanceService {
 
       transaction.set(statsRef, monthlyStats);
     } catch (error) {
-      console.error('Error actualizando estadísticas mensuales en transacción:', error);
       throw error;
     }
   }
@@ -349,7 +341,6 @@ export class ImprovedBalanceService {
         lastUpdated: new Date()
       });
     } catch (error) {
-      console.error('Error actualizando balance actual en transacción:', error);
       throw error;
     }
   }
@@ -445,7 +436,6 @@ export class ImprovedBalanceService {
         transactionCount
       };
     } catch (error) {
-      console.error('Error obteniendo estadísticas de resumen:', error);
       return {
         totalIncome: 0,
         totalExpenses: 0,

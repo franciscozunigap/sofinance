@@ -43,7 +43,6 @@ export class OfflineService {
         JSON.stringify(pendingOps)
       );
     } catch (error) {
-      console.error('Error guardando operación pendiente:', error);
     }
   }
 
@@ -62,7 +61,6 @@ export class OfflineService {
       }
       return [];
     } catch (error) {
-      console.error('Error obteniendo operaciones pendientes:', error);
       return [];
     }
   }
@@ -79,7 +77,6 @@ export class OfflineService {
         JSON.stringify(filteredOps)
       );
     } catch (error) {
-      console.error('Error eliminando operación pendiente:', error);
     }
   }
 
@@ -90,7 +87,6 @@ export class OfflineService {
     try {
       await AsyncStorage.removeItem(this.STORAGE_KEYS.PENDING_OPERATIONS);
     } catch (error) {
-      console.error('Error limpiando operaciones pendientes:', error);
     }
   }
 
@@ -105,7 +101,6 @@ export class OfflineService {
       };
       await AsyncStorage.setItem(key, JSON.stringify(cacheData));
     } catch (error) {
-      console.error(`Error guardando caché para ${key}:`, error);
     }
   }
 
@@ -127,7 +122,6 @@ export class OfflineService {
       }
       return null;
     } catch (error) {
-      console.error(`Error obteniendo caché para ${key}:`, error);
       return null;
     }
   }
@@ -184,7 +178,6 @@ export class OfflineService {
         new Date().toISOString()
       );
     } catch (error) {
-      console.error('Error actualizando última sincronización:', error);
     }
   }
 
@@ -199,7 +192,6 @@ export class OfflineService {
       }
       return null;
     } catch (error) {
-      console.error('Error obteniendo última sincronización:', error);
       return null;
     }
   }
@@ -255,7 +247,6 @@ export class OfflineService {
         AsyncStorage.removeItem(this.STORAGE_KEYS.LAST_SYNC),
       ]);
     } catch (error) {
-      console.error('Error limpiando caché:', error);
     }
   }
 
@@ -289,7 +280,6 @@ export class OfflineService {
         }
       }
     } catch (error) {
-      console.error('Error calculando tamaño del caché:', error);
     }
 
     return {

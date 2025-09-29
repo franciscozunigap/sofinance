@@ -75,7 +75,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al cargar el balance actual';
       setError(errorMessage);
-      console.error('Error loading current balance:', err);
     } finally {
       setLoading(false);
     }
@@ -93,7 +92,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al cargar el historial de balance';
       setError(errorMessage);
-      console.error('Error loading balance history:', err);
     } finally {
       setLoading(false);
     }
@@ -116,7 +114,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al cargar las estadísticas mensuales';
       setError(errorMessage);
-      console.error('Error loading monthly stats:', err);
     } finally {
       setLoading(false);
     }
@@ -158,7 +155,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al registrar el balance';
       setError(errorMessage);
-      console.error('Error registering balance:', err);
       return false;
     } finally {
       setLoading(false);
@@ -179,7 +175,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al actualizar los datos';
       setError(errorMessage);
-      console.error('Error refreshing data:', err);
     }
   }, [loadCurrentBalance, loadBalanceHistory, loadMonthlyStats]);
 
@@ -191,7 +186,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
       const stats = await ImprovedBalanceService.getSummaryStats(userId);
       setSummaryStats(stats);
     } catch (err) {
-      console.error('Error loading summary stats:', err);
     }
   }, [userId]);
 
@@ -220,7 +214,6 @@ export const useImprovedBalance = (userId: string): UseImprovedBalanceReturn => 
       historyUnsubscribeRef.current = historyUnsubscribe;
       setIsSubscribed(true);
     } catch (err) {
-      console.error('Error subscribing to changes:', err);
     }
   }, [userId, isSubscribed]);
 

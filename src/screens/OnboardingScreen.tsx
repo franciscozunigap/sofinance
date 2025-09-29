@@ -68,7 +68,6 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack 
       
       onComplete();
     } catch (error) {
-      console.error('Error en registro:', error);
       
       let errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
       let title = 'Error';

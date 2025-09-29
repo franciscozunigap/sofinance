@@ -14,9 +14,6 @@ const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'mes
 const missingKeys = requiredKeys.filter(key => !firebaseConfig[key as keyof typeof firebaseConfig]);
 
 if (missingKeys.length > 0) {
-  console.error('Firebase configuration is missing required keys:', missingKeys);
-  console.error('Platform:', platform);
-  console.error('Current config:', firebaseConfig);
   throw new Error(`Firebase configuration is incomplete for ${platform}. Missing: ${missingKeys.join(', ')}`);
 }
 
@@ -26,4 +23,3 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // Log de confirmación
-console.log(`Firebase initialized for ${platform} platform`);

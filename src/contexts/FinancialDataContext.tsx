@@ -70,7 +70,6 @@ export const FinancialDataProvider: React.FC<FinancialDataProviderProps> = ({ ch
       ]);
     } catch (err) {
       setError('Error al actualizar los datos');
-      console.error('Error refreshing data:', err);
     }
   };
 
@@ -86,16 +85,6 @@ export const FinancialDataProvider: React.FC<FinancialDataProviderProps> = ({ ch
     alerts: user?.alerts || 0,
   };
 
-  // Debug logs para el contexto
-  console.log('=== DEBUG FINANCIAL DATA CONTEXT ===');
-  console.log('currentBalance en contexto:', currentBalance);
-  console.log('monthlyStats en contexto:', monthlyStats);
-  console.log('monthlyStats.balance:', monthlyStats?.balance);
-  console.log('user.currentSavings:', user?.currentSavings);
-  console.log('user.wallet.amount:', user?.wallet?.amount);
-  console.log('userData.currentSavings calculado:', userData.currentSavings);
-  console.log('balanceLoading:', balanceLoading);
-  console.log('====================================');
 
   // Datos financieros calculados basándose en monthlyStats
   const financialData = monthlyStats ? {

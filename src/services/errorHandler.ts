@@ -189,9 +189,9 @@ export class ErrorHandler {
       this.errorLog = this.errorLog.slice(-100);
     }
 
-    // Log en consola en desarrollo
-    if (__DEV__) {
-      console.error(`[${context}] Error:`, error);
+    // Log solo en desarrollo para errores críticos
+    if (__DEV__ && this.isCriticalError(error)) {
+      console.error(`[${context}] Critical Error:`, error);
     }
   }
 
@@ -285,6 +285,23 @@ export class ErrorHandler {
       byContext,
       recent,
     };
+  }
+
+  /**
+   * Determina si un error es crítico y debe ser loggeado
+   */
+  private static isCriticalError(error: Error): boolean {
+    const criticalPatterns = [
+      'auth/network-request-failed',
+      'auth/too-many-requests',
+      'permission-denied',
+      'unavailable',
+      'quota-exceeded'
+    ];
+
+    return criticalPatterns.some(pattern => 
+      error.message.toLowerCase().includes(pattern)
+    );
   }
 }
 

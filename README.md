@@ -297,36 +297,54 @@ Sistema de espaciado consistente basado en múltiplos de 4px:
 
 ### **Desarrollo**
 ```bash
-npm run web          # Solo web
-npm run start        # Solo mobile
-npm run dev:both     # Ambos simultáneamente
-npm run dev:multi    # Menú interactivo
-npm run clean        # Limpiar cache
+npm run web              # Solo web (http://localhost:3000)
+npm run start            # Solo mobile (Expo)
+npm run dev:both         # Ambos simultáneamente
+npm run dev:multi        # Menú interactivo
+npm run dev:all          # Desarrollo completo
+npm run clean            # Limpiar cache
 ```
 
 ### **Configuración**
 ```bash
-npm run setup:firebase  # Configurar Firebase
-npm run test:env        # Probar variables de entorno
-npm run test:android    # Probar configuración de Android
+npm run setup:firebase   # Configurar Firebase
+npm run test:env         # Probar variables de entorno
+npm run test:android     # Probar configuración de Android
+npm run validate         # Validación completa del proyecto
+npm run health           # Análisis de salud del proyecto
 ```
 
 ### **Plataformas Específicas**
 ```bash
-npm run ios          # iOS Simulator
-npm run android      # Android Emulator
+npm run ios              # iOS Simulator
+npm run android          # Android Emulator
+npm run dev:mobile       # Mobile (Android + iOS)
+npm run dev:web-mobile   # Web + Mobile
 ```
 
 ### **Build**
 ```bash
-npm run build:web    # Build web para producción
-npm run build:mobile # Build mobile para producción
+npm run build:web        # Build web para producción
+npm run web:build        # Build web (alternativo)
+npm run build:mobile     # Build mobile para producción
 ```
 
 ### **Testing**
 ```bash
-npm run test:web     # Probar web
-npm run test:mobile  # Probar mobile
+npm test                 # Todos los tests
+npm run test:watch       # Tests en modo watch
+npm run test:coverage    # Tests con cobertura
+npm run test:services    # Tests de servicios
+npm run test:hooks       # Tests de hooks
+npm run test:contexts    # Tests de contextos
+```
+
+### **Utilidades**
+```bash
+npm run cache:clear      # Limpiar caché local
+npm run offline:clear    # Limpiar caché offline
+npm run lint             # Verificar TypeScript
+npm run lint:fix         # Corregir errores TypeScript
 ```
 
 ## 📊 Funcionalidades Implementadas
@@ -339,12 +357,13 @@ npm run test:mobile  # Probar mobile
 - **Persistencia de sesión** automática
 
 ### **📊 Dashboard Interactivo Avanzado**
-- **Resumen financiero** con métricas clave
-- **Gráficos de tendencias** (LineChart con react-native-chart-kit)
+- **Resumen financiero** con métricas clave en tiempo real
+- **Gráficos de tendencias** (LineChart, PieChart, BarChart con Recharts)
 - **Tarjetas de porcentajes** (4 columnas con datos financieros)
 - **Lista de transacciones** recientes con categorías
 - **Avatar animado** con efecto parallax en scroll
 - **Navegación flotante** personalizada
+- **Sincronización en tiempo real** con Firebase
 
 ### **🤖 Chat con IA (Sofia)**
 - **Interfaz de chat** completa y moderna
@@ -353,12 +372,21 @@ npm run test:mobile  # Probar mobile
 - **Avatar personalizado** y UI atractiva
 - **Integración** con el contexto financiero del usuario
 
-### **📈 Análisis Financiero**
-- **Pantalla de análisis** dedicada
+### **📈 Análisis Financiero Avanzado**
+- **Pantalla de análisis** dedicada con métricas detalladas
 - **Métricas de salud financiera** en tiempo real
-- **Visualizaciones de datos** interactivas
+- **Visualizaciones de datos** interactivas (gráficos de salud financiera)
 - **Sistema de scoring** personalizado
 - **Recomendaciones** basadas en patrones
+- **Registro de balance** con flujo de 2 pasos
+- **Categorización automática** de transacciones
+
+### **💰 Gestión de Balance**
+- **Registro de balance** con validación en tiempo real
+- **Categorización de transacciones** (Ingreso, Deuda, Consumo, Necesidad, Inversión)
+- **Cálculo automático** de diferencias
+- **Validación de registros** con suma exacta
+- **Persistencia** en Firebase
 
 ### **⚙️ Configuración y Perfil**
 - **Pantalla de ajustes** completa
@@ -372,6 +400,7 @@ npm run test:mobile  # Probar mobile
 - **Animaciones fluidas** con React Native Animated
 - **Micro-interacciones** en todos los elementos
 - **Estados de carga** y feedback visual
+- **Skeleton loaders** para mejor UX
 
 ## 🚀 Optimizaciones Implementadas
 

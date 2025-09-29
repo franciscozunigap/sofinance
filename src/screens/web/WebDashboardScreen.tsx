@@ -12,15 +12,6 @@ const WebDashboardScreen = () => {
   const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading, financialData, userData, refreshData } = useFinancialData();
   const [currentView, setCurrentView] = useState('dashboard');
 
-  // Debug logs para el saldo actual
-  console.log('=== DEBUG SALDO ACTUAL ===');
-  console.log('currentBalance desde useFinancialData:', currentBalance);
-  console.log('monthlyStats:', monthlyStats);
-  console.log('monthlyStats.balance:', monthlyStats?.balance);
-  console.log('user:', user);
-  console.log('user.wallet:', user?.wallet);
-  console.log('userData.currentSavings:', userData?.currentSavings);
-  console.log('========================');
 
   // Mostrar skeleton mientras se cargan los datos
   if (balanceLoading) {
@@ -104,9 +95,6 @@ const WebDashboardScreen = () => {
     const currentDate = new Date();
     const months = [];
     
-    console.log('Generando datos de ingresos mensuales...');
-    console.log('monthlyStats:', monthlyStats);
-    console.log('balanceHistory length:', balanceHistory.length);
     
     // Generar los últimos 6 meses
     for (let i = 5; i >= 0; i--) {
@@ -115,7 +103,6 @@ const WebDashboardScreen = () => {
       
       // Si es el mes actual y tenemos monthlyStats, usar totalIncome
       if (i === 0 && monthlyStats && monthlyStats.totalIncome > 0) {
-        console.log(`Mes actual (${monthName}): usando totalIncome = ${monthlyStats.totalIncome}`);
         months.push({
           month: monthName,
           income: monthlyStats.totalIncome
@@ -146,7 +133,6 @@ const WebDashboardScreen = () => {
           mockIncome = 800000 * variation;
         }
         
-        console.log(`Mes ${monthName}: totalIncome real = ${totalIncome}, mockIncome = ${mockIncome}`);
         
         months.push({
           month: monthName,
@@ -155,7 +141,6 @@ const WebDashboardScreen = () => {
       }
     }
     
-    console.log('Datos de ingresos mensuales generados:', months);
     return months;
   };
 
@@ -167,13 +152,6 @@ const WebDashboardScreen = () => {
   // Si no hay datos válidos, usar los datos generados directamente
   const displayData = validMonthlyData.length > 0 ? validMonthlyData : monthlyIncomeData;
   
-  // Debug: mostrar datos de ingresos mensuales
-  console.log('Monthly Income Data:', monthlyIncomeData);
-  console.log('Valid Monthly Data:', validMonthlyData);
-  console.log('Display Data:', displayData);
-  console.log('Display Data Length:', displayData.length);
-  console.log('Monthly Stats:', monthlyStats);
-  console.log('User Data:', userData);
 
   // Generar datos de categorías de ingresos por mes
   const generateIncomeCategoriesData = () => {
@@ -518,12 +496,6 @@ const WebDashboardScreen = () => {
             <p className="text-white/90 text-sm mb-2">Saldo Actual</p>
             <h1 className="text-3xl lg:text-4xl font-bold text-white">
               {(() => {
-                console.log('=== DEBUG SALDO EN UI ===');
-                console.log('currentBalance en UI:', currentBalance);
-                console.log('monthlyStats.balance:', monthlyStats?.balance);
-                console.log('formatChileanPeso(currentBalance):', formatChileanPeso(currentBalance));
-                console.log('formatChileanPeso(monthlyStats.balance):', formatChileanPeso(monthlyStats?.balance || 0));
-                console.log('========================');
                 // Usar monthlyStats.balance si currentBalance es 0
                 const balanceToShow = currentBalance || monthlyStats?.balance || 0;
                 return formatChileanPeso(balanceToShow);
