@@ -85,69 +85,124 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
     const investmentPercent = totalIncome > 0 ? (totalInvestment / totalIncome) * 100 : 0;
 
     return {
-      consume: { amount: totalWants, percent: Math.round(wantsPercent * 100) / 100 },
-      necesidades: { amount: totalNeeds, percent: Math.round(needsPercent * 100) / 100 },
-      disponible: { amount: actualDisponible, percent: Math.round(disponiblePercent * 100) / 100 },
-      invest: { amount: totalInvestment, percent: Math.round(investmentPercent * 100) / 100 }
+      consume: { amount: totalWants, percent: Math.round(wantsPercent * 10) / 10 },
+      necesidades: { amount: totalNeeds, percent: Math.round(needsPercent * 10) / 10 },
+      disponible: { amount: actualDisponible, percent: Math.round(disponiblePercent * 10) / 10 },
+      invest: { amount: totalInvestment, percent: Math.round(investmentPercent * 10) / 10 }
     };
   };
 
-  // Datos para análisis financiero - Mostrar últimos 6 meses con datos dispersos
+  // Datos para análisis financiero - Usar solo monthlyStats como fuente única
   const generateMonthlyTrend = () => {
     const currentDate = new Date();
     const months = [];
     
-    // Generar los últimos 6 meses a partir del mes actual
-    for (let i = 5; i >= 0; i--) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+    // Usar datos de monthlyStats como fuente única
+    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
+      const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
+      const monthlyIncome = monthlyStats.totalIncome;
       
-      // Calcular montos reales para este mes
-      const categoryData = calculateCategoryAmountsForMonth(date.getFullYear(), date.getMonth());
-      
-      // Verificar si hay datos reales para este mes
-      const hasData = categoryData.consume.amount > 0 || 
-                     categoryData.necesidades.amount > 0 || 
-                     categoryData.disponible.amount > 0 || 
-                     categoryData.invest.amount > 0;
+      // Usar porcentajes de monthlyStats
+      const consumePercent = monthlyStats?.percentages?.wants || 30;
+      const necesidadesPercent = monthlyStats?.percentages?.needs || 50;
+      const investPercent = monthlyStats?.percentages?.investment || 10;
+      const disponiblePercent = monthlyStats?.percentages?.savings || 10;
       
       months.push({
         month: monthName,
-        consume: hasData ? categoryData.consume : { amount: undefined, percent: 0 },
-        necesidades: hasData ? categoryData.necesidades : { amount: undefined, percent: 0 },
-        disponible: hasData ? categoryData.disponible : { amount: undefined, percent: 0 },
-        invest: hasData ? categoryData.invest : { amount: undefined, percent: 0 }
+        consume: { 
+          amount: monthlyIncome * consumePercent / 100, 
+          percent: consumePercent 
+        },
+        necesidades: { 
+          amount: monthlyIncome * necesidadesPercent / 100, 
+          percent: necesidadesPercent 
+        },
+        disponible: { 
+          amount: monthlyIncome * disponiblePercent / 100, 
+          percent: disponiblePercent 
+        },
+        invest: { 
+          amount: monthlyIncome * investPercent / 100, 
+          percent: investPercent 
+        }
       });
     }
 
-    // Si no hay datos en absoluto, mostrar todos los meses con valores 0
-    if (!monthlyStats && balanceHistory.length === 0) {
-      return months.map(month => ({
-        ...month,
-        consume: { amount: 0, percent: 0 },
-        necesidades: { amount: 0, percent: 0 },
-        disponible: { amount: 0, percent: 0 },
-        invest: { amount: 0, percent: 0 }
-      }));
-    }
-
-    // Retornar todos los meses (con datos reales donde estén disponibles, undefined donde no)
     return months;
   };
 
   const monthlyTrend = generateMonthlyTrend();
 
-  const categoryAnalysis = monthlyStats ? [
-    { name: 'Necesidades', amount: monthlyStats.totalExpenses * (monthlyStats.percentages.needs / 100), percentage: monthlyStats.percentages.needs, trend: 'stable' as const, color: '#ef4444' },
-    { name: 'Consumo', amount: monthlyStats.totalExpenses * (monthlyStats.percentages.wants / 100), percentage: monthlyStats.percentages.wants, trend: 'stable' as const, color: '#f97316' },
-    { name: 'Ahorro', amount: monthlyStats.balance * (monthlyStats.percentages.savings / 100), percentage: monthlyStats.percentages.savings, trend: 'up' as const, color: '#eab308' },
-    { name: 'Inversión', amount: monthlyStats.balance * (monthlyStats.percentages.investment / 100), percentage: monthlyStats.percentages.investment, trend: 'up' as const, color: '#8b5cf6' }
-  ] : [
-    { name: 'Necesidades', amount: 0, percentage: 0, trend: 'stable' as const, color: '#ef4444' },
-    { name: 'Consumo', amount: 0, percentage: 0, trend: 'stable' as const, color: '#f97316' },
-    { name: 'Ahorro', amount: 0, percentage: 0, trend: 'stable' as const, color: '#eab308' },
-    { name: 'Inversión', amount: 0, percentage: 0, trend: 'stable' as const, color: '#8b5cf6' }
-  ];
+  // Generar datos de ingresos mensuales
+  const generateMonthlyIncomeData = () => {
+    const currentDate = new Date();
+    const months = [];
+    
+    console.log('Generando datos de ingresos mensuales...');
+    console.log('monthlyStats:', monthlyStats);
+    
+    // Usar datos de monthlyStats
+    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
+      const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
+      console.log(`Mes actual (${monthName}): usando monthlyStats.totalIncome = ${monthlyStats.totalIncome}`);
+      months.push({
+        month: monthName,
+        income: monthlyStats.totalIncome
+      });
+    }
+    
+    console.log('Datos de ingresos mensuales generados:', months);
+    return months;
+  };
+
+  const monthlyIncomeData = generateMonthlyIncomeData();
+
+  // Calcular análisis de categorías basado en monthlyStats
+  const calculateCategoryAnalysis = () => {
+    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
+      const monthlyIncome = monthlyStats.totalIncome;
+      return [
+        { 
+          name: 'Necesidades', 
+          amount: monthlyIncome * (monthlyStats?.percentages?.needs || 50) / 100, 
+          percentage: monthlyStats?.percentages?.needs || 50, 
+          trend: 'stable' as const, 
+          color: '#ef4444' 
+        },
+        { 
+          name: 'Consumo', 
+          amount: monthlyIncome * (monthlyStats?.percentages?.wants || 30) / 100, 
+          percentage: monthlyStats?.percentages?.wants || 30, 
+          trend: 'stable' as const, 
+          color: '#f97316' 
+        },
+        { 
+          name: 'Ahorro', 
+          amount: monthlyIncome * (monthlyStats?.percentages?.savings || 10) / 100, 
+          percentage: monthlyStats?.percentages?.savings || 10, 
+          trend: 'up' as const, 
+          color: '#eab308' 
+        },
+        { 
+          name: 'Inversión', 
+          amount: monthlyIncome * (monthlyStats?.percentages?.investment || 10) / 100, 
+          percentage: monthlyStats?.percentages?.investment || 10, 
+          trend: 'up' as const, 
+          color: '#8b5cf6' 
+        }
+      ];
+    }
+    
+    return [
+      { name: 'Necesidades', amount: 0, percentage: 0, trend: 'stable' as const, color: '#ef4444' },
+      { name: 'Consumo', amount: 0, percentage: 0, trend: 'stable' as const, color: '#f97316' },
+      { name: 'Ahorro', amount: 0, percentage: 0, trend: 'up' as const, color: '#eab308' },
+      { name: 'Inversión', amount: 0, percentage: 0, trend: 'up' as const, color: '#8b5cf6' }
+    ];
+  };
+
+  const categoryAnalysis = calculateCategoryAnalysis();
 
   // Calcular gastos semanales basados en el historial real
   const calculateWeeklySpending = () => {
@@ -311,7 +366,7 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                 <div>
                   <p className="text-xs font-medium text-primary-700 mb-1">Saldo Actual</p>
                   <p className="text-lg font-bold text-primary-800">
-                    ${userData.currentSavings.toLocaleString()}
+                    {formatChileanPeso(userData.currentSavings)}
                   </p>
                 </div>
                 <PiggyBank className="h-5 w-5 text-primary-600" />
@@ -337,34 +392,53 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                 </div>
                 <h4 className="text-lg font-semibold text-gray-900">Consumo</h4>
               </div>
-              <ResponsiveContainer width="100%" height={150}>
-                <LineChart data={monthlyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} tick={{ fontSize: 12 }} />
-                  <Tooltip 
-                    formatter={(value, name, props) => [
-                      `${formatChileanPeso(typeof value === 'number' ? value : 0, true)} (${props.payload?.consume?.percent || 0}%)`, 
-                      'Consumo'
-                    ]}
-                    labelFormatter={(label) => `Mes: ${label}`}
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
-                      border: '1px solid #e5e7eb', 
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="consume.amount" 
-                    stroke="#f97316" 
-                    strokeWidth={3}
-                    dot={{ fill: '#f97316', r: 4 }}
-                    activeDot={{ r: 6, fill: '#f97316' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {monthlyTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={150}>
+                  <LineChart data={monthlyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      formatter={(value, name, props) => [
+                        `${formatChileanPeso(typeof value === 'number' ? value : 0, true)} (${props.payload?.consume?.percent || 0}%)`, 
+                        'Consumo'
+                      ]}
+                      labelFormatter={(label) => `Mes: ${label}`}
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="consume.amount" 
+                      stroke="#f97316" 
+                      strokeWidth={3}
+                      dot={{ fill: '#f97316', r: 6 }}
+                      activeDot={{ r: 8, fill: '#f97316' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="text-center">
+                    <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">No hay datos de consumo disponibles</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Gráfico de Necesidades */}
@@ -375,34 +449,53 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                 </div>
                 <h4 className="text-lg font-semibold text-gray-900">Necesidades</h4>
               </div>
-              <ResponsiveContainer width="100%" height={150}>
-                <LineChart data={monthlyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} tick={{ fontSize: 12 }} />
-                  <Tooltip 
-                    formatter={(value, name, props) => [
-                      `${formatChileanPeso(typeof value === 'number' ? value : 0, true)} (${props.payload?.necesidades?.percent || 0}%)`, 
-                      'Necesidades'
-                    ]}
-                    labelFormatter={(label) => `Mes: ${label}`}
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
-                      border: '1px solid #e5e7eb', 
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="necesidades.amount" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3}
-                    dot={{ fill: '#3b82f6', r: 4 }}
-                    activeDot={{ r: 6, fill: '#3b82f6' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {monthlyTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={150}>
+                  <LineChart data={monthlyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      formatter={(value, name, props) => [
+                        `${formatChileanPeso(typeof value === 'number' ? value : 0, true)} (${props.payload?.necesidades?.percent || 0}%)`, 
+                        'Necesidades'
+                      ]}
+                      labelFormatter={(label) => `Mes: ${label}`}
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="necesidades.amount" 
+                      stroke="#ef4444" 
+                      strokeWidth={3}
+                      dot={{ fill: '#ef4444', r: 6 }}
+                      activeDot={{ r: 8, fill: '#ef4444' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="text-center">
+                    <HomeIcon className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">No hay datos de necesidades disponibles</p>
+                  </div>
+                </div>
+              )}
             </div>
 
 
@@ -414,16 +507,138 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                 </div>
                 <h4 className="text-lg font-semibold text-gray-900">Invertido</h4>
               </div>
-              <ResponsiveContainer width="100%" height={150}>
-                <LineChart data={monthlyTrend}>
+              {monthlyTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={150}>
+                  <LineChart data={monthlyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      formatter={(value, name, props) => [
+                        `${formatChileanPeso(typeof value === 'number' ? value : 0, true)} (${props.payload?.invest?.percent || 0}%)`, 
+                        'Invertido'
+                      ]}
+                      labelFormatter={(label) => `Mes: ${label}`}
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="invest.amount" 
+                      stroke="#10b981" 
+                      strokeWidth={3}
+                      dot={{ fill: '#10b981', r: 6 }}
+                      activeDot={{ r: 8, fill: '#10b981' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="text-center">
+                    <TrendingUpIcon className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">No hay datos de inversión disponibles</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Gráfico de Ingresos Mensuales */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+                  <TrendingUp className="h-6 w-6 text-blue-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900">Ingresos Mensuales</h4>
+              </div>
+              {monthlyIncomeData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={150}>
+                  <LineChart data={monthlyIncomeData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} 
+                      tick={{ fontSize: 12 }} 
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      formatter={(value) => [formatChileanPeso(typeof value === 'number' ? value : 0, true), 'Ingresos']}
+                      labelFormatter={(label) => `Mes: ${label}`}
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="income" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      dot={{ fill: '#3b82f6', r: 6 }}
+                      activeDot={{ r: 8, fill: '#3b82f6' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="text-center">
+                    <TrendingUp className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">No hay datos de ingresos disponibles</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Gráfico Superpuesto de Porcentajes */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Evolución de Porcentajes por Categoría</h3>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+            {monthlyTrend.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={monthlyTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} tick={{ fontSize: 12 }} />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 12 }} 
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    tickFormatter={(value) => `${value}%`} 
+                    tick={{ fontSize: 12 }} 
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <Tooltip 
-                    formatter={(value, name, props) => [
-                      `${formatChileanPeso(typeof value === 'number' ? value : 0, true)} (${props.payload?.invest?.percent || 0}%)`, 
-                      'Invertido'
-                    ]}
+                    formatter={(value, name) => {
+                      const categoryName = name === 'consume' ? 'Consumo' :
+                                         name === 'necesidades' ? 'Necesidades' :
+                                       name === 'invest' ? 'Invertido' : name;
+                      return [`${value}%`, categoryName];
+                    }}
                     labelFormatter={(label) => `Mes: ${label}`}
                     contentStyle={{ 
                       backgroundColor: '#fff', 
@@ -432,73 +647,44 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
-                  <Line 
+                  <Area 
                     type="monotone" 
-                    dataKey="invest.amount" 
-                    stroke="#10b981" 
-                    strokeWidth={3}
-                    dot={{ fill: '#10b981', r: 4 }}
-                    activeDot={{ r: 6, fill: '#10b981' }}
+                    dataKey="consume.percent" 
+                    stackId="1" 
+                    stroke="#f97316" 
+                    fill="#f97316" 
+                    fillOpacity={0.3}
+                    name="consume"
                   />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Gráfico Superpuesto de Porcentajes */}
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Evolución de Porcentajes por Categoría</h3>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
-            <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={monthlyTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(value) => `${value}%`} tick={{ fontSize: 12 }} />
-                  <Tooltip 
-                  formatter={(value, name) => {
-                      const categoryName = name === 'consume' ? 'Consumo' :
-                                         name === 'necesidades' ? 'Necesidades' :
-                                       name === 'invest' ? 'Invertido' : name;
-                    return [`${value}%`, categoryName];
-                    }}
-                    labelFormatter={(label) => `Mes: ${label}`}
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb', 
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="consume.percent" 
-                  stackId="1" 
-                  stroke="#f97316" 
-                  fill="#f97316" 
-                  fillOpacity={0.3}
-                  name="consume"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="necesidades.percent" 
-                  stackId="1" 
-                  stroke="#3b82f6" 
-                  fill="#3b82f6" 
-                  fillOpacity={0.3}
-                  name="necesidades"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="invest.percent" 
-                  stackId="1" 
-                  stroke="#10b981" 
-                  fill="#10b981" 
-                  fillOpacity={0.3}
-                  name="invest"
-                />
+                  <Area 
+                    type="monotone" 
+                    dataKey="necesidades.percent" 
+                    stackId="1" 
+                    stroke="#ef4444" 
+                    fill="#ef4444" 
+                    fillOpacity={0.3}
+                    name="necesidades"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="invest.percent" 
+                    stackId="1" 
+                    stroke="#10b981" 
+                    fill="#10b981" 
+                    fillOpacity={0.3}
+                    name="invest"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <div className="text-center">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p className="text-lg font-medium">No hay datos de porcentajes disponibles</p>
+                  <p className="text-sm text-gray-400 mt-2">Registra algunas transacciones para ver la evolución</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

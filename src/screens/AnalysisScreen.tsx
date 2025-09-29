@@ -12,11 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
 import { useBalance } from '../hooks/useBalance';
+import { formatChileanPeso } from '../utils/currencyUtils';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Award, BarChart3, PieChart as PieChartIcon } from 'lucide-react-native';
-import { formatChileanPeso } from '../utils/currencyUtils';
 import FloatingNavBar from '../components/FloatingNavBar';
 import BalanceRegistrationScreen from './BalanceRegistrationScreen';
 
@@ -323,7 +323,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
               <DollarSign size={24} color={COLORS.primary} />
             </View>
             <Text style={[styles.singleMetricValue, { color: COLORS.primary }]}>
-              ${userData.currentSavings?.toLocaleString() || '1,500,000'}
+              {formatChileanPeso(userData.currentSavings || 1500000)}
             </Text>
             <View style={[styles.riskStatusContainer, { backgroundColor: riskStatus.backgroundColor }]}>
               <Text style={[styles.riskStatusText, { color: riskStatus.color }]}>
@@ -347,7 +347,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                     {userData.financialData?.disponible?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
-                    ${userData.financialData?.disponible?.amount?.toLocaleString() || '60,000'}
+                    {formatChileanPeso(userData.financialData?.disponible?.amount || 60000)}
                   </Text>
                 </View>
               </View>
@@ -371,7 +371,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                     {userData.financialData?.consumo?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
-                    ${userData.financialData?.consumo?.amount?.toLocaleString() || '133,500'}
+                    {formatChileanPeso(userData.financialData?.consumo?.amount || 133500)}
                   </Text>
                 </View>
               </View>
@@ -402,7 +402,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                     {userData.financialData?.necesidades?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
-                    ${userData.financialData?.necesidades?.amount?.toLocaleString() || '181,300'}
+                    {formatChileanPeso(userData.financialData?.necesidades?.amount || 181300)}
                   </Text>
                 </View>
               </View>
@@ -433,7 +433,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
                     {userData.financialData?.invertido?.percentage || 0}%
                   </Text>
                   <Text style={[styles.verticalMetricAmount, { color: COLORS.dark }]}>
-                    ${userData.financialData?.invertido?.amount?.toLocaleString() || '25,000'}
+                    {formatChileanPeso(userData.financialData?.invertido?.amount || 25000)}
                   </Text>
                 </View>
               </View>

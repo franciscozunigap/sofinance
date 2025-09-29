@@ -53,11 +53,15 @@ export class BalanceService {
       await setDoc(registrationRef, balanceRegistration);
       console.log('Registro guardado en Firestore:', balanceRegistration);
 
-      // Actualizar balance actual
+      // Actualizar estadísticas mensuales primero
+      await this.updateMonthlyStats(userId, month, year, balanceRegistration);
+
+      // Actualizar balance actual para que siempre refleje monthlyStats.balance
       await this.updateCurrentBalance(userId, balanceAfter);
 
-      // Actualizar estadísticas mensuales
-      await this.updateMonthlyStats(userId, month, year, balanceRegistration);
+      // Verificar y manejar cambio de mes automáticamente
+      await this.handleMonthChange(userId);
+
 
       console.log('Balance registrado exitosamente para userId:', userId);
       return { success: true, balanceRegistration };
@@ -69,20 +73,21 @@ export class BalanceService {
 
   /**
    * Obtiene el balance actual del usuario
+   * Siempre devuelve el balance del mes actual (monthlyStats.balance)
    */
   static async getCurrentBalance(userId: string): Promise<number> {
     try {
-      const balanceDocRef = doc(db, 'balances', userId);
-      const balanceDocSnap = await getDoc(balanceDocRef);
+      // Obtener el balance del mes actual desde monthlyStats
+      const currentDate = new Date();
+      const month = currentDate.getMonth() + 1;
+      const year = currentDate.getFullYear();
       
-      if (balanceDocSnap.exists()) {
-        const balanceData = balanceDocSnap.data() as BalanceData;
-        return balanceData.currentBalance;
-      } else {
-        // Crear balance inicial
-        await this.createInitialBalance(userId);
-        return 0;
-      }
+      const currentMonthBalance = await this.getCurrentMonthBalance(userId, month, year);
+      
+      // Sincronizar el balance actual con el balance del mes actual
+      await this.syncCurrentBalanceWithMonthlyStats(userId, currentMonthBalance);
+      
+      return currentMonthBalance;
     } catch (error) {
       console.error('Error al obtener balance actual:', error);
       return 0;
@@ -90,19 +95,64 @@ export class BalanceService {
   }
 
   /**
+   * Obtiene el balance del mes actual desde monthlyStats
+   */
+  static async getCurrentMonthBalance(userId: string, month: number, year: number): Promise<number> {
+    try {
+      const statsId = `${year}-${month.toString().padStart(2, '0')}_${userId}`;
+      const statsDocRef = doc(db, 'monthly_stats', statsId);
+      const statsDocSnap = await getDoc(statsDocRef);
+      
+      if (statsDocSnap.exists()) {
+        const stats = statsDocSnap.data() as MonthlyStats;
+        return stats.balance;
+      }
+      
+      return 0;
+    } catch (error) {
+      console.error('Error al obtener balance del mes actual:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Sincroniza el balance actual con el balance del mes actual
+   */
+  static async syncCurrentBalanceWithMonthlyStats(userId: string, monthlyBalance: number): Promise<void> {
+    try {
+      const balanceDocRef = doc(db, 'balances', userId);
+      const balanceDocSnap = await getDoc(balanceDocRef);
+      
+      if (balanceDocSnap.exists()) {
+        // Actualizar el balance actual para que coincida con monthlyStats
+        await updateDoc(balanceDocRef, {
+          currentBalance: monthlyBalance,
+          lastUpdated: new Date()
+        });
+      } else {
+        // Crear balance inicial con el valor del mes actual
+        await this.createInitialBalance(userId, monthlyBalance);
+      }
+    } catch (error) {
+      console.error('Error al sincronizar balance actual:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Crea el balance inicial del usuario
    */
-  static async createInitialBalance(userId: string): Promise<void> {
+  static async createInitialBalance(userId: string, initialAmount: number = 0): Promise<void> {
     try {
       const initialBalance: BalanceData = {
         userId,
-        currentBalance: 0,
+        currentBalance: initialAmount,
         lastUpdated: new Date()
       };
 
       const balanceDocRef = doc(db, 'balances', userId);
       await setDoc(balanceDocRef, initialBalance);
-      console.log('Balance inicial creado para el usuario:', userId);
+      console.log(`Balance inicial creado para el usuario ${userId}: ${initialAmount}`);
     } catch (error) {
       console.error('Error al crear balance inicial:', error);
       throw error;
@@ -121,6 +171,29 @@ export class BalanceService {
       });
     } catch (error) {
       console.error('Error al actualizar balance actual:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verifica y maneja el cambio de mes automáticamente
+   * Asegura que el balance actual siempre refleje el balance del mes actual
+   */
+  static async handleMonthChange(userId: string): Promise<void> {
+    try {
+      const currentDate = new Date();
+      const month = currentDate.getMonth() + 1;
+      const year = currentDate.getFullYear();
+      
+      // Obtener el balance del mes actual
+      const currentMonthBalance = await this.getCurrentMonthBalance(userId, month, year);
+      
+      // Sincronizar el balance actual con el balance del mes actual
+      await this.syncCurrentBalanceWithMonthlyStats(userId, currentMonthBalance);
+      
+      console.log(`Balance sincronizado para el mes ${month}/${year}: ${currentMonthBalance}`);
+    } catch (error) {
+      console.error('Error al manejar cambio de mes:', error);
       throw error;
     }
   }
@@ -193,7 +266,7 @@ export class BalanceService {
       }
 
       // Calcular porcentajes basándose en los registros reales del mes
-      monthlyStats.percentages = await this.calculateMonthlyPercentages(userId, month, year);
+      monthlyStats.percentages = await this.calculateMonthlyPercentages(userId, month, year, monthlyStats.balance, monthlyStats.totalIncome);
 
       await setDoc(statsDocRef, monthlyStats);
     } catch (error) {
@@ -206,7 +279,7 @@ export class BalanceService {
    * Calcula los porcentajes basados en los registros reales del mes
    * Todos los porcentajes son respecto al ingreso mensual total
    */
-  static async calculateMonthlyPercentages(userId: string, month: number, year: number): Promise<{
+  static async calculateMonthlyPercentages(userId: string, month: number, year: number, currentBalance?: number, totalIncome?: number): Promise<{
     needs: number;
     wants: number;
     savings: number;
@@ -257,21 +330,30 @@ export class BalanceService {
         return { needs: 0, wants: 0, savings: 0, investment: 0 };
       }
 
-      // Calcular disponible como el dinero restante del mes
+      // Calcular gastos totales
       const totalExpenses = totalNeeds + totalWants + totalInvestment;
-      const actualSavings = Math.max(0, totalIncome - totalExpenses);
 
       // Calcular porcentajes respecto al ingreso mensual total
       const needs = (totalNeeds / totalIncome) * 100;
       const wants = (totalWants / totalIncome) * 100;
-      const savings = (actualSavings / totalIncome) * 100;
       const investment = (totalInvestment / totalIncome) * 100;
+      
+      // El savings se calcula como el porcentaje del balance actual respecto al ingreso total
+      // Si se proporciona el balance actual, usarlo; si no, calcular como el restante
+      let savings = 0;
+      if (currentBalance !== undefined && totalIncome !== undefined && totalIncome > 0) {
+        savings = (currentBalance / totalIncome) * 100;
+      } else if (totalIncome > 0) {
+        // Fallback: calcular como el dinero restante del mes
+        const actualSavings = Math.max(0, totalIncome - totalExpenses);
+        savings = (actualSavings / totalIncome) * 100;
+      }
 
       return {
-        needs: Math.round(needs * 100) / 100,
-        wants: Math.round(wants * 100) / 100,
-        savings: Math.round(savings * 100) / 100,
-        investment: Math.round(investment * 100) / 100
+        needs: Math.round(needs * 10) / 10, // Truncar a un decimal
+        wants: Math.round(wants * 10) / 10, // Truncar a un decimal
+        savings: Math.round(savings * 10) / 10, // Truncar a un decimal
+        investment: Math.round(investment * 10) / 10 // Truncar a un decimal
       };
     } catch (error) {
       console.error('Error al calcular porcentajes mensuales:', error);
@@ -300,10 +382,10 @@ export class BalanceService {
     const investment = 0; // Por ahora 0%, se puede configurar después
 
     return {
-      needs: Math.round(needs * 100) / 100,
-      wants: Math.round(wants * 100) / 100,
-      savings: Math.round(savings * 100) / 100,
-      investment: Math.round(investment * 100) / 100
+      needs: Math.round(needs * 10) / 10, // Truncar a un decimal
+      wants: Math.round(wants * 10) / 10, // Truncar a un decimal
+      savings: Math.round(savings * 10) / 10, // Truncar a un decimal
+      investment: Math.round(investment * 10) / 10 // Truncar a un decimal
     };
   }
 

@@ -197,12 +197,6 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
                     <span className="text-sm text-gray-600">Balance anterior:</span>
                     <span className="font-semibold">{formatChileanPeso(currentBalance)}</span>
                   </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm text-gray-600">Diferencia:</span>
-                    <span className={`font-semibold ${difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {difference >= 0 ? '+' : ''}{formatChileanPeso(difference)}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>

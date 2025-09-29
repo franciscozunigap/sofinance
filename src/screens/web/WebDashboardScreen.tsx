@@ -89,15 +89,149 @@ const WebDashboardScreen = () => {
 
   const dailyScoreData = generateDailyScoreData();
 
-  // Categorías de gastos (en pesos chilenos)
+  // Generar datos de ingresos mensuales
+  const generateMonthlyIncomeData = () => {
+    const currentDate = new Date();
+    const months = [];
+    
+    console.log('Generando datos de ingresos mensuales...');
+    console.log('monthlyStats:', monthlyStats);
+    console.log('balanceHistory length:', balanceHistory.length);
+    
+    // Generar los últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+      
+      // Si es el mes actual y tenemos monthlyStats, usar totalIncome
+      if (i === 0 && monthlyStats && monthlyStats.totalIncome > 0) {
+        console.log(`Mes actual (${monthName}): usando totalIncome = ${monthlyStats.totalIncome}`);
+        months.push({
+          month: monthName,
+          income: monthlyStats.totalIncome
+        });
+      } else {
+        // Buscar datos del mes en balanceHistory
+        const monthData = balanceHistory.filter(registration => {
+          const regDate = new Date(registration.date);
+          return regDate.getFullYear() === date.getFullYear() && 
+                 regDate.getMonth() === date.getMonth() &&
+                 registration.type === 'income';
+        });
+        
+        const totalIncome = monthData.reduce((sum, reg) => sum + reg.amount, 0);
+        
+        // Si no hay datos reales, usar datos mock basados en el totalIncome actual o un valor por defecto
+        let mockIncome = 0;
+        if (monthlyStats && monthlyStats.totalIncome > 0) {
+          // Usar el totalIncome actual como base para generar datos históricos con variación fija
+          const variation = [0.8, 0.9, 0.85, 0.95, 0.75][i - 1] || 0.85; // Variación fija para cada mes
+          mockIncome = monthlyStats.totalIncome * variation;
+        } else if (userData && userData.monthlyIncome > 0) {
+          const variation = [0.8, 0.9, 0.85, 0.95, 0.75][i - 1] || 0.85;
+          mockIncome = userData.monthlyIncome * variation;
+        } else {
+          // Valor por defecto si no hay datos
+          const variation = [0.8, 0.9, 0.85, 0.95, 0.75][i - 1] || 0.85;
+          mockIncome = 800000 * variation;
+        }
+        
+        console.log(`Mes ${monthName}: totalIncome real = ${totalIncome}, mockIncome = ${mockIncome}`);
+        
+        months.push({
+          month: monthName,
+          income: totalIncome || mockIncome
+        });
+      }
+    }
+    
+    console.log('Datos de ingresos mensuales generados:', months);
+    return months;
+  };
+
+  const monthlyIncomeData = generateMonthlyIncomeData();
+  
+  // Asegurar que siempre tengamos datos válidos para mostrar
+  const validMonthlyData = monthlyIncomeData.filter(item => item.income > 0);
+  
+  // Si no hay datos válidos, usar los datos generados directamente
+  const displayData = validMonthlyData.length > 0 ? validMonthlyData : monthlyIncomeData;
+  
+  // Debug: mostrar datos de ingresos mensuales
+  console.log('Monthly Income Data:', monthlyIncomeData);
+  console.log('Valid Monthly Data:', validMonthlyData);
+  console.log('Display Data:', displayData);
+  console.log('Display Data Length:', displayData.length);
+  console.log('Monthly Stats:', monthlyStats);
+  console.log('User Data:', userData);
+
+  // Generar datos de categorías de ingresos por mes
+  const generateIncomeCategoriesData = () => {
+    const currentDate = new Date();
+    const months = [];
+    
+    // Generar los últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+      
+      // Si es el mes actual y tenemos monthlyStats, usar esos datos
+      if (i === 0 && monthlyStats) {
+        months.push({
+          month: monthName,
+          'Salario': monthlyStats.totalIncome * 0.7, // 70% del ingreso total
+          'Freelance': monthlyStats.totalIncome * 0.2, // 20% del ingreso total
+          'Inversiones': monthlyStats.totalIncome * 0.05, // 5% del ingreso total
+          'Otros': monthlyStats.totalIncome * 0.05 // 5% del ingreso total
+        });
+      } else {
+        // Para otros meses, usar datos del balanceHistory o datos mock
+        const monthData = balanceHistory.filter(registration => {
+          const regDate = new Date(registration.date);
+          return regDate.getFullYear() === date.getFullYear() && 
+                 regDate.getMonth() === date.getMonth() &&
+                 registration.type === 'income';
+        });
+        
+        if (monthData.length > 0) {
+          const totalIncome = monthData.reduce((sum, reg) => sum + reg.amount, 0);
+          months.push({
+            month: monthName,
+            'Salario': totalIncome * 0.7,
+            'Freelance': totalIncome * 0.2,
+            'Inversiones': totalIncome * 0.05,
+            'Otros': totalIncome * 0.05
+          });
+        } else {
+          // Datos mock para meses sin datos
+          const mockIncome = 800000; // Ingreso mock
+          months.push({
+            month: monthName,
+            'Salario': mockIncome * 0.7,
+            'Freelance': mockIncome * 0.2,
+            'Inversiones': mockIncome * 0.05,
+            'Otros': mockIncome * 0.05
+          });
+        }
+      }
+    }
+    
+    return months;
+  };
+
+  const incomeCategoriesData = generateIncomeCategoriesData();
+
+  // Categorías de gastos (en pesos chilenos) - usando totalIncome * percentages/100
   const expenseCategories = monthlyStats ? [
-    { name: 'Necesidades', value: monthlyStats.totalExpenses * 0.6, color: '#ea580c' },
-    { name: 'Consumo', value: monthlyStats.totalExpenses * 0.4, color: '#fb923c' },
-    { name: 'Ahorro', value: monthlyStats.balance * 0.7, color: '#fed7aa' }
+    { name: 'Necesidades', value: monthlyStats.totalIncome * (monthlyStats.percentages.needs / 100), color: '#ea580c' },
+    { name: 'Consumo', value: monthlyStats.totalIncome * (monthlyStats.percentages.wants / 100), color: '#fb923c' },
+    { name: 'Ahorro', value: monthlyStats.totalIncome * (monthlyStats.percentages.savings / 100), color: '#fed7aa' },
+    { name: 'Inversión', value: monthlyStats.totalIncome * (monthlyStats.percentages.investment / 100), color: '#8b5cf6' }
   ] : [
     { name: 'Necesidades', value: 1800000, color: '#ea580c' }, // 1.800.000 pesos
     { name: 'Consumo', value: 780000, color: '#fb923c' }, // 780.000 pesos
-    { name: 'Ahorro', value: 600000, color: '#fed7aa' } // 600.000 pesos
+    { name: 'Ahorro', value: 600000, color: '#fed7aa' }, // 600.000 pesos
+    { name: 'Inversión', value: 200000, color: '#8b5cf6' } // 200.000 pesos
   ];
 
   const weeklyTrend = balanceHistory.length > 0 ? 
@@ -456,6 +590,92 @@ const WebDashboardScreen = () => {
           </div>
         </div>
 
+        {/* Gráfico de Ingresos Mensuales */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border border-white/20">
+          <div className="flex items-center mb-6">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-3">
+              <TrendingUp className="h-6 w-6 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-dark">Ingresos Mensuales</h3>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={displayData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: 12, fill: '#6B7280' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} 
+                tick={{ fontSize: 12, fill: '#6B7280' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip 
+                formatter={(value) => [formatChileanPeso(typeof value === 'number' ? value : 0, true), 'Ingresos']}
+                labelFormatter={(label) => `Mes: ${label}`}
+                contentStyle={{ 
+                  backgroundColor: '#fff', 
+                  border: '1px solid #e5e7eb', 
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="income" 
+                stroke="#10b981" 
+                strokeWidth={3}
+                dot={{ fill: '#10b981', r: 4 }}
+                activeDot={{ r: 6, fill: '#10b981' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Gráfico de Categorías de Ingresos por Mes */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border border-white/20">
+          <div className="flex items-center mb-6">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+              <BarChart3 className="h-6 w-6 text-blue-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-dark">Categorías de Ingresos por Mes</h3>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={incomeCategoriesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: 12, fill: '#6B7280' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} 
+                tick={{ fontSize: 12, fill: '#6B7280' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip 
+                formatter={(value, name) => [formatChileanPeso(typeof value === 'number' ? value : 0, true), name]}
+                labelFormatter={(label) => `Mes: ${label}`}
+                contentStyle={{ 
+                  backgroundColor: '#fff', 
+                  border: '1px solid #e5e7eb', 
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Bar dataKey="Salario" stackId="a" fill="#3b82f6" name="Salario" />
+              <Bar dataKey="Freelance" stackId="a" fill="#10b981" name="Freelance" />
+              <Bar dataKey="Inversiones" stackId="a" fill="#f59e0b" name="Inversiones" />
+              <Bar dataKey="Otros" stackId="a" fill="#8b5cf6" name="Otros" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
         {/* Lista de Registros Mejorada */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
           <div className="flex items-center justify-between mb-6">
@@ -489,7 +709,7 @@ const WebDashboardScreen = () => {
                   <p className={`text-lg font-bold ${
                     transaction.amount > 0 ? 'text-success' : 'text-danger'
                   }`}>
-                    {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
+                    {transaction.amount > 0 ? '+' : ''}{formatChileanPeso(Math.abs(transaction.amount))}
                   </p>
                 </div>
               </div>

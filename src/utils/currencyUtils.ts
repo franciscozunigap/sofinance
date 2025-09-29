@@ -5,6 +5,9 @@
  * @returns String formateado como moneda chilena
  */
 export const formatChileanPeso = (amount: number, showSymbol: boolean = true): string => {
+  // Truncar a entero (sin decimales)
+  const truncatedAmount = Math.round(amount);
+  
   const formatter = new Intl.NumberFormat('es-CL', {
     style: 'currency',
     currency: 'CLP',
@@ -12,7 +15,7 @@ export const formatChileanPeso = (amount: number, showSymbol: boolean = true): s
     maximumFractionDigits: 0,
   });
 
-  const formatted = formatter.format(amount);
+  const formatted = formatter.format(truncatedAmount);
   
   // Si no queremos el símbolo, lo removemos
   if (!showSymbol) {

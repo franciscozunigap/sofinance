@@ -99,59 +99,99 @@ const SofinanceAppContent = () => {
 
   const dailyScoreData = generateDailyScoreData();
 
-  // Datos de balance diario - generar últimos 7 días con datos reales donde estén disponibles
+  // Datos de balance diario - seguimiento por días usando balanceHistory
   const generateBalanceData = () => {
-    if (balanceHistory.length === 0) {
-      // Si no hay datos reales, usar datos mock
-      return monthlyStats ? [
-        { date: 'Hoy', amount: currentBalance, upper_amount: currentBalance * 1.2, lower_amount: currentBalance * 0.8 },
-      ] : [
-        { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
-        { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
-        { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
-        { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+    const currentBalance = monthlyStats?.balance || 0;
+    
+    if (balanceHistory && balanceHistory.length > 0) {
+      // Generar los últimos 7 días basado en balanceHistory
+      const last7Days = [];
+      const today = new Date();
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateStr = date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' });
+        
+        // Buscar si hay datos reales para este día en balanceHistory
+        const dayData = balanceHistory.find(registration => {
+          const regDate = new Date(registration.date);
+          return regDate.toDateString() === date.toDateString();
+        });
+        
+        if (dayData) {
+          // Si hay datos reales para este día, usar el balanceAfter del registro
+          last7Days.push({
+            date: dateStr,
+            amount: dayData.balanceAfter,
+            upper_amount: dayData.balanceAfter * 1.2,
+            lower_amount: dayData.balanceAfter * 0.8,
+          });
+        } else if (i === 0) {
+          // Para hoy, usar el balance actual de monthlyStats si no hay datos en balanceHistory
+          last7Days.push({
+            date: dateStr,
+            amount: currentBalance,
+            upper_amount: currentBalance * 1.2,
+            lower_amount: currentBalance * 0.8,
+          });
+        } else {
+          // Para días anteriores sin datos, crear entrada sin punto
+          last7Days.push({
+            date: dateStr,
+            amount: undefined, // Sin punto en el gráfico
+            upper_amount: currentBalance * 1.2,
+            lower_amount: currentBalance * 0.8,
+          });
+        }
+      }
+      
+      return last7Days;
+    }
+
+    // Si no hay balanceHistory, mostrar solo el balance actual
+    if (currentBalance > 0) {
+      return [
+        { 
+          date: 'Hoy', 
+          amount: currentBalance, 
+          upper_amount: currentBalance * 1.2, 
+          lower_amount: currentBalance * 0.8 
+        },
       ];
     }
 
-    // Generar los últimos 7 días
-    const last7Days = [];
-    const today = new Date();
-    
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const dateStr = date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' });
-      
-      // Buscar si hay datos para este día
-      const dayData = balanceHistory.find(registration => {
-        const regDate = new Date(registration.date);
-        return regDate.toDateString() === date.toDateString();
-      });
-      
-      if (dayData) {
-        // Si hay datos para este día, usarlos
-        last7Days.push({
-          date: dateStr,
-          amount: dayData.balanceAfter,
-          upper_amount: dayData.balanceAfter * 1.2,
-          lower_amount: dayData.balanceAfter * 0.8,
-        });
-      } else {
-        // Si no hay datos para este día, crear entrada sin punto
-        const lastKnownBalance = balanceHistory[0]?.balanceAfter || currentBalance;
-        last7Days.push({
-          date: dateStr,
-          amount: undefined, // Sin punto en el gráfico
-          upper_amount: lastKnownBalance * 1.2,
-          lower_amount: lastKnownBalance * 0.8,
-        });
-      }
-    }
-    
-    return last7Days;
+    // Si no hay datos, mostrar valores por defecto
+    return [
+      { date: 'Hoy', amount: 0, upper_amount: 0, lower_amount: 0 },
+    ];
   };
 
   const balanceData = generateBalanceData();
+
+  // Generar datos de ingresos mensuales
+  const generateMonthlyIncomeData = () => {
+    const currentDate = new Date();
+    const months = [];
+    
+    console.log('Generando datos de ingresos mensuales...');
+    console.log('monthlyStats:', monthlyStats);
+    
+    // Usar datos de monthlyStats
+    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
+      const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
+      console.log(`Mes actual (${monthName}): usando monthlyStats.totalIncome = ${monthlyStats.totalIncome}`);
+      months.push({
+        month: monthName,
+        income: monthlyStats.totalIncome
+      });
+    }
+    
+    console.log('Datos de ingresos mensuales generados:', months);
+    return months;
+  };
+
+  const monthlyIncomeData = generateMonthlyIncomeData();
 
   // Categorías de gastos usando datos reales de Firebase
   const expenseCategories = monthlyStats ? [
@@ -453,29 +493,26 @@ const SofinanceAppContent = () => {
         <div className="bg-gradient-to-r from-primary-400 to-primaryIntense rounded-2xl shadow-xl p-6 mb-6 text-center">
           <h3 className="text-lg font-semibold text-white mb-2">Disponible</h3>
           <div className="text-4xl font-bold text-white">
-            {formatChileanPeso(financialData.disponible.amount)}
+            {formatChileanPeso(monthlyStats?.balance || 0)}
           </div>
-          <p className="text-primary-100 text-sm mt-1">
-            {financialData.disponible.percentage}% de tus ingresos
-          </p>
         </div>
 
         {/* Grid de Porcentajes - 3 columnas */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-warning mb-1">{financialData.consumo.percentage}%</div>
+            <div className="text-3xl font-bold text-warning mb-1">{financialData.consumo.percentage.toFixed(1)}%</div>
             <p className="text-sm font-medium text-dark">Consumo</p>
             <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.consumo.amount)}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-primaryIntense mb-1">{financialData.necesidades.percentage}%</div>
+            <div className="text-3xl font-bold text-primaryIntense mb-1">{financialData.necesidades.percentage.toFixed(1)}%</div>
             <p className="text-sm font-medium text-dark">Necesidades</p>
             <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.necesidades.amount)}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/20">
-            <div className="text-3xl font-bold text-success mb-1">{financialData.invertido.percentage}%</div>
+            <div className="text-3xl font-bold text-success mb-1">{financialData.invertido.percentage.toFixed(1)}%</div>
             <p className="text-sm font-medium text-dark">Invertido</p>
             <p className="text-xs text-gray-500 mt-1">{formatChileanPeso(financialData.invertido.amount)}</p>
           </div>

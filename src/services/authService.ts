@@ -65,11 +65,7 @@ export class AuthService {
       await BalanceService.createInitialBalance(firebaseUser.uid);
       console.log('Balance inicial creado exitosamente');
 
-      // Crear estadísticas mensuales iniciales
-      await BalanceService.createInitialMonthlyStats(firebaseUser.uid);
-      console.log('Estadísticas mensuales iniciales creadas exitosamente');
-
-      // Si el usuario tiene disponibles iniciales, registrar el balance
+      // Si el usuario tiene disponibles iniciales, registrar el balance PRIMERO
       if (data.currentSavings > 0) {
         await BalanceService.registerBalance(
           firebaseUser.uid,
@@ -80,6 +76,10 @@ export class AuthService {
         );
         console.log('Registro de balance inicial creado exitosamente');
       }
+
+      // Crear estadísticas mensuales iniciales DESPUÉS del registro
+      await BalanceService.createInitialMonthlyStats(firebaseUser.uid);
+      console.log('Estadísticas mensuales iniciales creadas exitosamente');
     } catch (error) {
       console.error('Error al crear documentos iniciales:', error);
       // No lanzar error aquí para no interrumpir el registro del usuario

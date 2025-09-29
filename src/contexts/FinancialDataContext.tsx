@@ -74,14 +74,14 @@ export const FinancialDataProvider: React.FC<FinancialDataProviderProps> = ({ ch
     }
   };
 
-  // Datos del usuario calculados
+  // Datos del usuario calculados - usar solo monthlyStats como fuente única
   const userData = {
     name: user?.name || user?.firstName || 'Usuario',
-    monthlyIncome: user?.monthlyIncome || user?.wallet?.monthly_income || 0,
+    monthlyIncome: monthlyStats?.totalIncome || user?.monthlyIncome || 0,
     currentScore: user?.currentScore || 0,
     riskScore: user?.riskScore || 0,
     monthlyExpenses: monthlyStats?.totalExpenses || user?.monthlyExpenses || 0,
-    currentSavings: currentBalance || user?.currentSavings || user?.wallet?.amount || 0,
+    currentSavings: currentBalance || user?.currentSavings || 0,
     savingsGoal: user?.savingsGoal || 0,
     alerts: user?.alerts || 0,
   };
@@ -90,22 +90,22 @@ export const FinancialDataProvider: React.FC<FinancialDataProviderProps> = ({ ch
   const financialData = monthlyStats ? {
     consumo: { 
       percentage: monthlyStats.percentages.wants, 
-      amount: monthlyStats.totalIncome * (monthlyStats.percentages.wants / 100), 
+      amount: monthlyStats.totalExpenses * (monthlyStats.percentages.wants / 100), 
       previousChange: 0 
     },
     necesidades: { 
       percentage: monthlyStats.percentages.needs, 
-      amount: monthlyStats.totalIncome * (monthlyStats.percentages.needs / 100), 
+      amount: monthlyStats.totalExpenses * (monthlyStats.percentages.needs / 100), 
       previousChange: 0 
     },
     disponible: { 
       percentage: monthlyStats.percentages.savings, 
-      amount: monthlyStats.totalIncome * (monthlyStats.percentages.savings / 100), 
+      amount: monthlyStats.balance, 
       previousChange: 0 
     },
     invertido: { 
       percentage: monthlyStats.percentages.investment, 
-      amount: monthlyStats.totalIncome * (monthlyStats.percentages.investment / 100), 
+      amount: monthlyStats.totalExpenses * (monthlyStats.percentages.investment / 100), 
       previousChange: 0 
     }
   } : {

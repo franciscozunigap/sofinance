@@ -65,8 +65,10 @@ export const formatCurrency = (amount: number, currency: string = 'USD'): string
   }).format(amount);
 };
 
-export const formatPercentage = (value: number, decimals: number = 0): string => {
-  return `${value.toFixed(decimals)}%`;
+export const formatPercentage = (value: number, decimals: number = 1): string => {
+  // Truncar a un decimal por defecto
+  const truncatedValue = Math.round(value * 10) / 10;
+  return `${truncatedValue.toFixed(decimals)}%`;
 };
 
 export const calculateExpensePercentages = (expenses: {
@@ -85,9 +87,9 @@ export const calculateExpensePercentages = (expenses: {
   }
   
   return {
-    needs: Math.round((expenses.needs / total) * 100),
-    wants: Math.round((expenses.wants / total) * 100),
-    savings: Math.round((expenses.savings / total) * 100),
+    needs: Math.round((expenses.needs / total) * 1000) / 10, // Truncar a un decimal
+    wants: Math.round((expenses.wants / total) * 1000) / 10, // Truncar a un decimal
+    savings: Math.round((expenses.savings / total) * 1000) / 10, // Truncar a un decimal
   };
 };
 
