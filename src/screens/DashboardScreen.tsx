@@ -9,11 +9,13 @@ import {
   Image,
   Animated,
   Platform,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
 import { COLORS, SIZES, FONTS, BORDER_RADIUS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
+import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import AnalysisScreen from './AnalysisScreen';
 import FloatingNavBar from '../components/FloatingNavBar';
 import ChatComponent from '../components/ChatComponent';
@@ -46,6 +48,147 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { currentView, navigateTo, goBack } = useViewNavigation();
   const { messages: chatMessages, input: chatInput, setInput: setChatInput, sendMessage: handleSendMessage } = useChat();
   const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading } = useBalance(user?.id || 'user-id');
+
+  // Generar datos de score diario como en web
+  const generateDailyScoreData = () => {
+    if (balanceHistory.length === 0) {
+      return [
+        { day: 'Lun', score: 45 },
+        { day: 'Mar', score: 48 },
+        { day: 'Mié', score: 44 },
+        { day: 'Jue', score: 46 },
+        { day: 'Vie', score: 50 },
+        { day: 'Sáb', score: 48 },
+        { day: 'Dom', score: 52 }
+      ];
+    }
+
+    const last7Days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dayStr = date.toLocaleDateString('es-CL', { weekday: 'short' });
+      
+      const dayData = balanceHistory.find(registration => {
+        const regDate = new Date(registration.date);
+        return regDate.toDateString() === date.toDateString();
+      });
+      
+      if (dayData) {
+        const score = Math.min(100, Math.max(0, 50 + (dayData.balanceAfter / 100000) * 10));
+        last7Days.push({
+          day: dayStr,
+          score: score
+        });
+      } else {
+        last7Days.push({
+          day: dayStr,
+          score: undefined
+        });
+      }
+    }
+    
+    return last7Days;
+  };
+
+  // Generar datos de ingresos mensuales como en web
+  const generateMonthlyIncomeData = () => {
+    const currentDate = new Date();
+    const months = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+      
+      if (i === 0 && monthlyStats && monthlyStats.totalIncome > 0) {
+        months.push({
+          month: monthName,
+          income: monthlyStats.totalIncome
+        });
+      } else {
+        const monthData = balanceHistory.filter(registration => {
+          const regDate = new Date(registration.date);
+          return regDate.getFullYear() === date.getFullYear() && 
+                 regDate.getMonth() === date.getMonth() &&
+                 registration.type === 'income';
+        });
+        
+        const totalIncome = monthData.reduce((sum, reg) => sum + reg.amount, 0);
+        
+        let mockIncome = 0;
+        if (monthlyStats && monthlyStats.totalIncome > 0) {
+          const variation = [0.8, 0.9, 0.85, 0.95, 0.75][i - 1] || 0.85;
+          mockIncome = monthlyStats.totalIncome * variation;
+        } else {
+          const variation = [0.8, 0.9, 0.85, 0.95, 0.75][i - 1] || 0.85;
+          mockIncome = 800000 * variation;
+        }
+        
+        months.push({
+          month: monthName,
+          income: totalIncome || mockIncome
+        });
+      }
+    }
+    
+    return months;
+  };
+
+  // Generar datos de categorías de ingresos como en web
+  const generateIncomeCategoriesData = () => {
+    const currentDate = new Date();
+    const months = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+      
+      if (i === 0 && monthlyStats) {
+        months.push({
+          month: monthName,
+          'Salario': monthlyStats.totalIncome * 0.7,
+          'Freelance': monthlyStats.totalIncome * 0.2,
+          'Inversiones': monthlyStats.totalIncome * 0.05,
+          'Otros': monthlyStats.totalIncome * 0.05
+        });
+      } else {
+        const monthData = balanceHistory.filter(registration => {
+          const regDate = new Date(registration.date);
+          return regDate.getFullYear() === date.getFullYear() && 
+                 regDate.getMonth() === date.getMonth() &&
+                 registration.type === 'income';
+        });
+        
+        if (monthData.length > 0) {
+          const totalIncome = monthData.reduce((sum, reg) => sum + reg.amount, 0);
+          months.push({
+            month: monthName,
+            'Salario': totalIncome * 0.7,
+            'Freelance': totalIncome * 0.2,
+            'Inversiones': totalIncome * 0.05,
+            'Otros': totalIncome * 0.05
+          });
+        } else {
+          const mockIncome = 800000 * ([0.8, 0.9, 0.85, 0.95, 0.75][i - 1] || 0.85);
+          months.push({
+            month: monthName,
+            'Salario': mockIncome * 0.7,
+            'Freelance': mockIncome * 0.2,
+            'Inversiones': mockIncome * 0.05,
+            'Otros': mockIncome * 0.05
+          });
+        }
+      }
+    }
+    
+    return months;
+  };
+
+  const dailyScoreData = generateDailyScoreData();
+  const monthlyIncomeData = generateMonthlyIncomeData();
+  const incomeCategoriesData = generateIncomeCategoriesData();
   const [scrollY] = useState(new Animated.Value(0));
   const [isUserDataLoading, setIsUserDataLoading] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(1));
@@ -222,17 +365,91 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   if (currentView === 'chat') {
     return (
       <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-        <SafeAreaView style={styles.container}>
-          <ChatComponent 
-            onBack={goBack}
-            initialMessages={INITIAL_CHAT_MESSAGES}
-            responses={CHAT_RESPONSES}
-          />
-          <FloatingNavBar 
-            currentView={currentView as 'dashboard' | 'analysis' | 'chat'}
-            onViewChange={handleViewChange}
-          />
-        </SafeAreaView>
+        <View style={styles.chatContainer}>
+          {/* Header del Chat como en web */}
+          <View style={styles.chatHeader}>
+            <View style={styles.chatHeaderLeft}>
+              <TouchableOpacity 
+                onPress={goBack}
+                style={styles.chatBackButton}
+              >
+                <Ionicons name="arrow-back" size={20} color={COLORS.gray} />
+              </TouchableOpacity>
+              <View style={styles.chatUserInfo}>
+                <View style={styles.chatAvatar}>
+                  <Text style={styles.chatAvatarText}>S</Text>
+                </View>
+                <View>
+                  <Text style={styles.chatUserName}>Sofía</Text>
+                  <Text style={styles.chatUserStatus}>En línea</Text>
+                </View>
+              </View>
+            </View>
+            <TouchableOpacity
+              onPress={onLogout}
+              style={styles.chatLogoutButton}
+            >
+              <Ionicons name="log-out-outline" size={20} color={COLORS.gray} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Chat Messages */}
+          <ScrollView style={styles.chatMessages} showsVerticalScrollIndicator={false}>
+            {INITIAL_CHAT_MESSAGES.map((message) => (
+              <View
+                key={message.id}
+                style={[
+                  styles.chatMessageContainer,
+                  message.sender === 'user' ? styles.chatMessageRight : styles.chatMessageLeft
+                ]}
+              >
+                {message.sender === 'sofia' && (
+                  <View style={styles.chatMessageAvatar}>
+                    <Text style={styles.chatMessageAvatarText}>S</Text>
+                  </View>
+                )}
+                
+                <View style={styles.chatMessageBubble}>
+                  <View style={[
+                    styles.chatMessageBubbleContent,
+                    message.sender === 'user' ? styles.chatMessageUser : styles.chatMessageSofia
+                  ]}>
+                    <Text style={[
+                      styles.chatMessageText,
+                      message.sender === 'user' ? styles.chatMessageTextUser : styles.chatMessageTextSofia
+                    ]}>
+                      {message.text}
+                    </Text>
+                  </View>
+                  <Text style={[
+                    styles.chatMessageTime,
+                    message.sender === 'user' ? styles.chatMessageTimeRight : styles.chatMessageTimeLeft
+                  ]}>
+                    {message.timestamp}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Chat Input como en web */}
+          <View style={styles.chatInputContainer}>
+            <View style={styles.chatInputWrapper}>
+              <TextInput
+                style={styles.chatInput}
+                placeholder="Pregúntame sobre tus finanzas..."
+                placeholderTextColor={COLORS.gray}
+                multiline
+              />
+              <TouchableOpacity style={styles.chatMicButton}>
+                <Ionicons name="mic-outline" size={16} color={COLORS.gray} />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.chatSendButton}>
+              <Ionicons name="send" size={16} color={COLORS.white} />
+            </TouchableOpacity>
+          </View>
+        </View>
       </Animated.View>
     );
   }
@@ -240,9 +457,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header con Avatar - mejorado para coincidir con web */}
+        {/* Header con Avatar - adaptado para coincidir exactamente con web */}
         <View style={styles.avatarHeader}>
-          {/* Gradiente de fondo */}
+          {/* Gradiente de fondo mejorado */}
           <View style={styles.avatarGradient} />
           
           {/* Patrones decorativos */}
@@ -251,50 +468,63 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             <View style={styles.decorativeCircle2} />
             <View style={styles.decorativeCircle3} />
           </View>
-          
-          <View style={styles.avatarHeaderContent}>
-            {/* Botón de configuración mejorado */}
+
+          {/* Botón de configuración mejorado */}
+          <View style={styles.settingsButtonContainer}>
             <TouchableOpacity
               onPress={() => handleViewChange('settings')}
               style={styles.settingsButton}
             >
               <Ionicons name="settings-outline" size={20} color={COLORS.white} />
             </TouchableOpacity>
-            
-            {/* Avatar con efecto parallax mejorado */}
-            <Animated.View 
-              style={[
-                styles.avatarContainer,
-                {
-                  transform: [
-                    {
-                      translateY: scrollY.interpolate({
-                        inputRange: [0, 100],
-                        outputRange: [0, 20],
-                        extrapolate: 'clamp',
-                      }),
-                    },
-                    {
-                      scale: scrollY.interpolate({
-                        inputRange: [0, 100],
-                        outputRange: [1, 0.95],
-                        extrapolate: 'clamp',
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            >
-              <Image 
-                source={require('../../assets/avatar.png')} 
-                style={styles.avatarImage}
-                resizeMode="cover"
-                onError={() => {}}
-                onLoad={() => {}}
-              />
-              {/* Overlay para integrar mejor con el fondo */}
-              <View style={styles.avatarOverlay} />
-            </Animated.View>
+          </View>
+          
+          {/* Avatar con efecto parallax mejorado */}
+          <Animated.View 
+            style={[
+              styles.avatarContainer,
+              {
+                transform: [
+                  {
+                    translateY: scrollY.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: [0, 20],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                  {
+                    scale: scrollY.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: [1, 0.95],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Image 
+              source={require('../../assets/avatar.png')} 
+              style={styles.avatarImage}
+              resizeMode="cover"
+              onError={() => {}}
+              onLoad={() => {}}
+            />
+            {/* Overlay para integrar mejor con el fondo */}
+            <View style={styles.avatarOverlay} />
+          </Animated.View>
+
+          {/* Saldo actual en el header como en web */}
+          <View style={styles.balanceHeaderContainer}>
+            <View style={styles.balanceHeaderCard}>
+              <Text style={styles.balanceHeaderLabel}>Saldo Actual</Text>
+              <Text style={styles.balanceHeaderAmount}>
+                {(() => {
+                  const balanceToShow = currentBalance || monthlyStats?.balance || 0;
+                  return formatChileanPeso(balanceToShow);
+                })()}
+              </Text>
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -310,53 +540,209 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
           )}
           scrollEventThrottle={16}
         >
-          {/* Saldo actual */}
-          <View style={styles.balanceSection}>
-            {isUserDataLoading || balanceLoading ? (
-              <SkeletonLoader width={200} height={60} borderRadius={12} />
-            ) : (
-              <>
-                <Text style={styles.balanceLabel}>Saldo Actual</Text>
-                <Text style={styles.balanceAmount}>
-                  {formatChileanPeso(currentBalance)}
+          {/* Score Card Principal exactamente como web */}
+          <View style={styles.scoreCard}>
+            <View style={styles.scoreHeader}>
+              <View style={[styles.scoreBadge, { backgroundColor: getScoreStatus(monthlyStats?.score || 50).color + '20' }]}>
+                <Text style={[styles.scoreBadgeText, { color: getScoreStatus(monthlyStats?.score || 50).color }]}>
+                  {getScoreStatus(monthlyStats?.score || 50).emoji} {getScoreStatus(monthlyStats?.score || 50).text}
                 </Text>
-              </>
-            )}
+              </View>
+            </View>
+            
+            {/* Gráfica de Zona Saludable exactamente como web */}
+            <View style={styles.healthZoneChart}>
+              {/* Zona Saludable con mejor diseño */}
+              <View style={styles.healthZone}>
+                <Text style={styles.healthZoneText}>Zona Saludable (40-80 pts)</Text>
+              </View>
+              
+              {/* Gráfico de Score Diario exactamente como web */}
+              <View style={styles.scoreChartContainer}>
+                <LineChart
+                  data={{
+                    labels: dailyScoreData.map(item => item.day),
+                    datasets: [{
+                      data: dailyScoreData.map(item => item.score || 0),
+                      strokeWidth: 4,
+                      color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`, // #858BF2
+                    }]
+                  }}
+                  width={Dimensions.get('window').width - 80}
+                  height={200}
+                  chartConfig={{
+                    backgroundColor: 'transparent',
+                    backgroundGradientFrom: 'transparent',
+                    backgroundGradientTo: 'transparent',
+                    decimalPlaces: 0,
+                    color: (opacity = 1) => `rgba(133, 139, 242, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
+                    style: {
+                      borderRadius: 16
+                    },
+                    propsForDots: {
+                      r: "8",
+                      strokeWidth: "2",
+                      stroke: "#fff"
+                    },
+                    propsForBackgroundLines: {
+                      strokeDasharray: "3,3",
+                      stroke: "#f0f0f0"
+                    }
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 16
+                  }}
+                />
+              </View>
+            </View>
           </View>
-
-        {/* Gráfico de Balance Diario con Rangos de Seguridad */}
-        <View style={styles.balanceChartCard}>
-          <BalanceChartMobile data={balanceData} height={300} />
-        </View>
 
         {/* Grid de Métricas - Solo Porcentajes como en web */}
         <View style={styles.percentageGrid}>
-          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
+          <View style={styles.percentageCard}>
+            <View style={[styles.percentageIcon, { backgroundColor: '#ea580c20' }]}>
+              <Ionicons name="cart-outline" size={24} color="#ea580c" />
+            </View>
             <Text style={[styles.percentageValue, { color: '#ea580c' }]}>
               {monthlyStats?.percentages.wants || userData.financialData?.consumo?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Consumo</Text>
           </View>
 
-          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
-            <Text style={[styles.percentageValue, { color: '#3b82f6' }]}>
+          <View style={styles.percentageCard}>
+            <View style={[styles.percentageIcon, { backgroundColor: '#7c3aed20' }]}>
+              <Ionicons name="home-outline" size={24} color="#7c3aed" />
+            </View>
+            <Text style={[styles.percentageValue, { color: '#7c3aed' }]}>
               {monthlyStats?.percentages.needs || userData.financialData?.necesidades?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Necesidades</Text>
           </View>
 
-          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
-            <Text style={[styles.percentageValue, { color: '#8b5cf6' }]}>
+          <View style={styles.percentageCard}>
+            <View style={[styles.percentageIcon, { backgroundColor: '#05966920' }]}>
+              <Ionicons name="piggy-bank-outline" size={24} color="#059669" />
+            </View>
+            <Text style={[styles.percentageValue, { color: '#059669' }]}>
               {monthlyStats?.percentages.savings || userData.financialData?.disponible?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Ahorro</Text>
           </View>
 
-          <View style={[styles.percentageCard, { backgroundColor: 'rgba(255, 255, 255, 0.8)' }]}>
-            <Text style={[styles.percentageValue, { color: '#10b981' }]}>
+          <View style={styles.percentageCard}>
+            <View style={[styles.percentageIcon, { backgroundColor: '#3b82f620' }]}>
+              <Ionicons name="trending-up-outline" size={24} color="#3b82f6" />
+            </View>
+            <Text style={[styles.percentageValue, { color: '#3b82f6' }]}>
               {monthlyStats?.percentages.investment || userData.financialData?.invertido?.percentage || 0}%
             </Text>
             <Text style={styles.percentageLabel}>Invertido</Text>
+          </View>
+        </View>
+
+        {/* Gráfico de Ingresos Mensuales como en web */}
+        <View style={styles.incomeChartCard}>
+          <View style={styles.chartHeader}>
+            <View style={[styles.chartIcon, { backgroundColor: '#dcfce7' }]}>
+              <Ionicons name="trending-up" size={24} color="#059669" />
+            </View>
+            <Text style={styles.chartTitle}>Ingresos Mensuales</Text>
+          </View>
+          <View style={styles.chartContainer}>
+            <LineChart
+              data={{
+                labels: monthlyIncomeData.map(item => item.month),
+                datasets: [{
+                  data: monthlyIncomeData.map(item => item.income),
+                  strokeWidth: 3,
+                  color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`, // #10b981
+                }]
+              }}
+              width={Dimensions.get('window').width - 80}
+              height={200}
+              chartConfig={{
+                backgroundColor: 'transparent',
+                backgroundGradientFrom: 'transparent',
+                backgroundGradientTo: 'transparent',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
+                style: {
+                  borderRadius: 16
+                },
+                propsForDots: {
+                  r: "4",
+                  strokeWidth: "0",
+                  stroke: "#10b981"
+                },
+                propsForBackgroundLines: {
+                  strokeDasharray: "3,3",
+                  stroke: "#f0f0f0"
+                },
+                formatYLabel: (value) => `${(parseFloat(value) / 1000).toFixed(0)}K`
+              }}
+              bezier
+              style={{
+                marginVertical: 8,
+                borderRadius: 16
+              }}
+            />
+          </View>
+        </View>
+
+        {/* Gráfico de Categorías de Ingresos exactamente como web */}
+        <View style={styles.categoriesChartCard}>
+          <View style={styles.chartHeader}>
+            <View style={[styles.chartIcon, { backgroundColor: '#dbeafe' }]}>
+              <Ionicons name="bar-chart" size={24} color="#3b82f6" />
+            </View>
+            <Text style={styles.chartTitle}>Categorías de Ingresos por Mes</Text>
+          </View>
+          <View style={styles.chartContainer}>
+            <BarChart
+              data={{
+                labels: incomeCategoriesData.map(item => item.month),
+                datasets: [{
+                  data: incomeCategoriesData.map(item => item.Salario),
+                  color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`, // #3b82f6
+                }, {
+                  data: incomeCategoriesData.map(item => item.Freelance),
+                  color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`, // #10b981
+                }, {
+                  data: incomeCategoriesData.map(item => item.Inversiones),
+                  color: (opacity = 1) => `rgba(245, 158, 11, ${opacity})`, // #f59e0b
+                }, {
+                  data: incomeCategoriesData.map(item => item.Otros),
+                  color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`, // #8b5cf6
+                }]
+              }}
+              width={Dimensions.get('window').width - 80}
+              height={300}
+              chartConfig={{
+                backgroundColor: 'transparent',
+                backgroundGradientFrom: 'transparent',
+                backgroundGradientTo: 'transparent',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
+                style: {
+                  borderRadius: 16
+                },
+                propsForBackgroundLines: {
+                  strokeDasharray: "3,3",
+                  stroke: "#f0f0f0"
+                },
+                formatYLabel: (value) => `${(parseFloat(value) / 1000).toFixed(0)}K`
+              }}
+              style={{
+                marginVertical: 8,
+                borderRadius: 16
+              }}
+              showValuesOnTopOfBars
+            />
           </View>
         </View>
 
@@ -449,10 +835,10 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 0,
   },
-  // Avatar Header styles - mejorado para coincidir con web
+  // Avatar Header styles - exactamente como web
   avatarHeader: {
-    height: 256, // Aumentado para coincidir con web (h-64 = 256px)
-    backgroundColor: COLORS.primary, // Usar color primario del tema
+    height: 256, // h-64 = 256px
+    backgroundColor: '#6B73FF', // from-primary-400
     position: 'relative',
     overflow: 'hidden',
   },
@@ -462,9 +848,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.primary, // Usar color primario del tema
-    // En React Native no podemos usar gradientes CSS directamente, 
-    // pero podemos simular el efecto con múltiples capas
+    backgroundColor: '#6B73FF', // from-primary-400
   },
   decorativePatterns: {
     position: 'absolute',
@@ -653,24 +1037,24 @@ const styles = StyleSheet.create({
   },
   percentageCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 16,
-    padding: SIZES.lg,
-    width: (width - SIZES.lg * 3) / 2,
-    marginBottom: SIZES.md,
-    alignItems: 'center',
+    borderRadius: 16, // rounded-2xl
+    padding: 24, // p-6
+    width: (width - 24 * 3) / 2, // grid-cols-2
+    marginBottom: 16, // mb-4
+    alignItems: 'center', // text-center
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
+    shadowRadius: 8,
     elevation: 4,
-    minHeight: 100,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   percentageValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: SIZES.xs,
+    fontSize: 32, // text-3xl
+    fontWeight: 'bold', // font-bold
+    marginBottom: 4, // mb-1
+    textAlign: 'center',
   },
   // Nuevos estilos para métricas financieras
   financialMetricsContainer: {
@@ -731,9 +1115,10 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   percentageLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.gray,
+    fontSize: 14, // text-sm
+    fontWeight: '500', // font-medium
+    color: COLORS.dark, // text-dark
+    textAlign: 'center',
   },
   // Registros styles - igual que web
   registrosCard: {
@@ -1325,6 +1710,321 @@ const styles = StyleSheet.create({
   logoutText: {
     color: COLORS.danger, // Rojo Vibrante
     fontWeight: '500',
+  },
+  // Estilos del header exactamente como web
+  settingsButtonContainer: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 10,
+  },
+  settingsButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  balanceHeaderContainer: {
+    position: 'absolute',
+    bottom: 24,
+    left: 24,
+    right: 24,
+    zIndex: 10,
+  },
+  balanceHeaderCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  balanceHeaderLabel: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  balanceHeaderAmount: {
+    color: COLORS.white,
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  scoreCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 24, // rounded-3xl
+    padding: 24, // p-6
+    marginBottom: 32, // mb-8
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  scoreHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 16, // mb-4
+  },
+  scoreBadge: {
+    paddingHorizontal: 12, // px-3
+    paddingVertical: 6, // py-1
+    borderRadius: 20, // rounded-full
+  },
+  scoreBadgeText: {
+    fontSize: 14, // text-sm
+    fontWeight: '600', // font-medium
+  },
+  healthZoneChart: {
+    height: 256, // h-64
+    backgroundColor: '#f0f9ff', // from-blue-50
+    borderRadius: 16, // rounded-2xl
+    padding: 16, // p-4
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  healthZone: {
+    position: 'absolute',
+    top: 48, // top-12
+    left: 24, // inset-x-6
+    right: 24,
+    bottom: 80, // bottom-20
+    backgroundColor: 'rgba(34, 197, 94, 0.1)', // from-green-200/40
+    borderRadius: 12, // rounded-xl
+    borderWidth: 2,
+    borderColor: 'rgba(34, 197, 94, 0.3)', // border-green-300/60
+    borderStyle: 'dashed',
+  },
+  healthZoneText: {
+    position: 'absolute',
+    top: 12, // top-3
+    left: 12, // left-3
+    fontSize: 12, // text-xs
+    fontWeight: '600', // font-semibold
+    color: '#15803d', // text-green-700
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // bg-white/80
+    paddingHorizontal: 8, // px-2
+    paddingVertical: 4, // py-1
+    borderRadius: 12, // rounded-full
+  },
+  scoreChartContainer: {
+    flex: 1,
+  },
+  percentageIcon: {
+    width: 48, // w-12
+    height: 48, // h-12
+    borderRadius: 12, // rounded-xl
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12, // mb-3
+    alignSelf: 'center', // mx-auto
+  },
+  incomeChartCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 32,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  categoriesChartCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 32,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  chartIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#dcfce7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.dark,
+  },
+  chartContainer: {
+    height: 200,
+  },
+  // Estilos del chat
+  chatContainer: {
+    flex: 1,
+    backgroundColor: COLORS.light,
+  },
+  chatHeader: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightGray,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  chatHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chatBackButton: {
+    padding: 8,
+    marginRight: 12,
+  },
+  chatUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chatAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  chatAvatarText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  chatUserName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.dark,
+  },
+  chatUserStatus: {
+    fontSize: 14,
+    color: '#10b981',
+  },
+  chatLogoutButton: {
+    padding: 8,
+  },
+  chatMessages: {
+    flex: 1,
+    padding: 16,
+  },
+  chatMessageContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  chatMessageLeft: {
+    justifyContent: 'flex-start',
+  },
+  chatMessageRight: {
+    justifyContent: 'flex-end',
+  },
+  chatMessageAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  chatMessageAvatarText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  chatMessageBubble: {
+    maxWidth: '80%',
+  },
+  chatMessageBubbleContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  chatMessageUser: {
+    backgroundColor: COLORS.primary,
+    borderBottomRightRadius: 8,
+  },
+  chatMessageSofia: {
+    backgroundColor: COLORS.white,
+    borderBottomLeftRadius: 8,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  chatMessageText: {
+    fontSize: 14,
+  },
+  chatMessageTextUser: {
+    color: COLORS.white,
+  },
+  chatMessageTextSofia: {
+    color: COLORS.dark,
+  },
+  chatMessageTime: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: 4,
+  },
+  chatMessageTimeLeft: {
+    textAlign: 'left',
+  },
+  chatMessageTimeRight: {
+    textAlign: 'right',
+  },
+  chatInputContainer: {
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.lightGray,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chatInputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.lightGray,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 12,
+  },
+  chatInput: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.dark,
+    maxHeight: 100,
+  },
+  chatMicButton: {
+    padding: 4,
+  },
+  chatSendButton: {
+    backgroundColor: COLORS.primary,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
