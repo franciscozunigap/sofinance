@@ -40,7 +40,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ currentView, onViewChan
     currentScore: user?.currentScore || 0,
     riskScore: user?.riskScore || 0,
     monthlyExpenses: monthlyStats?.totalExpenses || user?.monthlyExpenses || 0,
-    currentSavings: currentBalance || user?.currentSavings || user?.wallet?.amount || 0,
+    currentSavings: currentBalance || 0,
     savingsGoal: user?.savingsGoal || 0,
     alerts: user?.alerts || 0,
     // Datos financieros reales o por defecto

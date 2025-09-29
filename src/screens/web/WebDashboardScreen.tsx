@@ -12,6 +12,16 @@ const WebDashboardScreen = () => {
   const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading, financialData, userData, refreshData } = useFinancialData();
   const [currentView, setCurrentView] = useState('dashboard');
 
+  // Debug logs para el saldo actual
+  console.log('=== DEBUG SALDO ACTUAL ===');
+  console.log('currentBalance desde useFinancialData:', currentBalance);
+  console.log('monthlyStats:', monthlyStats);
+  console.log('monthlyStats.balance:', monthlyStats?.balance);
+  console.log('user:', user);
+  console.log('user.wallet:', user?.wallet);
+  console.log('userData.currentSavings:', userData?.currentSavings);
+  console.log('========================');
+
   // Mostrar skeleton mientras se cargan los datos
   if (balanceLoading) {
     return <AppSkeleton />;
@@ -507,7 +517,17 @@ const WebDashboardScreen = () => {
           <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 text-center">
             <p className="text-white/90 text-sm mb-2">Saldo Actual</p>
             <h1 className="text-3xl lg:text-4xl font-bold text-white">
-              {formatChileanPeso(currentBalance)}
+              {(() => {
+                console.log('=== DEBUG SALDO EN UI ===');
+                console.log('currentBalance en UI:', currentBalance);
+                console.log('monthlyStats.balance:', monthlyStats?.balance);
+                console.log('formatChileanPeso(currentBalance):', formatChileanPeso(currentBalance));
+                console.log('formatChileanPeso(monthlyStats.balance):', formatChileanPeso(monthlyStats?.balance || 0));
+                console.log('========================');
+                // Usar monthlyStats.balance si currentBalance es 0
+                const balanceToShow = currentBalance || monthlyStats?.balance || 0;
+                return formatChileanPeso(balanceToShow);
+              })()}
             </h1>
           </div>
         </div>

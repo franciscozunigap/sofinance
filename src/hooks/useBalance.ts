@@ -15,6 +15,10 @@ export const useBalance = (userId: string) => {
       setLoading(true);
       setError(null);
       const balance = await BalanceService.getCurrentBalance(userId);
+      console.log('=== DEBUG USE BALANCE ===');
+      console.log('userId:', userId);
+      console.log('balance obtenido de BalanceService:', balance);
+      console.log('========================');
       setCurrentBalance(balance);
     } catch (err) {
       setError('Error al cargar el balance actual');

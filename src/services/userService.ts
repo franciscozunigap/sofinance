@@ -31,7 +31,7 @@ export const fetchUserData = async (userId: string): Promise<User | null> => {
         lastName: userData.last_name || '',
         age: userData.age || 0,
         monthlyIncome: userData.wallet?.monthly_income || 0,
-        currentSavings: userData.wallet?.amount || 0,
+        currentSavings: 0, // No usar wallet.amount, se calculará desde monthlyStats
         preferences: userData.preferences || {
           needs_percent: 0,
           saving_percent: 0,

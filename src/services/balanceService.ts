@@ -82,10 +82,18 @@ export class BalanceService {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
       
+      console.log('=== DEBUG BALANCE SERVICE ===');
+      console.log('getCurrentBalance - userId:', userId);
+      console.log('getCurrentBalance - month:', month, 'year:', year);
+      
       const currentMonthBalance = await this.getCurrentMonthBalance(userId, month, year);
+      console.log('getCurrentBalance - currentMonthBalance:', currentMonthBalance);
       
       // Sincronizar el balance actual con el balance del mes actual
       await this.syncCurrentBalanceWithMonthlyStats(userId, currentMonthBalance);
+      
+      console.log('getCurrentBalance - balance final retornado:', currentMonthBalance);
+      console.log('=============================');
       
       return currentMonthBalance;
     } catch (error) {
@@ -103,11 +111,20 @@ export class BalanceService {
       const statsDocRef = doc(db, 'monthly_stats', statsId);
       const statsDocSnap = await getDoc(statsDocRef);
       
+      console.log('=== DEBUG GET CURRENT MONTH BALANCE ===');
+      console.log('statsId:', statsId);
+      console.log('statsDocSnap.exists():', statsDocSnap.exists());
+      
       if (statsDocSnap.exists()) {
         const stats = statsDocSnap.data() as MonthlyStats;
+        console.log('stats encontradas:', stats);
+        console.log('stats.balance:', stats.balance);
+        console.log('=====================================');
         return stats.balance;
       }
       
+      console.log('No se encontraron estadísticas para el mes actual, retornando 0');
+      console.log('=====================================');
       return 0;
     } catch (error) {
       console.error('Error al obtener balance del mes actual:', error);

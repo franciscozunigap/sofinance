@@ -81,10 +81,21 @@ export const FinancialDataProvider: React.FC<FinancialDataProviderProps> = ({ ch
     currentScore: user?.currentScore || 0,
     riskScore: user?.riskScore || 0,
     monthlyExpenses: monthlyStats?.totalExpenses || user?.monthlyExpenses || 0,
-    currentSavings: currentBalance || user?.currentSavings || 0,
+    currentSavings: currentBalance || 0,
     savingsGoal: user?.savingsGoal || 0,
     alerts: user?.alerts || 0,
   };
+
+  // Debug logs para el contexto
+  console.log('=== DEBUG FINANCIAL DATA CONTEXT ===');
+  console.log('currentBalance en contexto:', currentBalance);
+  console.log('monthlyStats en contexto:', monthlyStats);
+  console.log('monthlyStats.balance:', monthlyStats?.balance);
+  console.log('user.currentSavings:', user?.currentSavings);
+  console.log('user.wallet.amount:', user?.wallet?.amount);
+  console.log('userData.currentSavings calculado:', userData.currentSavings);
+  console.log('balanceLoading:', balanceLoading);
+  console.log('====================================');
 
   // Datos financieros calculados basándose en monthlyStats
   const financialData = monthlyStats ? {
