@@ -61,14 +61,18 @@ export const FinancialDataProvider: React.FC<FinancialDataProviderProps> = ({ ch
 
   // Función para refrescar todos los datos
   const refreshData = async () => {
+    console.log('🔄 [FinancialDataContext] Iniciando refreshData...');
     try {
       setError(null);
+      console.log('🔄 [FinancialDataContext] Cargando datos en paralelo...');
       await Promise.all([
         loadCurrentBalance(),
         loadBalanceHistory(),
         loadMonthlyStats()
       ]);
+      console.log('✅ [FinancialDataContext] Datos refrescados exitosamente');
     } catch (err) {
+      console.error('💥 [FinancialDataContext] Error durante refreshData:', err);
       setError('Error al actualizar los datos');
     }
   };

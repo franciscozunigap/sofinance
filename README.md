@@ -1,4 +1,5 @@
 # 💰 SoFinance - Aplicación de Finanzas Personales Multiplataforma
+# DEVELOP
 
 Una aplicación moderna y optimizada para la gestión de finanzas personales, desarrollada con **React Native**, **Expo** y **React Native Web** para funcionar en **Web**, **iOS** y **Android** simultáneamente.
 

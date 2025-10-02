@@ -23,3 +23,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // Log de confirmación
+console.log('🔥 [Firebase] Configuración inicializada correctamente');
+console.log('🔥 [Firebase] Proyecto:', firebaseConfig.projectId);
+console.log('🔥 [Firebase] Plataforma:', platform);
+console.log('🔥 [Firebase] Auth Domain:', firebaseConfig.authDomain);

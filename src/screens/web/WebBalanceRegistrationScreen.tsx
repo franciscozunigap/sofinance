@@ -85,30 +85,60 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
   };
 
   const handleComplete = async () => {
+    console.log('🚀 [WebBalanceRegistrationScreen] Iniciando proceso de guardado...');
+    console.log('📊 [WebBalanceRegistrationScreen] Datos del usuario:', { userId: user?.id, userName: user?.name });
+    console.log('📝 [WebBalanceRegistrationScreen] Registros a guardar:', records);
+    console.log('💰 [WebBalanceRegistrationScreen] Monto actual:', currentAmount);
+    console.log('📈 [WebBalanceRegistrationScreen] Balance anterior:', currentBalance);
+    console.log('🔢 [WebBalanceRegistrationScreen] Diferencia calculada:', difference);
+    
     setLoading(true);
     try {
       // Registrar cada transacción individualmente usando el hook
-      for (const record of records) {
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        console.log(`🔄 [WebBalanceRegistrationScreen] Procesando registro ${i + 1}/${records.length}:`, record);
+        
         const type = record.category === 'Ingreso' ? 'income' : 'expense';
+        const amount = typeof record.amount === 'string' ? parseFloat(record.amount) || 0 : record.amount;
+        const description = `Registro de ${record.category}`;
+        
+        console.log(`📤 [WebBalanceRegistrationScreen] Llamando a registerBalance con:`, {
+          type,
+          description,
+          amount,
+          category: record.category
+        });
+        
         const success = await registerBalance(
           type,
-          `Registro de ${record.category}`,
-          typeof record.amount === 'string' ? parseFloat(record.amount) || 0 : record.amount,
+          description,
+          amount,
           record.category
         );
         
+        console.log(`✅ [WebBalanceRegistrationScreen] Resultado del registro ${i + 1}:`, success);
+        
         if (!success) {
-          throw new Error('Error al registrar el balance');
+          console.error(`❌ [WebBalanceRegistrationScreen] Error en registro ${i + 1}`);
+          throw new Error(`Error al registrar el balance en el registro ${i + 1}`);
         }
       }
       
+      console.log('🎉 [WebBalanceRegistrationScreen] Todos los registros guardados exitosamente');
+      
       if (onComplete) {
+        console.log('🔄 [WebBalanceRegistrationScreen] Ejecutando callback onComplete');
         onComplete();
       }
+      console.log('🚪 [WebBalanceRegistrationScreen] Cerrando modal');
       onClose();
     } catch (error) {
-      alert('Error al guardar el registro. Inténtalo de nuevo.');
+      console.error('💥 [WebBalanceRegistrationScreen] Error durante el guardado:', error);
+      console.error('💥 [WebBalanceRegistrationScreen] Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
+      alert(`Error al guardar el registro: ${error instanceof Error ? error.message : 'Error desconocido'}. Inténtalo de nuevo.`);
     } finally {
+      console.log('🏁 [WebBalanceRegistrationScreen] Finalizando proceso de guardado');
       setLoading(false);
     }
   };

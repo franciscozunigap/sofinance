@@ -20,18 +20,44 @@ export class BalanceService {
     amount: number,
     category: string
   ): Promise<{ success: boolean; error?: string; balanceRegistration?: BalanceRegistration }> {
+    console.log('🏦 [BalanceService] Iniciando registerBalance...');
+    console.log('📊 [BalanceService] Parámetros:', { userId, type, description, amount, category });
+    
+    // Verificar autenticación
+    console.log('🔐 [BalanceService] Verificando autenticación...');
+    const { auth } = await import('../firebase/config');
+    console.log('🔐 [BalanceService] Usuario autenticado:', auth.currentUser?.uid);
+    console.log('🔐 [BalanceService] Email del usuario:', auth.currentUser?.email);
+    
+    if (!auth.currentUser) {
+      console.error('❌ [BalanceService] Usuario no autenticado');
+      return { 
+        success: false, 
+        error: 'Usuario no autenticado. Por favor, inicia sesión nuevamente.' 
+      };
+    }
+    
     try {
       const now = new Date();
       const month = now.getMonth() + 1;
       const year = now.getFullYear();
+      console.log('📅 [BalanceService] Fecha actual:', { now, month, year });
 
       // Obtener balance actual
+      console.log('💰 [BalanceService] Obteniendo balance actual...');
       const currentBalance = await this.getCurrentBalance(userId);
+      console.log('💰 [BalanceService] Balance actual obtenido:', currentBalance);
       
       // Calcular nuevo balance
       const balanceAfter = type === 'income' 
         ? currentBalance + amount 
         : currentBalance - amount;
+      console.log('🧮 [BalanceService] Cálculo de balance:', { 
+        currentBalance, 
+        amount, 
+        type, 
+        balanceAfter 
+      });
 
       // Crear registro de balance
       const balanceRegistration: BalanceRegistration = {
@@ -47,24 +73,38 @@ export class BalanceService {
         year,
         createdAt: now
       };
+      console.log('📝 [BalanceService] Registro creado:', balanceRegistration);
 
       // Guardar registro
+      console.log('💾 [BalanceService] Guardando registro en Firestore...');
       const registrationRef = doc(db, 'balance_registrations', balanceRegistration.id);
       await setDoc(registrationRef, balanceRegistration);
+      console.log('✅ [BalanceService] Registro guardado exitosamente');
 
       // Actualizar estadísticas mensuales primero
+      console.log('📊 [BalanceService] Actualizando estadísticas mensuales...');
       await this.updateMonthlyStats(userId, month, year, balanceRegistration);
+      console.log('✅ [BalanceService] Estadísticas mensuales actualizadas');
 
       // Actualizar balance actual para que siempre refleje monthlyStats.balance
+      console.log('💰 [BalanceService] Actualizando balance actual...');
       await this.updateCurrentBalance(userId, balanceAfter);
+      console.log('✅ [BalanceService] Balance actual actualizado');
 
       // Verificar y manejar cambio de mes automáticamente
+      console.log('📅 [BalanceService] Verificando cambio de mes...');
       await this.handleMonthChange(userId);
+      console.log('✅ [BalanceService] Verificación de mes completada');
 
-
+      console.log('🎉 [BalanceService] Registro completado exitosamente');
       return { success: true, balanceRegistration };
     } catch (error) {
-      return { success: false, error: 'Error al registrar el balance' };
+      console.error('💥 [BalanceService] Error durante registerBalance:', error);
+      console.error('💥 [BalanceService] Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
+      return { 
+        success: false, 
+        error: `Error al registrar el balance: ${error instanceof Error ? error.message : 'Error desconocido'}` 
+      };
     }
   }
 
@@ -73,19 +113,28 @@ export class BalanceService {
    * Siempre devuelve el balance del mes actual (monthlyStats.balance)
    */
   static async getCurrentBalance(userId: string): Promise<number> {
+    console.log('💰 [BalanceService.getCurrentBalance] Iniciando...');
+    console.log('👤 [BalanceService.getCurrentBalance] userId:', userId);
+    
     try {
       // Obtener el balance del mes actual desde monthlyStats
       const currentDate = new Date();
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
+      console.log('📅 [BalanceService.getCurrentBalance] Fecha:', { currentDate, month, year });
       
       const currentMonthBalance = await this.getCurrentMonthBalance(userId, month, year);
+      console.log('💰 [BalanceService.getCurrentBalance] Balance del mes obtenido:', currentMonthBalance);
       
       // Sincronizar el balance actual con el balance del mes actual
+      console.log('🔄 [BalanceService.getCurrentBalance] Sincronizando balance actual...');
       await this.syncCurrentBalanceWithMonthlyStats(userId, currentMonthBalance);
+      console.log('✅ [BalanceService.getCurrentBalance] Sincronización completada');
       
+      console.log('💰 [BalanceService.getCurrentBalance] Retornando balance:', currentMonthBalance);
       return currentMonthBalance;
     } catch (error) {
+      console.error('💥 [BalanceService.getCurrentBalance] Error:', error);
       return 0;
     }
   }
@@ -94,17 +143,30 @@ export class BalanceService {
    * Obtiene el balance del mes actual desde monthlyStats
    */
   static async getCurrentMonthBalance(userId: string, month: number, year: number): Promise<number> {
+    console.log('📊 [BalanceService.getCurrentMonthBalance] Iniciando...');
+    console.log('📊 [BalanceService.getCurrentMonthBalance] Parámetros:', { userId, month, year });
+    
     try {
       const statsId = `${year}-${month.toString().padStart(2, '0')}_${userId}`;
+      console.log('🔍 [BalanceService.getCurrentMonthBalance] statsId:', statsId);
+      
       const statsDocRef = doc(db, 'monthly_stats', statsId);
+      console.log('📄 [BalanceService.getCurrentMonthBalance] Consultando documento...');
+      
       const statsDocSnap = await getDoc(statsDocRef);
+      console.log('📄 [BalanceService.getCurrentMonthBalance] Documento existe:', statsDocSnap.exists());
       
       if (statsDocSnap.exists()) {
         const stats = statsDocSnap.data() as MonthlyStats;
+        console.log('📊 [BalanceService.getCurrentMonthBalance] Datos encontrados:', stats);
+        console.log('💰 [BalanceService.getCurrentMonthBalance] Balance retornado:', stats.balance);
         return stats.balance;
       }
+      
+      console.log('❌ [BalanceService.getCurrentMonthBalance] No se encontraron estadísticas, retornando 0');
       return 0;
     } catch (error) {
+      console.error('💥 [BalanceService.getCurrentMonthBalance] Error:', error);
       return 0;
     }
   }
@@ -154,13 +216,24 @@ export class BalanceService {
    * Actualiza el balance actual del usuario
    */
   static async updateCurrentBalance(userId: string, newBalance: number): Promise<void> {
+    console.log('💰 [BalanceService.updateCurrentBalance] Iniciando...');
+    console.log('💰 [BalanceService.updateCurrentBalance] Parámetros:', { userId, newBalance });
+    
     try {
       const balanceDocRef = doc(db, 'balances', userId);
-      await updateDoc(balanceDocRef, {
+      console.log('📄 [BalanceService.updateCurrentBalance] Referencia del documento:', balanceDocRef.path);
+      
+      const updateData = {
         currentBalance: newBalance,
         lastUpdated: new Date()
-      });
+      };
+      console.log('📝 [BalanceService.updateCurrentBalance] Datos a actualizar:', updateData);
+      
+      await updateDoc(balanceDocRef, updateData);
+      console.log('✅ [BalanceService.updateCurrentBalance] Balance actualizado exitosamente');
     } catch (error) {
+      console.error('💥 [BalanceService.updateCurrentBalance] Error:', error);
+      console.error('💥 [BalanceService.updateCurrentBalance] Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
       throw error;
     }
   }
@@ -195,16 +268,27 @@ export class BalanceService {
     year: number, 
     newRegistration: BalanceRegistration
   ): Promise<void> {
+    console.log('📊 [BalanceService.updateMonthlyStats] Iniciando...');
+    console.log('📊 [BalanceService.updateMonthlyStats] Parámetros:', { userId, month, year });
+    console.log('📝 [BalanceService.updateMonthlyStats] Nuevo registro:', newRegistration);
+    
     try {
       const statsId = `${year}-${month.toString().padStart(2, '0')}_${userId}`;
+      console.log('🔍 [BalanceService.updateMonthlyStats] statsId:', statsId);
+      
       const statsDocRef = doc(db, 'monthly_stats', statsId);
+      console.log('📄 [BalanceService.updateMonthlyStats] Consultando documento existente...');
+      
       const statsDocSnap = await getDoc(statsDocRef);
+      console.log('📄 [BalanceService.updateMonthlyStats] Documento existe:', statsDocSnap.exists());
 
       let monthlyStats: MonthlyStats;
 
       if (statsDocSnap.exists()) {
+        console.log('📊 [BalanceService.updateMonthlyStats] Actualizando estadísticas existentes...');
         // Actualizar estadísticas existentes
         const existingStats = statsDocSnap.data() as MonthlyStats;
+        console.log('📊 [BalanceService.updateMonthlyStats] Estadísticas existentes:', existingStats);
         
         if (newRegistration.type === 'income') {
           monthlyStats = {
@@ -213,6 +297,11 @@ export class BalanceService {
             balance: newRegistration.balanceAfter,
             lastUpdated: new Date()
           };
+          console.log('💰 [BalanceService.updateMonthlyStats] Actualizando ingreso:', {
+            totalIncomeAnterior: existingStats.totalIncome,
+            montoNuevo: newRegistration.amount,
+            totalIncomeNuevo: monthlyStats.totalIncome
+          });
         } else {
           monthlyStats = {
             ...existingStats,
@@ -220,12 +309,21 @@ export class BalanceService {
             balance: newRegistration.balanceAfter,
             lastUpdated: new Date()
           };
+          console.log('💸 [BalanceService.updateMonthlyStats] Actualizando gasto:', {
+            totalExpensesAnterior: existingStats.totalExpenses,
+            montoNuevo: newRegistration.amount,
+            totalExpensesNuevo: monthlyStats.totalExpenses
+          });
         }
       } else {
+        console.log('📊 [BalanceService.updateMonthlyStats] Creando nuevas estadísticas mensuales...');
         // Crear nuevas estadísticas mensuales
         const previousMonth = month === 1 ? 12 : month - 1;
         const previousYear = month === 1 ? year - 1 : year;
+        console.log('📅 [BalanceService.updateMonthlyStats] Mes anterior:', { previousMonth, previousYear });
+        
         const previousMonthBalance = await this.getPreviousMonthBalance(userId, previousMonth, previousYear);
+        console.log('💰 [BalanceService.updateMonthlyStats] Balance del mes anterior:', previousMonthBalance);
 
         monthlyStats = {
           id: statsId,
@@ -254,10 +352,17 @@ export class BalanceService {
       }
 
       // Calcular porcentajes basándose en los registros reales del mes
+      console.log('📊 [BalanceService.updateMonthlyStats] Calculando porcentajes...');
       monthlyStats.percentages = await this.calculateMonthlyPercentages(userId, month, year, monthlyStats.balance, monthlyStats.totalIncome);
+      console.log('📊 [BalanceService.updateMonthlyStats] Porcentajes calculados:', monthlyStats.percentages);
 
+      console.log('💾 [BalanceService.updateMonthlyStats] Guardando estadísticas en Firestore...');
+      console.log('📊 [BalanceService.updateMonthlyStats] Datos finales a guardar:', monthlyStats);
       await setDoc(statsDocRef, monthlyStats);
+      console.log('✅ [BalanceService.updateMonthlyStats] Estadísticas guardadas exitosamente');
     } catch (error) {
+      console.error('💥 [BalanceService.updateMonthlyStats] Error:', error);
+      console.error('💥 [BalanceService.updateMonthlyStats] Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
       throw error;
     }
   }
