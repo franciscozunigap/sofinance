@@ -2,6 +2,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BalanceRegistration, MonthlyStats } from '../types';
 
 /**
+ * Operaciones pendientes que se ejecutarán cuando se recupere la conexión
+ */
+interface PendingOperation {
+  id: string;
+  type: 'register_balance' | 'update_balance' | 'delete_balance';
+  data: any;
+  timestamp: Date;
+  retryCount: number;
+}
+
+/**
  * Servicio para manejo offline con Firebase
  */
 export class OfflineService {
@@ -12,17 +23,6 @@ export class OfflineService {
     CACHED_STATS: 'cached_stats',
     LAST_SYNC: 'last_sync',
   } as const;
-
-  /**
-   * Operaciones pendientes que se ejecutarán cuando se recupere la conexión
-   */
-  interface PendingOperation {
-    id: string;
-    type: 'register_balance' | 'update_balance' | 'delete_balance';
-    data: any;
-    timestamp: Date;
-    retryCount: number;
-  }
 
   /**
    * Guarda una operación pendiente

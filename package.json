@@ -33,7 +33,10 @@
     "lint:fix": "npx tsc --noEmit --fix",
     "health": "node scripts/validate-and-setup.js",
     "cache:clear": "node -e \"const { CacheService } = require('./src/services/cacheService'); CacheService.clear();\"",
-    "offline:clear": "node -e \"const { OfflineService } = require('./src/services/offlineService'); OfflineService.clearAllCache();\""
+    "offline:clear": "node -e \"const { OfflineService } = require('./src/services/offlineService'); OfflineService.clearAllCache();\"",
+    "firebase:indexes": "firebase deploy --only firestore:indexes",
+    "firebase:rules": "firebase deploy --only firestore:rules",
+    "firebase:setup": "firebase deploy --only firestore:indexes,firestore:rules"
   },
   "dependencies": {
     "@babel/preset-env": "^7.28.3",

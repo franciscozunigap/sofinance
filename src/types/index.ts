@@ -150,6 +150,9 @@ export interface BalanceRegistrationData {
   records: BalanceRecord[];
 }
 
+// ✅ ELIMINADO: BalanceData - Ya no se usa colección 'balances'
+// La información del balance actual ahora viene de monthly_stats
+
 export type RootStackParamList = {
   Login: { onLoginSuccess: () => void };
   Register: { onRegistrationSuccess: () => void };

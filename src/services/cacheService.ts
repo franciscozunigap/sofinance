@@ -2,6 +2,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BalanceRegistration, MonthlyStats } from '../types';
 
 /**
+ * Entrada de cache con metadata
+ */
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  expiresAt: number;
+  version: string;
+}
+
+/**
  * Servicio de caché optimizado para Firebase
  */
 export class CacheService {
@@ -20,13 +30,6 @@ export class CacheService {
     USER_DATA: 60 * 60 * 1000, // 1 hora
     SUMMARY_STATS: 15 * 60 * 1000, // 15 minutos
   } as const;
-
-  interface CacheEntry<T> {
-    data: T;
-    timestamp: number;
-    expiresAt: number;
-    version: string;
-  }
 
   /**
    * Guarda datos en caché con expiración

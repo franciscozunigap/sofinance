@@ -40,9 +40,9 @@ export const useBalance = (userId: string) => {
       setLoading(true);
       setError(null);
       console.log('🔄 [useBalance.loadBalanceHistory] Llamando a BalanceService.getBalanceHistory...');
-      const history = await BalanceService.getBalanceHistory(userId);
-      console.log('📜 [useBalance.loadBalanceHistory] Historial obtenido:', history.length, 'registros');
-      setBalanceHistory(history);
+      const result = await BalanceService.getBalanceHistory(userId);
+      console.log('📜 [useBalance.loadBalanceHistory] Historial obtenido:', result.data.length, 'registros');
+      setBalanceHistory(result.data); // ✅ Extraer .data del resultado
       console.log('✅ [useBalance.loadBalanceHistory] Historial actualizado en estado');
     } catch (err) {
       console.error('💥 [useBalance.loadBalanceHistory] Error:', err);

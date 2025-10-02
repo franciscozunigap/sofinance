@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función auxiliar para verificar autenticación
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Función auxiliar para verificar si el usuario es el dueño
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Reglas para la colección de usuarios
+    match /users/{userId} {
+      // Permitir lectura solo al usuario dueño
+      allow read: if isOwner(userId);
+      
+      // Permitir escritura (crear/actualizar) solo al usuario dueño
+      allow write: if isOwner(userId);
+    }
+    
+    // ✅ ELIMINADO: Reglas para colección 'balances' (ya no existe)
+    
+    // Reglas para la colección de registros de balance
+    match /balance_registrations/{registrationId} {
+      // Permitir lectura si el documento pertenece al usuario
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // Permitir escritura si el usuario está autenticado y es el dueño
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Reglas para las estadísticas mensuales
+    match /monthly_stats/{statsId} {
+      // Permitir lectura si el documento pertenece al usuario
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // Permitir escritura si el usuario está autenticado y es el dueño
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Denegar acceso a cualquier otra colección por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
