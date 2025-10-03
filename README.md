@@ -167,15 +167,37 @@ sofinance/
    ```
 
 3. **Configurar Firebase (Requerido)**
-   ```bash
-   # Ejecutar script de configuración interactivo
-   npm run setup:firebase
    
-   # O configurar manualmente editando:
-   # src/firebase/firebaseConfig.ts
+   **Opción A: Script automático (Recomendado)**
+   ```bash
+   npm run setup:firebase
    ```
    
-   📖 **Ver documentación completa**: [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
+   **Opción B: Configuración manual**
+   
+   a) Crear proyecto en [Firebase Console](https://console.firebase.google.com/)
+   
+   b) Habilitar Authentication (Email/Password) y Firestore Database
+   
+   c) Obtener credenciales de configuración:
+      - Web: Project Settings > General > Your apps > Web app
+      - iOS: Project Settings > General > Your apps > iOS (Bundle ID: com.sofinance)
+      - Android: Project Settings > General > Your apps > Android (Package: com.sofinancetemp)
+   
+   d) Crear archivo `.env` en la raíz del proyecto:
+   ```env
+   PRIVATE_FIREBASE_APIKEY=tu-api-key-web
+   PRIVATE_FIREBASE_AUTH_DOMAIN=tu-proyecto.firebaseapp.com
+   PRIVATE_FIREBASE_PROYECT_ID=tu-proyecto-id
+   PRIVATE_FIREBASE_STORAGE_BUCKET=tu-proyecto.appspot.com
+   PRIVATE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+   PRIVATE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
+   PRIVATE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+   ```
+   
+   e) Descargar archivos de configuración:
+      - iOS: `GoogleService-Info.plist` → `ios/SoFinance/`
+      - Android: `google-services.json` → `android/app/`
 
 ## 🔥 Desarrollo Multiplataforma
 
