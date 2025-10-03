@@ -116,9 +116,12 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
       
       for (const record of records) {
         const type = record.category === 'Ingreso' ? 'income' : 'expense';
+        // ✅ Usar la descripción personalizada del usuario
+        const description = record.description || `Registro de ${record.category}`;
+        
         const success = await registerBalance(
           type,
-          `Registro de ${record.category}`,
+          description,  // ✅ Descripción del usuario
           record.amount,
           record.category
         );

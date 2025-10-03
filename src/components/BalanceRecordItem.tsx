@@ -29,6 +29,7 @@ const BalanceRecordItem: React.FC<BalanceRecordItemProps> = ({
 }) => {
   const [amount, setAmount] = useState(record.amount.toString());
   const [category, setCategory] = useState<BalanceCategory | null>(record.category);
+  const [description, setDescription] = useState(record.description || '');
   const [amountError, setAmountError] = useState<string | undefined>();
 
   const handleAmountChange = (text: string) => {
@@ -48,9 +49,19 @@ const BalanceRecordItem: React.FC<BalanceRecordItemProps> = ({
       onUpdate({
         ...record,
         amount: numericValue || 0,
-        type: correctType, // ← Asegurar que el tipo sea correcto
+        type: correctType,
       });
     }
+  };
+
+  const handleDescriptionChange = (text: string) => {
+    // ✅ Limitar a 20 caracteres
+    const limitedText = text.slice(0, 20);
+    setDescription(limitedText);
+    onUpdate({
+      ...record,
+      description: limitedText,
+    });
   };
 
   const handleCategoryChange = (newCategory: BalanceCategory) => {
@@ -89,6 +100,20 @@ const BalanceRecordItem: React.FC<BalanceRecordItemProps> = ({
       </View>
 
       <View style={styles.content}>
+        {/* Campo de descripción */}
+        <View style={styles.descriptionContainer}>
+          <View style={styles.labelRow}>
+            <Text style={styles.fieldLabel}>Nombre</Text>
+            <Text style={styles.charCount}>{description.length}/20</Text>
+          </View>
+          <Input
+            placeholder="Ej: Sueldo, Supermercado..."
+            value={description}
+            onChangeText={handleDescriptionChange}
+            maxLength={20}
+          />
+        </View>
+
         <View style={styles.inputRow}>
           <View style={styles.amountContainer}>
             <Text style={styles.fieldLabel}>Monto</Text>
@@ -163,6 +188,21 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  descriptionContainer: {
+    marginBottom: SIZES.sm,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.xs,
+    marginLeft: SIZES.xs,
+  },
+  charCount: {
+    fontSize: 11,
+    fontFamily: FONTS.regular,
+    color: COLORS.gray,
   },
   inputRow: {
     flexDirection: 'row',

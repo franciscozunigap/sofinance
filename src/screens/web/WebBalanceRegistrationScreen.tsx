@@ -101,7 +101,8 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
         
         const type = record.category === 'Ingreso' ? 'income' : 'expense';
         const amount = typeof record.amount === 'string' ? parseFloat(record.amount) || 0 : record.amount;
-        const description = `Registro de ${record.category}`;
+        // ✅ Usar la descripción personalizada del usuario
+        const description = record.description || `Registro de ${record.category}`;
         
         console.log(`📤 [WebBalanceRegistrationScreen] Llamando a registerBalance con:`, {
           type,
@@ -112,7 +113,7 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
         
         const success = await registerBalance(
           type,
-          description,
+          description,  // ✅ Descripción personalizada
           amount,
           record.category
         );
@@ -167,8 +168,8 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col relative z-[101]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
@@ -185,7 +186,7 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6" style={{ paddingBottom: currentStep === 2 ? '200px' : '32px' }}>
           {currentStep === 1 ? (
             <div className="space-y-6">
               <div className="text-center">
@@ -272,6 +273,29 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
                           </button>
                         </div>
                         
+                        {/* ✅ Campo de Nombre/Descripción */}
+                        <div className="mb-3">
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-xs font-medium text-gray-700">
+                              Nombre
+                            </label>
+                            <span className="text-xs text-gray-500">
+                              {(record.description || '').length}/20
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            value={record.description || ''}
+                            onChange={(e) => {
+                              const text = e.target.value.slice(0, 20); // ✅ Limitar a 20 caracteres
+                              updateRecord(record.id, 'description', text);
+                            }}
+                            placeholder="Ej: Sueldo, Supermercado..."
+                            maxLength={20}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-400 focus:border-transparent outline-none text-sm"
+                          />
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -335,7 +359,7 @@ const WebBalanceRegistrationScreen: React.FC<WebBalanceRegistrationScreenProps> 
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-6 border-t border-gray-200 bg-gray-50 relative z-50">
           <div className="flex justify-between">
             <button
               onClick={currentStep === 1 ? onClose : () => setCurrentStep(1)}
