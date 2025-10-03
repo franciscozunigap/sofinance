@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -7,8 +7,23 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Animated,
+  Platform,
 } from 'react-native';
 import { COLORS, SIZES, FONTS } from '../constants';
+
+// Haptic feedback (solo para mobile nativo)
+const triggerHaptic = () => {
+  if (Platform.OS !== 'web') {
+    try {
+      // Intentar usar expo-haptics si está disponible
+      const Haptics = require('expo-haptics');
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (e) {
+      // Si no está disponible, no hacer nada
+    }
+  }
+};
 
 interface ButtonProps {
   title: string;
@@ -33,6 +48,9 @@ const Button: React.FC<ButtonProps> = ({
   textStyle,
   icon,
 }) => {
+  // ✅ Animación de escala para feedback visual
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
   const getButtonStyle = () => {
     const baseStyle = [styles.button, styles[size]];
     
@@ -69,30 +87,62 @@ const Button: React.FC<ButtonProps> = ({
 
   const isDisabled = disabled || loading;
 
+  // ✅ Handlers para micro-interacciones
+  const handlePressIn = () => {
+    if (!isDisabled) {
+      triggerHaptic();
+      Animated.spring(scaleAnim, {
+        toValue: 0.96,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  const handlePressOut = () => {
+    if (!isDisabled) {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  const handlePress = () => {
+    if (!isDisabled) {
+      onPress();
+    }
+  };
+
   return (
-    <TouchableOpacity
-      style={[...getButtonStyle(), style]}
-      onPress={onPress}
-      disabled={isDisabled}
-      activeOpacity={0.8}
-    >
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator 
-            size="small" 
-            color={variant === 'primary' ? COLORS.white : COLORS.primary} 
-          />
-          <Text style={[...getTextStyle(), { marginLeft: SIZES.sm }]}>
-            Cargando...
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.contentContainer}>
-          {icon && <View style={styles.iconContainer}>{icon}</View>}
-          <Text style={[...getTextStyle(), textStyle]}>{title}</Text>
-        </View>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        style={[...getButtonStyle(), style]}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={isDisabled}
+        activeOpacity={0.9}
+      >
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator 
+              size="small" 
+              color={variant === 'primary' ? COLORS.white : COLORS.primary} 
+            />
+            <Text style={[...getTextStyle(), { marginLeft: SIZES.sm }]}>
+              Cargando...
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.contentContainer}>
+            {icon && <View style={styles.iconContainer}>{icon}</View>}
+            <Text style={[...getTextStyle(), textStyle]}>{title}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -103,16 +153,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
-  // Sizes
+  // Sizes (✅ Touch targets mínimos 44x44px)
   small: {
     paddingHorizontal: SIZES.md,
     paddingVertical: SIZES.sm,
-    minHeight: 36,
+    minHeight: 44,  // ✅ Mínimo touch target
   },
   medium: {
     paddingHorizontal: SIZES.lg,
     paddingVertical: SIZES.md,
-    minHeight: 48,
+    minHeight: 50,  // ✅ Más cómodo para mobile
   },
   large: {
     paddingHorizontal: SIZES.xl,

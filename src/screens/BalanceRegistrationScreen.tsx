@@ -218,7 +218,11 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         {currentStep === 1 ? (
           // Paso 1: Ingreso del monto actual
           <Animated.View 
@@ -244,6 +248,7 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
                 keyboardType="numeric"
                 error={amountError}
                 currencyFormat={true}
+                autoFocus={true}  // ✅ Auto-focus al abrir
               />
             </View>
 
@@ -348,16 +353,22 @@ const BalanceRegistrationScreen: React.FC<BalanceRegistrationScreenProps> = ({
               </View>
             </View>
 
-            <Button
-              title="Registrar"
-              onPress={handleRegister}
-              disabled={records.length === 0 || Math.abs(totalRecords - difference) > 0.01 || loading}
-              loading={loading}
-              style={styles.registerButton}
-            />
           </Animated.View>
         )}
       </ScrollView>
+
+      {/* ✅ Botón sticky siempre visible en paso 2 */}
+      {currentStep === 2 && (
+        <View style={styles.stickyButtonContainer}>
+          <Button
+            title="Registrar"
+            onPress={handleRegister}
+            disabled={records.length === 0 || Math.abs(totalRecords - difference) > 0.01 || loading}
+            loading={loading}
+            size="large"
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -392,8 +403,32 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: SIZES.lg,
   },
+  scrollContentContainer: {
+    paddingBottom: 120,  // ✅ Espacio para botón sticky
+  },
   stepContainer: {
     flex: 1,
+  },
+  // ✅ Botón sticky siempre visible
+  stickyButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: SIZES.lg,
+    paddingTop: SIZES.md,
+    paddingBottom: Platform.OS === 'ios' ? SIZES.xl : SIZES.lg,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.lightGray,
+    shadowColor: COLORS.dark,
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 10,
   },
   stepTitle: {
     fontSize: 24,

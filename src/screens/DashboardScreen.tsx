@@ -10,6 +10,7 @@ import {
   Animated,
   Platform,
   TextInput,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../contexts/UserContext';
@@ -47,7 +48,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   const { user } = useUser();
   const { currentView, navigateTo, goBack } = useViewNavigation();
   const { messages: chatMessages, input: chatInput, setInput: setChatInput, sendMessage: handleSendMessage } = useChat();
-  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading } = useBalance(user?.id || 'user-id');
+  const { currentBalance, monthlyStats, balanceHistory, loading: balanceLoading, loadCurrentBalance, loadBalanceHistory, loadMonthlyStats } = useBalance(user?.id || 'user-id');
+  
+  // ✅ Estado para pull-to-refresh
+  const [refreshing, setRefreshing] = useState(false);
 
   // Generar datos de score diario como en web
   const generateDailyScoreData = () => {
@@ -313,6 +317,22 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
   }, []);
 
   // Función para transiciones suaves entre vistas
+  // ✅ Función para pull-to-refresh
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        loadCurrentBalance(),
+        loadBalanceHistory(),
+        loadMonthlyStats()
+      ]);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const handleViewChange = (view: 'dashboard' | 'analysis' | 'chat' | 'settings') => {
     Animated.sequence([
       Animated.timing(fadeAnim, {
@@ -539,6 +559,15 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
             { useNativeDriver: true }
           )}
           scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+              colors={[COLORS.primary]}
+              progressBackgroundColor={COLORS.white}
+            />
+          }
         >
           {/* Score Card Principal exactamente como web */}
           <View style={styles.scoreCard}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
+  Animated,
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { COLORS, SIZES, FONTS } from '../constants';
@@ -25,6 +26,8 @@ interface InputProps {
   numberOfLines?: number;
   style?: any;
   currencyFormat?: boolean;
+  autoFocus?: boolean;  // ✅ Nueva prop
+  maxLength?: number;   // ✅ Nueva prop
 }
 
 const Input: React.FC<InputProps> = ({
@@ -41,9 +44,37 @@ const Input: React.FC<InputProps> = ({
   numberOfLines = 1,
   style,
   currencyFormat = false,
+  autoFocus = false,
+  maxLength,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+  
+  // ✅ Animación de shake para errores
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+
+  // ✅ Auto-focus cuando autoFocus es true
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus]);
+
+  // ✅ Animación de shake cuando hay error
+  useEffect(() => {
+    if (error) {
+      Animated.sequence([
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [error]);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -71,11 +102,12 @@ const Input: React.FC<InputProps> = ({
   ];
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { transform: [{ translateX: shakeAnim }] }]}>
       {label && <Text style={styles.label}>{label}</Text>}
       
       <View style={styles.inputContainer}>
         <TextInput
+          ref={inputRef}
           style={inputStyle}
           placeholder={placeholder}
           placeholderTextColor={COLORS.gray}
@@ -87,6 +119,7 @@ const Input: React.FC<InputProps> = ({
           autoCorrect={autoCorrect}
           multiline={multiline}
           numberOfLines={numberOfLines}
+          maxLength={maxLength}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
@@ -107,7 +140,7 @@ const Input: React.FC<InputProps> = ({
       </View>
       
       {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
+    </Animated.View>
   );
 };
 
