@@ -1,34 +1,41 @@
-import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet, Animated, Dimensions, ScrollView, Platform } from 'react-native';
 import { COLORS } from '../constants';
+import { SkeletonChart, SkeletonMetric, SkeletonCard, SkeletonText } from './shared/SkeletonLoader';
+
+const { width } = Dimensions.get('window');
 
 const AnalysisSkeleton: React.FC = () => {
-  const pulseAnim = new Animated.Value(0.3);
+  const pulseAnim = React.useRef(new Animated.Value(0.4)).current;
 
   React.useEffect(() => {
     const pulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 1000,
+          duration: 1500,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
-          toValue: 0.3,
-          duration: 1000,
+          toValue: 0.4,
+          duration: 1500,
           useNativeDriver: true,
         }),
       ])
     );
     pulse.start();
     return () => pulse.stop();
-  }, []);
+  }, [pulseAnim]);
 
-  const SkeletonBox = ({ width, height, style = {} }: { width: number | string; height: number; style?: any }) => (
+  // Mobile first: detectar tamaño de dispositivo
+  const isSmallDevice = useMemo(() => width < 375, []);
+  const cardWidth = useMemo(() => isSmallDevice ? '100%' : '48%', [isSmallDevice]);
+
+  const SkeletonBox = ({ width: boxWidth, height, style = {} }: { width: number | string; height: number; style?: any }) => (
     <Animated.View
       style={[
         {
-          width,
+          width: boxWidth,
           height,
           backgroundColor: COLORS.lightGray,
           opacity: pulseAnim,
@@ -41,84 +48,83 @@ const AnalysisSkeleton: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header Skeleton */}
+      {/* Header Skeleton - Mobile optimized */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <SkeletonBox width={32} height={32} />
-          <SkeletonBox width={96} height={24} style={{ marginLeft: 12 }} />
+          <SkeletonBox width={isSmallDevice ? 28 : 32} height={isSmallDevice ? 28 : 32} />
+          <SkeletonBox width={isSmallDevice ? 80 : 96} height={isSmallDevice ? 20 : 24} style={{ marginLeft: 12 }} />
         </View>
         <View style={styles.headerContent}>
-          <SkeletonBox width={32} height={32} style={{ borderRadius: 16 }} />
-          <SkeletonBox width={80} height={16} style={{ marginLeft: 16 }} />
+          <SkeletonBox width={isSmallDevice ? 28 : 32} height={isSmallDevice ? 28 : 32} style={{ borderRadius: 16 }} />
         </View>
       </View>
 
-      {/* Main Content Skeleton */}
+      {/* Main Content Skeleton - Scrollable */}
+      <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        {/* Title Section */}
+        {/* Title Section - Mobile friendly */}
         <View style={styles.titleSection}>
-          <SkeletonBox width={200} height={28} />
-          <SkeletonBox width={300} height={16} style={{ marginTop: 8 }} />
+          <SkeletonBox width={isSmallDevice ? '85%' : '50%'} height={isSmallDevice ? 24 : 28} />
+          <SkeletonBox width={isSmallDevice ? '100%' : '75%'} height={14} style={{ marginTop: 8 }} />
         </View>
 
-        {/* Metrics Cards */}
-        <View style={styles.metricsGrid}>
+        {/* Summary Card - Destacado */}
+        <SkeletonCard style={{ marginBottom: 20 }} />
+
+        {/* Financial Metrics - Mobile first grid */}
+        <View style={[styles.metricsGrid, isSmallDevice && styles.metricsGridSmall]}>
           {[1, 2, 3, 4].map((item) => (
-            <View key={item} style={styles.metricCard}>
-              <View style={styles.metricHeader}>
-                <SkeletonBox width={48} height={48} />
-                <SkeletonBox width={32} height={32} />
-              </View>
-              <SkeletonBox width={80} height={28} style={{ marginTop: 16 }} />
-              <SkeletonBox width={64} height={16} style={{ marginTop: 8 }} />
-            </View>
+            <SkeletonMetric 
+              key={`metric-${item}`}
+              style={{ 
+                width: cardWidth,
+                marginBottom: 16
+              }}
+            />
           ))}
         </View>
 
-        {/* Charts Section */}
-        <View style={styles.chartsSection}>
-          <View style={styles.chartCard}>
-            <SkeletonBox width={160} height={24} />
-            <SkeletonBox width="100%" height={200} style={{ marginTop: 16 }} />
-          </View>
-          <View style={styles.chartCard}>
-            <SkeletonBox width={140} height={24} />
-            <SkeletonBox width="100%" height={200} style={{ marginTop: 16 }} />
-          </View>
+        {/* Monthly Trend Chart - Gráfico principal */}
+        <SkeletonChart 
+          height={isSmallDevice ? 220 : 260} 
+          style={{ marginBottom: 20 }} 
+        />
+
+        {/* Category Charts - Stack en mobile, grid en desktop */}
+        <View style={[styles.chartsSection, isSmallDevice && styles.chartsSectionSmall]}>
+          <SkeletonChart 
+            height={isSmallDevice ? 200 : 240} 
+            style={{ width: isSmallDevice ? '100%' : '48%', marginBottom: 20 }} 
+          />
+          <SkeletonChart 
+            height={isSmallDevice ? 200 : 240} 
+            style={{ width: isSmallDevice ? '100%' : '48%', marginBottom: 20 }} 
+          />
         </View>
 
-        {/* Analysis Cards */}
-        <View style={styles.analysisCards}>
-          <View style={styles.analysisCard}>
-            <SkeletonBox width={120} height={24} />
-            <SkeletonBox width="100%" height={150} style={{ marginTop: 16 }} />
-          </View>
-          <View style={styles.analysisCard}>
-            <SkeletonBox width={100} height={24} />
-            <SkeletonBox width="100%" height={150} style={{ marginTop: 16 }} />
-          </View>
-        </View>
-
-        {/* Recommendations Section */}
-        <View style={styles.recommendationsSection}>
-          <SkeletonBox width={180} height={24} />
-          <View style={styles.recommendationsList}>
+        {/* Analysis Insights Section */}
+        <View style={styles.insightsSection}>
+          <SkeletonBox width={isSmallDevice ? 140 : 180} height={20} style={{ marginBottom: 16 }} />
+          <View style={[styles.insightsGrid, isSmallDevice && styles.insightsGridSmall]}>
             {[1, 2, 3].map((item) => (
-              <View key={item} style={styles.recommendationItem}>
-                <View style={styles.recommendationLeft}>
-                  <SkeletonBox width={40} height={40} />
-                  <View style={styles.recommendationText}>
-                    <SkeletonBox width={120} height={16} />
-                    <SkeletonBox width={200} height={12} style={{ marginTop: 4 }} />
-                    <SkeletonBox width={160} height={12} style={{ marginTop: 4 }} />
-                  </View>
-                </View>
-                <SkeletonBox width={24} height={24} />
+              <View 
+                key={`insight-${item}`} 
+                style={[
+                  styles.insightCard,
+                  isSmallDevice && styles.insightCardSmall
+                ]}
+              >
+                <SkeletonBox width={32} height={32} style={{ marginBottom: 12 }} />
+                <SkeletonText lines={3} width="80%" />
               </View>
             ))}
           </View>
         </View>
+
+        {/* Bottom Spacer para navegación flotante */}
+        <View style={{ height: 100 }} />
       </View>
+      </ScrollView>
     </View>
   );
 };
@@ -137,82 +143,88 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  scrollContent: {
+    flex: 1,
+  },
   content: {
     flex: 1,
     padding: 16,
+    paddingBottom: 80,
   },
   titleSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
+  // Mobile first grid
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  metricCard: {
-    width: '48%',
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
+  metricsGridSmall: {
+    flexDirection: 'column',
   },
-  metricHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  // Charts section - Stack en mobile
   chartsSection: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  chartCard: {
-    width: '48%',
+  chartsSectionSmall: {
+    flexDirection: 'column',
+  },
+  // Insights section
+  insightsSection: {
     backgroundColor: COLORS.white,
     padding: 16,
     borderRadius: 12,
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
-  analysisCards: {
+  insightsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    flexWrap: 'wrap',
   },
-  analysisCard: {
-    width: '48%',
-    backgroundColor: COLORS.white,
-    padding: 16,
+  insightsGridSmall: {
+    flexDirection: 'column',
+  },
+  insightCard: {
+    width: '31%',
+    padding: 12,
+    backgroundColor: COLORS.grayScale[100],
     borderRadius: 12,
+    marginBottom: 12,
   },
-  recommendationsSection: {
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 12,
-  },
-  recommendationsList: {
-    marginTop: 16,
-  },
-  recommendationItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-  },
-  recommendationLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  recommendationText: {
-    marginLeft: 12,
-    flex: 1,
+  insightCardSmall: {
+    width: '100%',
   },
 });
 

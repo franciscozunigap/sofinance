@@ -1,34 +1,41 @@
-import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet, Animated, Dimensions, ScrollView, Platform } from 'react-native';
 import { COLORS } from '../constants';
+import { SkeletonCard, SkeletonChart, SkeletonMetric, SkeletonTransaction } from './shared/SkeletonLoader';
+
+const { width } = Dimensions.get('window');
 
 const AppSkeleton: React.FC = () => {
-  const pulseAnim = new Animated.Value(0.3);
+  const pulseAnim = React.useRef(new Animated.Value(0.4)).current;
 
   React.useEffect(() => {
     const pulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 1000,
+          duration: 1500, // Más suave
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
-          toValue: 0.3,
-          duration: 1000,
+          toValue: 0.4,
+          duration: 1500,
           useNativeDriver: true,
         }),
       ])
     );
     pulse.start();
     return () => pulse.stop();
-  }, []);
+  }, [pulseAnim]);
 
-  const SkeletonBox = ({ width, height, style = {} }: { width: number | string; height: number; style?: any }) => (
+  // Detectar si es mobile pequeño para adaptar layout
+  const isSmallDevice = useMemo(() => width < 375, []);
+  const cardWidth = useMemo(() => isSmallDevice ? '100%' : '48%', [isSmallDevice]);
+
+  const SkeletonBox = ({ width: boxWidth, height, style = {} }: { width: number | string; height: number; style?: any }) => (
     <Animated.View
       style={[
         {
-          width,
+          width: boxWidth,
           height,
           backgroundColor: COLORS.lightGray,
           opacity: pulseAnim,
@@ -41,100 +48,70 @@ const AppSkeleton: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header Skeleton */}
+      {/* Header Skeleton - Mobile first */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <SkeletonBox width={32} height={32} />
-          <SkeletonBox width={96} height={24} style={{ marginLeft: 12 }} />
+          <SkeletonBox width={isSmallDevice ? 28 : 32} height={isSmallDevice ? 28 : 32} />
+          <SkeletonBox width={isSmallDevice ? 80 : 96} height={isSmallDevice ? 20 : 24} style={{ marginLeft: 12 }} />
         </View>
         <View style={styles.headerContent}>
-          <SkeletonBox width={32} height={32} style={{ borderRadius: 16 }} />
-          <SkeletonBox width={80} height={16} style={{ marginLeft: 16 }} />
+          <SkeletonBox width={isSmallDevice ? 28 : 32} height={isSmallDevice ? 28 : 32} style={{ borderRadius: 16 }} />
         </View>
       </View>
 
-      {/* Main Content Skeleton */}
+      {/* Main Content Skeleton - Scrollable para mobile */}
+      <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        {/* Title Skeleton */}
+        {/* Title Skeleton - Mobile friendly */}
         <View style={styles.titleSection}>
-          <SkeletonBox width={256} height={32} />
-          <SkeletonBox width={384} height={16} style={{ marginTop: 8 }} />
+          <SkeletonBox width={isSmallDevice ? '90%' : '60%'} height={isSmallDevice ? 24 : 32} />
+          <SkeletonBox width={isSmallDevice ? '100%' : '80%'} height={14} style={{ marginTop: 8 }} />
         </View>
 
-        {/* Cards Grid Skeleton */}
-        <View style={styles.cardsGrid}>
+        {/* Balance Score Card - Destacado en mobile */}
+        <SkeletonCard style={{ marginBottom: 20 }} />
+
+        {/* Metrics Grid - Mobile first: stack en pequeño, grid en grande */}
+        <View style={[styles.metricsGrid, isSmallDevice && styles.metricsGridSmall]}>
           {[1, 2, 3, 4].map((item) => (
-            <View key={item} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <SkeletonBox width={48} height={48} />
-                <SkeletonBox width={32} height={32} />
-              </View>
-              <SkeletonBox width={80} height={32} style={{ marginTop: 16 }} />
-              <SkeletonBox width={64} height={16} style={{ marginTop: 8 }} />
-            </View>
+            <SkeletonMetric 
+              key={`metric-${item}`} 
+              style={{ 
+                width: cardWidth, 
+                marginBottom: 16 
+              }} 
+            />
           ))}
         </View>
 
-        {/* Charts Grid Skeleton */}
-        <View style={styles.chartsGrid}>
-          <View style={styles.chartCard}>
-            <SkeletonBox width={128} height={24} />
-            <SkeletonBox width="100%" height={256} style={{ marginTop: 16 }} />
-          </View>
-          <View style={styles.chartCard}>
-            <SkeletonBox width={160} height={24} />
-            <SkeletonBox width="100%" height={256} style={{ marginTop: 16 }} />
-          </View>
-        </View>
+        {/* Balance Chart - Full width en mobile */}
+        <SkeletonChart height={isSmallDevice ? 220 : 280} style={{ marginBottom: 20 }} />
 
-        {/* Weekly Progress Skeleton */}
-        <View style={styles.weeklyProgress}>
-          <SkeletonBox width={192} height={24} />
+        {/* Weekly Progress - Responsive */}
+        <View style={styles.weeklySection}>
+          <SkeletonBox width={isSmallDevice ? 140 : 180} height={20} style={{ marginBottom: 16 }} />
           <View style={styles.weeklyGrid}>
             {[1, 2, 3, 4, 5, 6, 7].map((item) => (
-              <View key={item} style={styles.weeklyItem}>
-                <SkeletonBox width={32} height={32} style={{ borderRadius: 16 }} />
-                <SkeletonBox width={48} height={24} style={{ marginTop: 8 }} />
-                <SkeletonBox width={64} height={12} style={{ marginTop: 4 }} />
+              <View key={`day-${item}`} style={styles.weeklyItem}>
+                <SkeletonBox width={isSmallDevice ? 28 : 32} height={isSmallDevice ? 28 : 32} style={{ borderRadius: 16, marginBottom: 4 }} />
+                <SkeletonBox width={isSmallDevice ? 36 : 48} height={12} />
               </View>
             ))}
           </View>
         </View>
 
-        {/* Transactions Skeleton */}
-        <View style={styles.transactions}>
-          <SkeletonBox width={160} height={24} />
-          <View style={styles.transactionsList}>
-            {[1, 2, 3, 4].map((item) => (
-              <View key={item} style={styles.transactionItem}>
-                <View style={styles.transactionLeft}>
-                  <SkeletonBox width={40} height={40} />
-                  <View style={styles.transactionText}>
-                    <SkeletonBox width={96} height={16} />
-                    <SkeletonBox width={64} height={12} style={{ marginTop: 4 }} />
-                  </View>
-                </View>
-                <SkeletonBox width={80} height={16} />
-              </View>
-            ))}
-          </View>
+        {/* Recent Transactions - Using new component */}
+        <View style={styles.transactionsSection}>
+          <SkeletonBox width={isSmallDevice ? 180 : 200} height={20} style={{ marginBottom: 16 }} />
+          {[1, 2, 3, 4].map((item) => (
+            <SkeletonTransaction key={`trans-${item}`} style={{ marginBottom: 8 }} />
+          ))}
         </View>
 
-        {/* Recommendations Skeleton */}
-        <View style={styles.recommendations}>
-          <SkeletonBox width={128} height={24} />
-          <View style={styles.recommendationsGrid}>
-            {[1, 2, 3].map((item) => (
-              <View key={item} style={styles.recommendationItem}>
-                <SkeletonBox width={32} height={32} />
-                <SkeletonBox width={96} height={20} style={{ marginTop: 12 }} />
-                <SkeletonBox width="100%" height={12} style={{ marginTop: 4 }} />
-                <SkeletonBox width="75%" height={12} style={{ marginTop: 4 }} />
-              </View>
-            ))}
-          </View>
-        </View>
+        {/* Bottom Spacer para navegación flotante */}
+        <View style={{ height: 100 }} />
       </View>
+      </ScrollView>
     </View>
   );
 };
@@ -153,98 +130,87 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  scrollContent: {
+    flex: 1,
+  },
   content: {
     flex: 1,
     padding: 16,
+    paddingBottom: 80, // Espacio para navegación flotante
   },
   titleSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  cardsGrid: {
+  // Metrics Grid - Mobile first
+  metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  card: {
-    width: '48%',
+  metricsGridSmall: {
+    flexDirection: 'column', // Stack en dispositivos pequeños
+  },
+  // Weekly Progress - Responsive
+  weeklySection: {
     backgroundColor: COLORS.white,
     padding: 16,
     borderRadius: 12,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  chartsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  chartCard: {
-    width: '48%',
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 12,
-  },
-  weeklyProgress: {
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   weeklyGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   weeklyItem: {
     alignItems: 'center',
+    flex: 1,
   },
-  transactions: {
+  // Transactions Section
+  transactionsSection: {
     backgroundColor: COLORS.white,
     padding: 16,
     borderRadius: 12,
-    marginBottom: 24,
-  },
-  transactionsList: {
-    marginTop: 16,
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-  },
-  transactionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  transactionText: {
-    marginLeft: 12,
-  },
-  recommendations: {
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 12,
-  },
-  recommendationsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-  },
-  recommendationItem: {
-    width: '30%',
-    alignItems: 'center',
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
 });
 

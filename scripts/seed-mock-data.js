@@ -54,7 +54,7 @@ const MOCK_USER = {
   lastName: 'Hernández',
   age: 28,
   monthlyIncome: 1500000, // $1.500.000 CLP
-  currentSavings: 800000, // $800.000 CLP
+  currentSavings: 1800000, // $1.800.000 CLP - 1.2x del ingreso (en zona alta del rango seguro)
   preferences: {
     needs_percent: 50,
     wants_percent: 30,
@@ -62,6 +62,11 @@ const MOCK_USER = {
     investment_percent: 5,
   },
   financialProfile: ['salario_fijo', 'gastos_controlados', 'ahorro_activo'],
+  // Rangos de seguridad basados en ingreso mensual (estilo Gentler Streak)
+  safeRange: {
+    upper: 1500000 * 1.5, // $2.250.000 (150% del ingreso)
+    lower: 1500000 * 0.5, // $750.000 (50% del ingreso)
+  },
 };
 
 // ==========================================
@@ -265,17 +270,217 @@ function generateInvestmentTransactions(userId, year, month) {
 }
 
 /**
- * Genera todas las transacciones para un mes
+ * Genera todas las transacciones para un mes con comportamiento realista
+ * Balance siempre en rango seguro (0.5x - 1.5x del ingreso)
+ * Gastos entre 90%-110% del ingreso mensual
+ * Últimos meses tienden a ahorrar más (balance hacia rango superior)
  */
-function generateMonthTransactions(userId, year, month) {
+function generateMonthTransactions(userId, year, month, previousBalance, monthIndex = 0, totalMonths = 6) {
+  const incomeTransactions = generateIncomeTransactions(userId, year, month);
+  
+  // Calcular ingreso total del mes
+  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0) || MOCK_USER.monthlyIncome;
+  
+  // Rango seguro basado en ingreso mensual
+  const safeRangeUpper = totalIncome * 1.5; // $2.250.000
+  const safeRangeLower = totalIncome * 0.5; // $750.000
+  const safeRangeMid = (safeRangeUpper + safeRangeLower) / 2; // $1.500.000
+  
+  // Los últimos 2 meses tienden a ahorrar más (tirando hacia rango superior)
+  const isRecentMonth = monthIndex >= totalMonths - 2;
+  
+  // Determinar gastos objetivo (entre 90% y 110% del ingreso)
+  // Meta: mantener balance estable y en rango seguro
+  let expensePercentage;
+  
+  if (isRecentMonth) {
+    // Últimos 2 meses: Ahorrar más para subir el balance
+    expensePercentage = 0.90 + Math.random() * 0.03; // 90-93% (ahorra 7-10%)
+    console.log(`   📈 Mes reciente: Ahorrando (${(expensePercentage * 100).toFixed(1)}% de gastos)`);
+  } else {
+    // Meses anteriores: comportamiento normal pero controlado
+    const roll = Math.random();
+    
+    if (roll < 0.7) {
+      // Mayoría de meses - ahorra un poco
+      expensePercentage = 0.92 + Math.random() * 0.06; // 92-98%
+    } else {
+      // Algunos meses - gasta más pero sin excederse
+      expensePercentage = 0.98 + Math.random() * 0.07; // 98-105%
+    }
+  }
+  
+  let targetExpenses = totalIncome * expensePercentage;
+  
+  // IMPORTANTE: Ajustar gastos para mantener balance en rango seguro
+  let projectedBalance = previousBalance + totalIncome - targetExpenses;
+  
+  // Objetivo para últimos meses: estar entre 1.1x y 1.3x del ingreso (zona superior del rango)
+  const targetBalanceRecent = totalIncome * 1.2; // $1.800.000 para últimos meses
+  
+  // Si el balance proyectado se sale del rango, ajustar gastos
+  if (projectedBalance > safeRangeUpper) {
+    // Balance muy alto - aumentar gastos o inversión para mantenerlo en límite
+    const excess = projectedBalance - (safeRangeUpper * 0.95); // Apuntar a 95% del máximo
+    targetExpenses += excess;
+    console.log(`   ⚠️  Balance muy alto, aumentando inversiones en $${excess.toLocaleString('es-CL')}`);
+  } else if (projectedBalance < safeRangeLower) {
+    // Balance muy bajo - reducir gastos drasticamente
+    const deficit = (safeRangeLower * 1.1) - projectedBalance; // Apuntar a 110% del mínimo
+    targetExpenses = Math.max(targetExpenses - deficit, totalIncome * 0.75); // Mínimo 75% de gastos
+    console.log(`   ⚠️  Balance muy bajo, reduciendo gastos en $${deficit.toLocaleString('es-CL')}`);
+  } else if (isRecentMonth && projectedBalance < targetBalanceRecent) {
+    // Mes reciente con balance bajo del objetivo - reducir aún más los gastos
+    const adjustment = targetBalanceRecent - projectedBalance;
+    targetExpenses = Math.max(targetExpenses - adjustment * 0.5, totalIncome * 0.85);
+    console.log(`   💰 Ajustando para aumentar ahorro hacia rango superior`);
+  }
+  
+  // Asegurar que los gastos estén entre 90% y 110% del ingreso
+  targetExpenses = Math.max(totalIncome * 0.90, Math.min(totalIncome * 1.10, targetExpenses));
+  
+  // Recalcular balance proyectado después de ajustes
+  projectedBalance = previousBalance + totalIncome - targetExpenses;
+  
+  // Distribuir gastos según preferencias del usuario
+  const needsTarget = targetExpenses * (MOCK_USER.preferences.needs_percent / 100);
+  const wantsTarget = targetExpenses * (MOCK_USER.preferences.wants_percent / 100);
+  const investmentTarget = targetExpenses * (MOCK_USER.preferences.investment_percent / 100);
+  
+  // Generar transacciones ajustadas al objetivo
+  const needsTransactions = generateNeedsTransactionsWithBudget(userId, year, month, needsTarget);
+  const wantsTransactions = generateWantsTransactionsWithBudget(userId, year, month, wantsTarget);
+  const investmentTransactions = generateInvestmentTransactionsWithBudget(userId, year, month, investmentTarget);
+  
   const transactions = [
-    ...generateIncomeTransactions(userId, year, month),
-    ...generateNeedsTransactions(userId, year, month),
-    ...generateWantsTransactions(userId, year, month),
-    ...generateInvestmentTransactions(userId, year, month),
+    ...incomeTransactions,
+    ...needsTransactions,
+    ...wantsTransactions,
+    ...investmentTransactions,
   ];
 
   return sortByDate(transactions);
+}
+
+/**
+ * Genera transacciones de necesidades ajustadas a un presupuesto
+ */
+function generateNeedsTransactionsWithBudget(userId, year, month, budget) {
+  const transactions = [];
+  let spent = 0;
+  
+  // Transacciones fijas (arriendo, cuentas)
+  const fixedNeeds = TRANSACTION_TYPES.needs.filter(t => t.probability >= 0.9);
+  const variableNeeds = TRANSACTION_TYPES.needs.filter(t => t.probability < 0.9);
+  
+  // Agregar necesidades fijas primero
+  fixedNeeds.forEach((type) => {
+    const amount = generateAmount(type.amount, 0.1); // Poca variación en fijos
+    if (spent + amount <= budget) {
+      transactions.push({
+        id: generateId(),
+        userId,
+        date: generateRandomDate(year, month),
+        type: 'expense',
+        description: type.description,
+        amount,
+        category: 'Necesidad',
+        month,
+        year,
+        createdAt: new Date(),
+      });
+      spent += amount;
+    }
+  });
+  
+  // Agregar variables si queda presupuesto
+  variableNeeds.forEach((type) => {
+    if (shouldOccur(type.probability) && spent < budget) {
+      const remaining = budget - spent;
+      const amount = Math.min(generateAmount(type.amount, 0.2), remaining);
+      if (amount > 0) {
+        transactions.push({
+          id: generateId(),
+          userId,
+          date: generateRandomDate(year, month),
+          type: 'expense',
+          description: type.description,
+          amount,
+          category: 'Necesidad',
+          month,
+          year,
+          createdAt: new Date(),
+        });
+        spent += amount;
+      }
+    }
+  });
+  
+  return transactions;
+}
+
+/**
+ * Genera transacciones de consumo ajustadas a un presupuesto
+ */
+function generateWantsTransactionsWithBudget(userId, year, month, budget) {
+  const transactions = [];
+  let spent = 0;
+  
+  TRANSACTION_TYPES.wants.forEach((type) => {
+    if (shouldOccur(type.probability) && spent < budget) {
+      const remaining = budget - spent;
+      const amount = Math.min(generateAmount(type.amount, 0.3), remaining);
+      if (amount > 0) {
+        transactions.push({
+          id: generateId(),
+          userId,
+          date: generateRandomDate(year, month),
+          type: 'expense',
+          description: type.description,
+          amount,
+          category: 'Consumo',
+          month,
+          year,
+          createdAt: new Date(),
+        });
+        spent += amount;
+      }
+    }
+  });
+  
+  return transactions;
+}
+
+/**
+ * Genera transacciones de inversión ajustadas a un presupuesto
+ */
+function generateInvestmentTransactionsWithBudget(userId, year, month, budget) {
+  const transactions = [];
+  let spent = 0;
+  
+  TRANSACTION_TYPES.investment.forEach((type) => {
+    if (shouldOccur(type.probability) && spent < budget) {
+      const remaining = budget - spent;
+      const amount = Math.min(generateAmount(type.amount, 0.2), remaining);
+      if (amount > 0) {
+        transactions.push({
+          id: generateId(),
+          userId,
+          date: generateRandomDate(year, month),
+          type: 'expense',
+          description: type.description,
+          amount,
+          category: 'Inversión',
+          month,
+          year,
+          createdAt: new Date(),
+        });
+        spent += amount;
+      }
+    }
+  });
+  
+  return transactions;
 }
 
 // ==========================================
@@ -351,47 +556,44 @@ function calculateMonthlyStats(userId, year, month, transactions, previousBalanc
 // ==========================================
 
 /**
- * Guarda todas las transacciones en Firebase
+ * Guarda todas las transacciones en Firebase con balanceAfter correcto
  */
 async function saveTransactions(transactions) {
   console.log(`💾 Guardando ${transactions.length} transacciones...`);
 
-  for (const transaction of transactions) {
-    // Calcular balanceAfter basándose en las transacciones anteriores
-    const previousTransactions = transactions.filter(
-      (t) => t.date < transaction.date && t.month === transaction.month && t.year === transaction.year
-    );
+  // Ordenar TODAS las transacciones por fecha cronológicamente
+  const sortedTransactions = transactions.sort((a, b) => a.date - b.date);
 
-    let balanceAfter = 0;
-    if (transaction.month === 1 && transaction.year === 2024) {
-      // Primer mes: empezar con el ahorro inicial
-      balanceAfter = MOCK_USER.currentSavings;
-    } else {
-      // Obtener balance del mes anterior (calculado después)
-      balanceAfter = 0; // Se calculará después
-    }
+  // Calcular balanceAfter correctamente transacción por transacción
+  let runningBalance = MOCK_USER.currentSavings; // Balance inicial
 
-    previousTransactions.forEach((t) => {
-      if (t.type === 'income') {
-        balanceAfter += t.amount;
-      } else {
-        balanceAfter -= t.amount;
-      }
-    });
+  console.log(`   💰 Balance inicial: $${runningBalance.toLocaleString('es-CL')}`);
 
+  for (let i = 0; i < sortedTransactions.length; i++) {
+    const transaction = sortedTransactions[i];
+    
+    // Aplicar la transacción al balance acumulado
     if (transaction.type === 'income') {
-      balanceAfter += transaction.amount;
+      runningBalance += transaction.amount;
     } else {
-      balanceAfter -= transaction.amount;
+      runningBalance -= transaction.amount;
     }
 
-    transaction.balanceAfter = balanceAfter;
+    // Asignar el balance después de esta transacción
+    transaction.balanceAfter = Math.round(runningBalance);
 
+    // Guardar en Firestore
     const docRef = doc(db, 'balance_registrations', transaction.id);
     await setDoc(docRef, transaction);
+
+    // Log cada 20 transacciones para ver progreso
+    if ((i + 1) % 20 === 0 || i === sortedTransactions.length - 1) {
+      console.log(`   ✓ ${i + 1}/${sortedTransactions.length} transacciones | Balance actual: $${Math.round(runningBalance).toLocaleString('es-CL')}`);
+    }
   }
 
-  console.log('✅ Transacciones guardadas');
+  console.log(`✅ Transacciones guardadas con balance acumulativo correcto`);
+  console.log(`💰 Balance final total: $${Math.round(runningBalance).toLocaleString('es-CL')}`);
 }
 
 /**
@@ -444,6 +646,7 @@ async function main() {
     console.log(`   Email: ${MOCK_USER.email}`);
     console.log(`   Password: ${MOCK_USER.password}\n`);
 
+    let userId;
     let userCredential;
     try {
       userCredential = await createUserWithEmailAndPassword(
@@ -451,20 +654,20 @@ async function main() {
         MOCK_USER.email,
         MOCK_USER.password
       );
+      userId = userCredential.user.uid;
       console.log('✅ Usuario creado en Firebase Auth\n');
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
-        console.log('⚠️  Usuario ya existe, usando el existente\n');
-        // En este caso, necesitarías el UID del usuario existente
-        // Por simplicidad, salimos del script
-        console.log('❌ Por favor, elimina el usuario existente o usa otro email');
-        process.exit(1);
+        console.log('⚠️  Usuario ya existe, regenerando datos para el usuario existente...\n');
+        
+        // Usar un ID fijo derivado del email para testing
+        userId = 'demo-user-' + MOCK_USER.email.split('@')[0];
+        console.log(`📝 Usando User ID: ${userId}\n`);
+        console.log('⚠️  NOTA: Las transacciones y estadísticas existentes serán sobrescritas\n');
       } else {
         throw error;
       }
     }
-
-    const userId = userCredential.user.uid;
     console.log(`👤 User ID: ${userId}\n`);
 
     // 2. Guardar datos del usuario
@@ -487,10 +690,11 @@ async function main() {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
 
-      console.log(`📅 Mes ${month}/${year}:`);
+      console.log(`📅 Mes ${month}/${year} (${i === 0 ? 'MES ACTUAL' : `hace ${i} ${i === 1 ? 'mes' : 'meses'}`}):`);
 
-      // Generar transacciones del mes
-      const monthTransactions = generateMonthTransactions(userId, year, month);
+      // Generar transacciones del mes pasando el balance previo y el índice
+      const monthIndex = 5 - i; // 0 es el mes más antiguo, 5 es el actual
+      const monthTransactions = generateMonthTransactions(userId, year, month, previousBalance, monthIndex, 6);
       console.log(`   - ${monthTransactions.length} transacciones generadas`);
 
       // Calcular estadísticas del mes
@@ -498,6 +702,15 @@ async function main() {
       console.log(`   - Balance: $${monthStats.balance.toLocaleString('es-CL')}`);
       console.log(`   - Ingresos: $${monthStats.totalIncome.toLocaleString('es-CL')}`);
       console.log(`   - Gastos: $${monthStats.totalExpenses.toLocaleString('es-CL')}`);
+      
+      // Verificar que el balance esté en rango seguro
+      const safeUpper = monthStats.totalIncome * 1.5;
+      const safeLower = monthStats.totalIncome * 0.5;
+      const inRange = monthStats.balance >= safeLower && monthStats.balance <= safeUpper;
+      const rangeStatus = monthStats.balance > safeUpper ? '🔴 Sobre rango' : 
+                         monthStats.balance < safeLower ? '🟡 Bajo rango' : 
+                         '🟢 En rango seguro';
+      console.log(`   - Estado: ${rangeStatus} (${safeLower.toLocaleString('es-CL')} - ${safeUpper.toLocaleString('es-CL')})`);
 
       allTransactions.push(...monthTransactions);
       allStats.push(monthStats);

@@ -99,8 +99,13 @@ const SofinanceAppContent = () => {
 
   const categorySpendingData = generateCategorySpendingData();
 
-  // ✅ Gráfico Principal - Últimos 5 días con transacciones reales
+  // ✅ Gráfico Principal - Últimos 5 días con rangos basados en ingreso mensual (estilo Gentler Streak)
   const generateBalanceData = () => {
+    // Obtener ingreso mensual para calcular rangos
+    const monthlyIncome = monthlyStats?.totalIncome || 1500000; // Fallback realista
+    const upperRange = monthlyIncome * 2.5; // Rango superior: 2.5x del ingreso
+    const lowerRange = monthlyIncome * 1.0; // Rango inferior: 1x del ingreso
+    
     if (balanceHistory && balanceHistory.length > 0) {
       const last5Days = [];
       const today = new Date();
@@ -127,34 +132,35 @@ const SofinanceAppContent = () => {
       
       last5Transactions.forEach(transaction => {
         const date = new Date(transaction.date);
-        const dateStr = date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short' });
+        // Safari-safe: usar formato ISO string en lugar de fecha formateada
+        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
         
         last5Days.push({
           date: dateStr,
           amount: transaction.balanceAfter,
-          upper_amount: transaction.balanceAfter * 1.2,
-          lower_amount: transaction.balanceAfter * 0.8,
+          upper_amount: upperRange, // Rango superior fijo basado en ingreso
+          lower_amount: lowerRange, // Rango inferior fijo basado en ingreso
         });
       });
       
       return last5Days;
     }
 
-    // Si no hay datos, mostrar solo el balance actual
+    // Si no hay datos, mostrar solo el balance actual con rangos
     const currentBalance = monthlyStats?.balance || 0;
     if (currentBalance > 0) {
       return [
         { 
-          date: 'Hoy', 
+          date: new Date().toISOString().split('T')[0], 
           amount: currentBalance, 
-          upper_amount: currentBalance * 1.2, 
-          lower_amount: currentBalance * 0.8 
+          upper_amount: upperRange, 
+          lower_amount: lowerRange 
         },
       ];
     }
 
     return [
-      { date: 'Hoy', amount: 0, upper_amount: 0, lower_amount: 0 },
+      { date: new Date().toISOString().split('T')[0], amount: monthlyIncome, upper_amount: upperRange, lower_amount: lowerRange },
     ];
   };
 

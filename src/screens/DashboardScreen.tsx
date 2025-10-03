@@ -253,17 +253,23 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
     }
   };
 
-  // Datos de balance diario - generar últimos 7 días con datos reales donde estén disponibles
+  // Datos de balance diario - rangos basados en ingreso mensual (estilo Gentler Streak)
   const generateBalanceData = () => {
+    // Obtener ingreso mensual para calcular rangos fijos
+    const monthlyIncome = monthlyStats?.totalIncome || 1500000; // Fallback realista
+    const upperRange = monthlyIncome * 2.5; // Rango superior: 2.5x del ingreso
+    const lowerRange = monthlyIncome * 1.0; // Rango inferior: 1x del ingreso
+    
     if (balanceHistory.length === 0) {
-      // Si no hay datos reales, usar datos mock
+      // Si no hay datos reales, usar datos mock con fechas en formato ISO (Safari-safe)
+      const today = new Date();
       return monthlyStats ? [
-        { date: 'Hoy', amount: currentBalance, upper_amount: currentBalance * 1.2, lower_amount: currentBalance * 0.8 },
+        { date: today.toISOString().split('T')[0], amount: currentBalance, upper_amount: upperRange, lower_amount: lowerRange },
       ] : [
-        { date: '2024-01-15', amount: 1250000, upper_amount: 1500000, lower_amount: 1000000 },
-        { date: '2024-01-16', amount: 1280000, upper_amount: 1500000, lower_amount: 1000000 },
-        { date: '2024-01-17', amount: 980000, upper_amount: 1500000, lower_amount: 1000000 },
-        { date: '2024-01-18', amount: 1350000, upper_amount: 1500000, lower_amount: 1000000 },
+        { date: new Date(2024, 0, 15).toISOString().split('T')[0], amount: 1250000, upper_amount: upperRange, lower_amount: lowerRange },
+        { date: new Date(2024, 0, 16).toISOString().split('T')[0], amount: 1280000, upper_amount: upperRange, lower_amount: lowerRange },
+        { date: new Date(2024, 0, 17).toISOString().split('T')[0], amount: 980000, upper_amount: upperRange, lower_amount: lowerRange },
+        { date: new Date(2024, 0, 18).toISOString().split('T')[0], amount: 1350000, upper_amount: upperRange, lower_amount: lowerRange },
       ];
     }
 
@@ -283,26 +289,26 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ onLogout }) => {
       });
       
       if (dayData) {
-        // Si hay datos para este día, usarlos
+        // Safari-safe: usar formato ISO string
+        const isoDateStr = date.toISOString().split('T')[0];
+        // Si hay datos para este día, usarlos con rangos fijos
         last7Days.push({
-          date: dateStr,
+          date: isoDateStr,
           amount: dayData.balanceAfter,
-          upper_amount: dayData.balanceAfter * 1.2,
-          lower_amount: dayData.balanceAfter * 0.8,
-        });
-      } else {
-        // Si no hay datos para este día, crear entrada sin punto
-        const lastKnownBalance = balanceHistory[0]?.balanceAfter || currentBalance;
-        last7Days.push({
-          date: dateStr,
-          amount: undefined, // Sin punto en el gráfico
-          upper_amount: lastKnownBalance * 1.2,
-          lower_amount: lastKnownBalance * 0.8,
+          upper_amount: upperRange, // Rango superior fijo basado en ingreso
+          lower_amount: lowerRange, // Rango inferior fijo basado en ingreso
         });
       }
     }
     
-    return last7Days;
+    // Safari-safe: usar formato ISO string
+    const todayStr = today.toISOString().split('T')[0];
+    return last7Days.length > 0 ? last7Days : [{
+      date: todayStr,
+      amount: currentBalance,
+      upper_amount: upperRange,
+      lower_amount: lowerRange
+    }];
   };
 
   const balanceData = generateBalanceData();

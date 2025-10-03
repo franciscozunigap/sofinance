@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Modal,
+  Linking,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, BORDER_RADIUS } from '../constants';
+import { useUser } from '../contexts/UserContext';
 
 interface SettingsComponentProps {
   onBack: () => void;
@@ -16,6 +20,10 @@ interface SettingsComponentProps {
 }
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({ onBack, onLogout }) => {
+  const { user } = useUser();
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const contactEmail = 'francisco.zunigap@usm.cl';
+
   const handleLogout = () => {
     Alert.alert(
       'Cerrar Sesión',
@@ -34,88 +42,130 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ onBack, onLogout 
     );
   };
 
+  const handleSendEmail = () => {
+    Linking.openURL(`mailto:${contactEmail}`);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header de Ajustes */}
+      {/* Header Simplificado */}
       <View style={styles.chatHeader}>
         <View style={styles.chatHeaderContent}>
           <TouchableOpacity 
             onPress={onBack}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>←</Text>
+            <Ionicons name="arrow-back" size={24} color={COLORS.dark} />
           </TouchableOpacity>
           <View style={styles.chatUserInfo}>
             <View style={styles.chatAvatar}>
-              <Text style={styles.chatAvatarText}>⚙️</Text>
+              <Ionicons name="person" size={20} color={COLORS.white} />
             </View>
             <View>
-              <Text style={styles.chatUserName}>Ajustes</Text>
+              <Text style={styles.chatUserName}>Mi Cuenta</Text>
               <Text style={styles.chatUserStatus}>Configuración</Text>
             </View>
           </View>
         </View>
       </View>
 
-      {/* Contenido de Ajustes */}
-      <ScrollView style={styles.settingsContent}>
+      {/* Contenido Simplificado */}
+      <ScrollView style={styles.settingsContent} showsVerticalScrollIndicator={false}>
+        {/* Información del Usuario */}
+        {user && (
+          <View style={styles.userInfoCard}>
+            <View style={styles.userAvatarLarge}>
+              <Ionicons name="person" size={32} color={COLORS.white} />
+            </View>
+            <Text style={styles.userName}>{user.name || 'Usuario'}</Text>
+            <Text style={styles.userEmail}>{user.email || 'usuario@ejemplo.com'}</Text>
+          </View>
+        )}
+
+        {/* Menu Items Simplificado */}
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>Cuenta</Text>
-          
-          <TouchableOpacity style={styles.settingsItem}>
+          {/* Ayuda */}
+          <TouchableOpacity 
+            style={styles.settingsItem}
+            onPress={() => setShowHelpModal(true)}
+          >
             <View style={styles.settingsItemLeft}>
-              <Ionicons name="person-outline" size={24} color={COLORS.gray} />
-              <Text style={styles.settingsItemText}>Perfil</Text>
+              <View style={[styles.iconContainer, { backgroundColor: '#DBEAFE' }]}>
+                <Ionicons name="help-circle" size={24} color={COLORS.primary} />
+              </View>
+              <View style={styles.itemTextContainer}>
+                <Text style={styles.settingsItemText}>Ayuda</Text>
+                <Text style={styles.settingsItemSubtext}>Contacta con soporte</Text>
+              </View>
             </View>
             <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingsItem}>
+          {/* Cerrar Sesión */}
+          <TouchableOpacity 
+            style={[styles.settingsItem, styles.logoutItem]} 
+            onPress={handleLogout}
+          >
             <View style={styles.settingsItemLeft}>
-              <Ionicons name="shield-outline" size={24} color={COLORS.gray} />
-              <Text style={styles.settingsItemText}>Privacidad</Text>
+              <View style={[styles.iconContainer, { backgroundColor: '#FEE2E2' }]}>
+                <Ionicons name="log-out" size={24} color={COLORS.danger} />
+              </View>
+              <View style={styles.itemTextContainer}>
+                <Text style={[styles.settingsItemText, styles.logoutText]}>Cerrar Sesión</Text>
+                <Text style={styles.logoutSubtext}>Salir de tu cuenta</Text>
+              </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingsItem}>
-            <View style={styles.settingsItemLeft}>
-              <Ionicons name="notifications-outline" size={24} color={COLORS.gray} />
-              <Text style={styles.settingsItemText}>Notificaciones</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>Aplicación</Text>
-          
-          <TouchableOpacity style={styles.settingsItem}>
-            <View style={styles.settingsItemLeft}>
-              <Ionicons name="help-circle-outline" size={24} color={COLORS.gray} />
-              <Text style={styles.settingsItemText}>Ayuda</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingsItem}>
-            <View style={styles.settingsItemLeft}>
-              <Ionicons name="information-circle-outline" size={24} color={COLORS.gray} />
-              <Text style={styles.settingsItemText}>Acerca de</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.settingsSection}>
-          <TouchableOpacity style={[styles.settingsItem, styles.logoutItem]} onPress={handleLogout}>
-            <View style={styles.settingsItemLeft}>
-              <Ionicons name="log-out-outline" size={24} color={COLORS.danger} />
-              <Text style={[styles.settingsItemText, styles.logoutText]}>Cerrar Sesión</Text>
-            </View>
-          </TouchableOpacity>
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>SoFinance v1.0.0</Text>
         </View>
       </ScrollView>
+
+      {/* Modal de Ayuda */}
+      <Modal
+        visible={showHelpModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowHelpModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalIconContainer}>
+                <Ionicons name="mail" size={32} color={COLORS.primary} />
+              </View>
+              <Text style={styles.modalTitle}>¿Necesitas ayuda?</Text>
+              <Text style={styles.modalSubtitle}>Contáctanos para cualquier consulta</Text>
+            </View>
+
+            <View style={styles.emailContainer}>
+              <Text style={styles.emailLabel}>Correo de contacto:</Text>
+              <View style={styles.emailBox}>
+                <Text style={styles.emailText}>{contactEmail}</Text>
+              </View>
+            </View>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.modalButtonSecondary]}
+                onPress={() => setShowHelpModal(false)}
+              >
+                <Text style={styles.modalButtonTextSecondary}>Cerrar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.modalButtonPrimary]}
+                onPress={handleSendEmail}
+              >
+                <Ionicons name="mail-outline" size={20} color={COLORS.white} style={{ marginRight: 8 }} />
+                <Text style={styles.modalButtonTextPrimary}>Enviar Email</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -123,7 +173,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ onBack, onLogout 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F2',
+    backgroundColor: '#F5F5F7',
   },
   chatHeader: {
     backgroundColor: COLORS.white,
@@ -131,6 +181,17 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.grayScale[200],
     paddingHorizontal: SIZES.lg,
     paddingVertical: SIZES.md,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   chatHeaderContent: {
     flexDirection: 'row',
@@ -139,10 +200,6 @@ const styles = StyleSheet.create({
   backButton: {
     padding: SIZES.sm,
     marginRight: SIZES.md,
-  },
-  backButtonText: {
-    fontSize: 20,
-    color: COLORS.gray,
   },
   chatUserInfo: {
     flexDirection: 'row',
@@ -157,85 +214,228 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: SIZES.md,
   },
-  chatAvatarText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   chatUserName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: COLORS.dark,
   },
   chatUserStatus: {
-    fontSize: 14,
-    color: COLORS.success,
+    fontSize: 13,
+    color: COLORS.gray,
   },
   settingsContent: {
     flex: 1,
     padding: SIZES.lg,
-    paddingBottom: 80,
-    backgroundColor: '#F2F2F2',
+    paddingBottom: 100,
   },
-  settingsSection: {
-    marginBottom: SIZES.xl,
+  // User Info Card
+  userInfoCard: {
     backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SIZES.md,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SIZES.xl,
+    marginBottom: SIZES.lg,
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
-  settingsSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.dark,
+  userAvatarLarge: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: SIZES.md,
-    marginLeft: SIZES.sm,
-    marginTop: SIZES.sm,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.dark,
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: COLORS.gray,
+  },
+  // Settings Section
+  settingsSection: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SIZES.sm,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   settingsItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'transparent',
     paddingVertical: SIZES.md,
-    paddingHorizontal: SIZES.lg,
-    marginBottom: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.grayScale[100],
-    borderRadius: BORDER_RADIUS.md,
-    marginHorizontal: SIZES.sm,
-    marginTop: SIZES.sm,
+    paddingHorizontal: SIZES.md,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: 8,
   },
   settingsItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
+  iconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: BORDER_RADIUS.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
+  },
+  itemTextContainer: {
+    flex: 1,
+  },
   settingsItemText: {
     fontSize: 16,
+    fontWeight: '600',
     color: COLORS.dark,
-    marginLeft: SIZES.md,
+    marginBottom: 2,
+  },
+  settingsItemSubtext: {
+    fontSize: 13,
+    color: COLORS.gray,
   },
   logoutItem: {
-    backgroundColor: 'transparent',
-    borderRadius: BORDER_RADIUS.md,
-    marginTop: SIZES.sm,
-    borderBottomWidth: 0,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    marginHorizontal: SIZES.sm,
-    marginBottom: SIZES.sm,
+    marginBottom: 0,
   },
   logoutText: {
     color: COLORS.danger,
-    fontWeight: '500',
+  },
+  logoutSubtext: {
+    color: '#FCA5A5',
+  },
+  // Footer
+  footer: {
+    marginTop: SIZES.xl,
+    paddingVertical: SIZES.lg,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 12,
+    color: COLORS.gray,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#DBEAFE',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.dark,
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: COLORS.gray,
+    textAlign: 'center',
+  },
+  emailContainer: {
+    marginBottom: 24,
+  },
+  emailLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.gray,
+    marginBottom: 12,
+  },
+  emailBox: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  emailText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.primary,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: BORDER_RADIUS.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  modalButtonSecondary: {
+    backgroundColor: '#F3F4F6',
+  },
+  modalButtonPrimary: {
+    backgroundColor: COLORS.primary,
+  },
+  modalButtonTextSecondary: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.dark,
+  },
+  modalButtonTextPrimary: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 });
 

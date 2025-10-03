@@ -29,6 +29,8 @@ Email:    demo@sofinance.app
 Password: Demo123456
 ```
 
+**Nota:** El script usa el email configurado en `MOCK_USER.email` dentro del archivo.
+
 **Importante:** Usa estas credenciales para hacer login y ver los datos generados.
 
 ---
@@ -39,7 +41,7 @@ Password: Demo123456
 Nombre: Sofia Hernández
 Edad: 28 años
 Ingreso mensual: $1.500.000 CLP
-Ahorro inicial: $800.000 CLP
+Ahorro inicial: $1.800.000 CLP (1.2x del ingreso - zona alta del rango seguro)
 
 Distribución de gastos:
 - Necesidades: 50%
@@ -47,10 +49,36 @@ Distribución de gastos:
 - Ahorro: 15%
 - Inversión: 5%
 
+Comportamiento financiero realista (estilo Gentler Streak):
+- Gastos siempre entre 90% y 110% del ingreso mensual
+- Balance siempre dentro del rango seguro (excepto momentos específicos)
+- Últimos 2 meses: Tendencia a ahorrar más (88-93% de gastos)
+  
+Distribución de meses (primeros 4 meses):
+- 60% de los meses: Gasta 90-95% del ingreso (ahorra 5-10%)
+- 30% de los meses: Gasta 95-105% del ingreso (equilibrado)
+- 10% de los meses: Gasta 105-110% del ingreso (gasta un poco más)
+
+Últimos 2 meses (más recientes):
+- Gasta solo 88-93% del ingreso (ahorra 7-12%)
+- Balance sube progresivamente hacia el rango superior
+- Usuario acumula más dinero mes a mes
+
+Rangos del gráfico principal (estilo Gentler Streak):
+- 🟢 Rango superior: 1.5x del ingreso mensual ($2.250.000)
+- 🟡 Rango inferior: 0.5x del ingreso mensual ($750.000)
+- 🎯 Balance objetivo: Entre $750.000 y $2.250.000
+
+Lógica de ajuste automático:
+- Si balance > rango superior → Aumenta inversiones automáticamente
+- Si balance < rango inferior → Reduce gastos variables
+- Balance se mantiene siempre en zona verde del gráfico
+
 Perfil financiero:
 - Salario fijo
 - Gastos controlados
-- Ahorro activo
+- Ahorro activo y consistente
+- Balance saludable dentro del rango seguro
 ```
 
 ---
