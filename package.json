@@ -38,7 +38,8 @@
     "firebase:rules": "firebase deploy --only firestore:rules",
     "firebase:setup": "firebase deploy --only firestore:indexes,firestore:rules",
     "seed:mock": "node scripts/seed-mock-data.js",
-    "verify:deployment": "node scripts/verify-deployment.js"
+    "verify:deployment": "node scripts/verify-deployment.js",
+    "vercel-build": "npm run build:web"
   },
   "dependencies": {
     "@babel/preset-env": "^7.28.3",
