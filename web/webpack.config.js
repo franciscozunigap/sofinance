@@ -12,8 +12,8 @@ const envKeys = Object.keys(env || {}).reduce((prev, next) => {
   return prev;
 }, {});
 
-module.exports = {
-  mode: 'development',
+module.exports = (env, argv) => ({
+  mode: argv.mode || 'development',
   entry: ['./web/index.js', './web/styles.css', './web/react-native-web.css'],
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -162,4 +162,4 @@ module.exports = {
     },
   },
   devtool: 'source-map',
-};
+});

@@ -1,0 +1,16 @@
+node_modules
+coverage
+android
+ios
+__tests__
+scripts
+*.md
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+dist
+build
+.expo
+.expo-shared
