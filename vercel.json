@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "web/webpack.config.js",
-      "use": "@vercel/webpack"
+      "use": "@vercel/static-build"
     }
   ],
   "rewrites": [
