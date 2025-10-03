@@ -92,40 +92,33 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
     };
   };
 
-  // Datos para análisis financiero - Usar solo monthlyStats como fuente única
+  // ✅ Datos para análisis financiero - Últimos 6 meses por categoría
   const generateMonthlyTrend = () => {
+    if (!balanceHistory || balanceHistory.length === 0) {
+      return [];
+    }
+
     const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
     const months = [];
     
-    // Usar datos de monthlyStats como fuente única
-    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
-      const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
-      const monthlyIncome = monthlyStats.totalIncome;
+    // Generar datos de los últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentYear, currentMonth - 1 - i, 1);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
       
-      // Usar porcentajes de monthlyStats
-      const consumePercent = monthlyStats?.percentages?.wants || 30;
-      const necesidadesPercent = monthlyStats?.percentages?.needs || 50;
-      const investPercent = monthlyStats?.percentages?.investment || 10;
-      const disponiblePercent = monthlyStats?.percentages?.savings || 10;
+      // Calcular categorías del mes
+      const categoryData = calculateCategoryAmountsForMonth(year, month - 1);
       
       months.push({
-        month: monthName,
-        consume: { 
-          amount: monthlyIncome * consumePercent / 100, 
-          percent: consumePercent 
-        },
-        necesidades: { 
-          amount: monthlyIncome * necesidadesPercent / 100, 
-          percent: necesidadesPercent 
-        },
-        disponible: { 
-          amount: monthlyIncome * disponiblePercent / 100, 
-          percent: disponiblePercent 
-        },
-        invest: { 
-          amount: monthlyIncome * investPercent / 100, 
-          percent: investPercent 
-        }
+        month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+        consume: categoryData.consume,
+        necesidades: categoryData.necesidades,
+        disponible: categoryData.disponible,
+        invest: categoryData.invest
       });
     }
 
@@ -134,18 +127,32 @@ const WebAnalysisScreen: React.FC<WebAnalysisScreenProps> = () => {
 
   const monthlyTrend = generateMonthlyTrend();
 
-  // Generar datos de ingresos mensuales
+  // ✅ Generar datos de ingresos mensuales de los últimos 6 meses
   const generateMonthlyIncomeData = () => {
+    if (!balanceHistory || balanceHistory.length === 0) {
+      return [];
+    }
+
     const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
     const months = [];
     
-    
-    // Usar datos de monthlyStats
-    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
-      const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
+    // Generar los últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentYear, currentMonth - 1 - i, 1);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+      
+      // Calcular ingresos del mes
+      const monthIncome = balanceHistory
+        .filter(t => t.type === 'income' && t.month === month && t.year === year)
+        .reduce((sum, t) => sum + t.amount, 0);
+      
       months.push({
-        month: monthName,
-        income: monthlyStats.totalIncome
+        month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+        income: monthIncome
       });
     }
     

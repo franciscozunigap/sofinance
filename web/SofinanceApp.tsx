@@ -47,109 +47,101 @@ const SofinanceAppContent = () => {
 
   // Los datos del usuario y financieros ahora vienen del contexto centralizado
 
-  // Gráfico de salud financiera - 7 días usando datos reales de Firebase
+  // ✅ Dashboard - Comportamiento por categorías (Necesidades, Consumo, Inversión)
   const currentMonth = new Date().toLocaleDateString('es-CL', { month: 'long' });
   
-  const generateDailyScoreData = () => {
+  const generateCategorySpendingData = () => {
     if (balanceHistory.length === 0) {
       return [
-        { day: 'Lun', score: 45 },
-        { day: 'Mar', score: 48 },
-        { day: 'Mié', score: 44 },
-        { day: 'Jue', score: 46 },
-        { day: 'Vie', score: 50 },
-        { day: 'Sáb', score: 48 },
-        { day: 'Dom', score: 52 }
+        { category: 'Necesidades', amount: 0 },
+        { category: 'Consumo', amount: 0 },
+        { category: 'Inversión', amount: 0 },
+        { category: 'Ahorro', amount: 0 }
       ];
     }
 
-    // Generar los últimos 7 días
-    const last7Days = [];
-    const today = new Date();
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
     
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const dayStr = date.toLocaleDateString('es-CL', { weekday: 'short' });
-      
-      // Buscar si hay datos para este día
-      const dayData = balanceHistory.find(registration => {
-        const regDate = new Date(registration.date);
-        return regDate.toDateString() === date.toDateString();
-      });
-      
-      if (dayData) {
-        // Si hay datos para este día, calcular score basado en balance
-        const score = Math.min(100, Math.max(0, 50 + (dayData.balanceAfter / 100000) * 10));
-        last7Days.push({
-          day: dayStr,
-          score: score
-        });
-      } else {
-        // Si no hay datos para este día, crear entrada sin punto
-        last7Days.push({
-          day: dayStr,
-          score: undefined // Sin punto en el gráfico
-        });
-      }
-    }
+    // Filtrar transacciones del mes actual
+    const currentMonthTransactions = balanceHistory.filter(t => 
+      t.month === currentMonth && t.year === currentYear
+    );
     
-    return last7Days;
+    // Calcular totales por categoría
+    const necesidades = currentMonthTransactions
+      .filter(t => t.category === 'Necesidad' && t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const consumo = currentMonthTransactions
+      .filter(t => t.category === 'Consumo' && t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const inversion = currentMonthTransactions
+      .filter(t => t.category === 'Inversión' && t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const ingresos = currentMonthTransactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const gastos = necesidades + consumo + inversion;
+    const ahorro = Math.max(0, ingresos - gastos);
+    
+    return [
+      { category: 'Necesidades', amount: necesidades },
+      { category: 'Consumo', amount: consumo },
+      { category: 'Inversión', amount: inversion },
+      { category: 'Ahorro', amount: ahorro }
+    ].filter(item => item.amount > 0); // Solo mostrar categorías con datos
   };
 
-  const dailyScoreData = generateDailyScoreData();
+  const categorySpendingData = generateCategorySpendingData();
 
-  // Datos de balance diario - seguimiento por días usando balanceHistory
+  // ✅ Gráfico Principal - Últimos 5 días con transacciones reales
   const generateBalanceData = () => {
-    const currentBalance = monthlyStats?.balance || 0;
-    
     if (balanceHistory && balanceHistory.length > 0) {
-      // Generar los últimos 7 días basado en balanceHistory
-      const last7Days = [];
+      const last5Days = [];
       const today = new Date();
       
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        const dateStr = date.toLocaleDateString('es-CL', { month: 'short', day: 'numeric' });
-        
-        // Buscar si hay datos reales para este día en balanceHistory
-        const dayData = balanceHistory.find(registration => {
-          const regDate = new Date(registration.date);
-          return regDate.toDateString() === date.toDateString();
-        });
-        
-        if (dayData) {
-          // Si hay datos reales para este día, usar el balanceAfter del registro
-          last7Days.push({
-            date: dateStr,
-            amount: dayData.balanceAfter,
-            upper_amount: dayData.balanceAfter * 1.2,
-            lower_amount: dayData.balanceAfter * 0.8,
-          });
-        } else if (i === 0) {
-          // Para hoy, usar el balance actual de monthlyStats si no hay datos en balanceHistory
-          last7Days.push({
-            date: dateStr,
-            amount: currentBalance,
-            upper_amount: currentBalance * 1.2,
-            lower_amount: currentBalance * 0.8,
-          });
-        } else {
-          // Para días anteriores sin datos, crear entrada sin punto
-          last7Days.push({
-            date: dateStr,
-            amount: undefined, // Sin punto en el gráfico
-            upper_amount: currentBalance * 1.2,
-            lower_amount: currentBalance * 0.8,
-          });
-        }
-      }
+      // Ordenar transacciones por fecha descendente
+      const sortedTransactions = [...balanceHistory].sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
       
-      return last7Days;
+      // Tomar las últimas 5 transacciones únicas por día
+      const transactionsByDay = new Map();
+      
+      sortedTransactions.forEach(transaction => {
+        const dateKey = new Date(transaction.date).toDateString();
+        if (!transactionsByDay.has(dateKey)) {
+          transactionsByDay.set(dateKey, transaction);
+        }
+      });
+      
+      // Convertir a array y tomar las últimas 5
+      const last5Transactions = Array.from(transactionsByDay.values())
+        .slice(0, 5)
+        .reverse(); // Ordenar cronológicamente
+      
+      last5Transactions.forEach(transaction => {
+        const date = new Date(transaction.date);
+        const dateStr = date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short' });
+        
+        last5Days.push({
+          date: dateStr,
+          amount: transaction.balanceAfter,
+          upper_amount: transaction.balanceAfter * 1.2,
+          lower_amount: transaction.balanceAfter * 0.8,
+        });
+      });
+      
+      return last5Days;
     }
 
-    // Si no hay balanceHistory, mostrar solo el balance actual
+    // Si no hay datos, mostrar solo el balance actual
+    const currentBalance = monthlyStats?.balance || 0;
     if (currentBalance > 0) {
       return [
         { 
@@ -161,7 +153,6 @@ const SofinanceAppContent = () => {
       ];
     }
 
-    // Si no hay datos, mostrar valores por defecto
     return [
       { date: 'Hoy', amount: 0, upper_amount: 0, lower_amount: 0 },
     ];
@@ -169,34 +160,68 @@ const SofinanceAppContent = () => {
 
   const balanceData = generateBalanceData();
 
-  // Generar datos de ingresos mensuales
-  const generateMonthlyIncomeData = () => {
+  // ✅ Gastos por categoría mes a mes (últimos 6 meses)
+  const generateMonthlyCategoryData = () => {
     const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
     const months = [];
     
-    // Usar datos de monthlyStats
-    if (monthlyStats?.totalIncome && monthlyStats.totalIncome > 0) {
-      const monthName = currentDate.toLocaleDateString('es-CL', { month: 'short' });
+    // Generar los últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentYear, currentMonth - 1 - i, 1);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const monthName = date.toLocaleDateString('es-CL', { month: 'short' });
+      
+      // Calcular por categoría
+      const monthTransactions = balanceHistory.filter(t => t.month === month && t.year === year);
+      
+      const necesidades = monthTransactions
+        .filter(t => t.category === 'Necesidad' && t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const consumo = monthTransactions
+        .filter(t => t.category === 'Consumo' && t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const inversion = monthTransactions
+        .filter(t => t.category === 'Inversión' && t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const ingresos = monthTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
       months.push({
-        month: monthName,
-        income: monthlyStats.totalIncome
+        month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+        necesidades,
+        consumo,
+        inversion,
+        ahorro: Math.max(0, ingresos - (necesidades + consumo + inversion))
       });
     }
+    
     return months;
   };
 
-  const monthlyIncomeData = generateMonthlyIncomeData();
+  const monthlyCategoryData = generateMonthlyCategoryData();
 
-  // Categorías de gastos usando datos reales de Firebase
-  const expenseCategories = monthlyStats ? [
-    { name: 'Necesidades', value: monthlyStats.totalExpenses * 0.6, color: '#ea580c' },
-    { name: 'Consumo', value: monthlyStats.totalExpenses * 0.4, color: '#fb923c' },
-    { name: 'Ahorro', value: monthlyStats.balance * 0.7, color: '#fed7aa' }
-  ] : [
-    { name: 'Necesidades', value: 1800000, color: '#ea580c' }, // 1.800.000 pesos
-    { name: 'Consumo', value: 780000, color: '#fb923c' }, // 780.000 pesos
-    { name: 'Ahorro', value: 600000, color: '#fed7aa' } // 600.000 pesos
-  ];
+  // ✅ Categorías de gastos del mes actual con datos reales
+  const expenseCategories = categorySpendingData.map(item => {
+    const colors = {
+      'Necesidades': '#ea580c',
+      'Consumo': '#fb923c',
+      'Inversión': '#8b5cf6',
+      'Ahorro': '#10b981'
+    };
+    
+    return {
+      name: item.category,
+      value: item.amount,
+      color: colors[item.category] || '#6b7280'
+    };
+  });
 
   const weeklyTrend = balanceHistory.length > 0 ? 
     balanceHistory.slice(0, 4).map((registration, index) => ({
